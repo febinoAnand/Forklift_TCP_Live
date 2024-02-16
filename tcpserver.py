@@ -6,8 +6,12 @@ import struct
 import decimal
 import django
 
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ForkliftWeb.settings')
 django.setup()
+
+from forklift.models import tracker_device
+from deviceData.models import RAWData, GPSData, EXTData
 
 HOST = "0.0.0.0"
 PORT = 9090  #change this to your port
@@ -96,6 +100,7 @@ def ascii_imei_converter(hex_imei):
 
 def start_server_tigger():
 	print("Starting server!")
+
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 		s.bind((HOST, PORT))
 		while True:
@@ -151,6 +156,10 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 	print()
 #	print (str("codec 8 string entered - " + codec_8E_packet))
 
+	rawDataObject = RAWData()
+	# tracker_deviceObject = tracker_device()
+	
+
 	io_dict_raw = {}
 #	timestamp = codec_8E_packet[20:36]	
 	io_dict_raw["device_IMEI"] = device_imei
@@ -159,6 +168,15 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 #	io_dict_raw["_rec_delay_"] = record_delay_counter(timestamp)
 	io_dict_raw["data_length"] = "Record length: " + str(int(len(codec_8E_packet))) + " characters" + " // " + str(int(len(codec_8E_packet) // 2)) + " bytes"
 	io_dict_raw["_raw_data__"] = codec_8E_packet
+
+	try:
+		rawDataObject.device_id = device_imei
+		rawDataObject.received_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		rawDataObject.data_length = len(codec_8E_packet)
+		rawDataObject.data = codec_8E_packet
+		rawDataObject.save()
+	except Exception as e:
+		print ("Data cant be save in raw table ", e)
 
 	try: #writing raw DATA dictionary to ./data/data.json
 		json_printer_rawDATA(io_dict_raw, device_imei)
@@ -199,6 +217,9 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 		print (f"timestamp = {device_time_stamper(timestamp)}")	
 		io_dict["_rec_delay_"] = record_delay_counter(timestamp)		
 		data_field_position += len(timestamp)
+		
+		
+
 
 		priority = avl_data_start[data_field_position:data_field_position+2]
 		io_dict["priority"] = int(priority, 16)
@@ -206,14 +227,19 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 		data_field_position += len(priority)
 
 		longtitude = avl_data_start[data_field_position:data_field_position+8]
+		print ("Long--->",longtitude)
 		io_dict["longtitude"] = struct.unpack('>i', bytes.fromhex(longtitude))[0]
 		print (f"longtitude = {struct.unpack('>i', bytes.fromhex(longtitude))[0]}")
 		data_field_position += len(longtitude)
+		
+
 
 		latitude = avl_data_start[data_field_position:data_field_position+8]
+		print ("Lat--->",latitude)
 		print (f"latitude = {struct.unpack('>i', bytes.fromhex(latitude))[0]}")
 		io_dict["latitude"] = struct.unpack('>i', bytes.fromhex(latitude))[0]
 		data_field_position += len(latitude)
+		
 
 		altitude = avl_data_start[data_field_position:data_field_position+4]
 		print(f"altitude = {int(altitude, 16)}")
@@ -248,7 +274,24 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 		byte1_io_number = avl_data_start[data_field_position:data_field_position+data_step]
 		byte1_io_number_parsed = int(byte1_io_number, 16)
 		print(f"1 byte io count = {byte1_io_number_parsed}")
-		data_field_position += len(byte1_io_number)		
+		data_field_position += len(byte1_io_number)	
+
+		try:
+			currentDevice = tracker_device.objects.get(device_id=device_imei)
+			# print ("current Device -->",currentDevice)
+			if currentDevice != None:
+				GPSDataObject = GPSData()
+				GPSDataObject.date = extract_device_date(timestamp)
+				GPSDataObject.time = extract_device_time(timestamp)
+				GPSDataObject.device_id = currentDevice
+				GPSDataObject.longitude = io_dict["longtitude"]
+				GPSDataObject.latitude = io_dict["latitude"]
+				GPSDataObject.speed = io_dict["speed"]	
+				GPSDataObject.distance = 0.0
+				GPSDataObject.state = 3
+				GPSDataObject.save()
+		except Exception as e:
+			print ("GPSData was not added because--> ",e)
 
 		if byte1_io_number_parsed > 0:
 			i = 1				
@@ -379,7 +422,7 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 def codec_12_parser(codec_12_packet, device_imei, props): #think a lot before modifying  this function
 	print()
 #	print (str("codec 12 string entered - " + codec_12_packet))
-
+	rawDataObject = RAWData()
 	io_dict_raw = {}
 #	timestamp = codec_12_packet[20:36]	
 	io_dict_raw["device_IMEI"] = device_imei
@@ -388,6 +431,15 @@ def codec_12_parser(codec_12_packet, device_imei, props): #think a lot before mo
 #	io_dict_raw["_rec_delay_"] = record_delay_counter(timestamp)
 	io_dict_raw["data_length"] = "Record length: " + str(int(len(codec_12_packet))) + " characters" + " // " + str(int(len(codec_12_packet) // 2)) + " bytes"
 	io_dict_raw["_raw_data__"] = codec_12_packet
+
+	try:
+		rawDataObject.device_id = device_imei
+		rawDataObject.received_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		rawDataObject.data_length = len(codec_12_packet)
+		rawDataObject.data = codec_12_packet
+		rawDataObject.save()
+	except Exception as e:
+		print ("Data cant be save in raw table ", e)
 
 	try: #writing raw DATA dictionary to ./data/data.json
 		json_printer_rawDATA(io_dict_raw, device_imei)
@@ -415,6 +467,70 @@ def codec_12_parser(codec_12_packet, device_imei, props): #think a lot before mo
 
 	external_uart_data = bytearray.fromhex(codec_12_packet[30:30+data_length*2]).decode()
 	print (f"Uart data = {external_uart_data}")
+
+	
+
+
+	try:
+		extDistance = 0.0
+		extBatPower = 0.0
+		extBatVolt = 0.0
+		extBatAmp = 0.0
+		extWattHr = 0.0
+		extSpeed = 0.0
+		extBatCapacity = 0.0
+
+		ext_data = external_uart_data[external_uart_data.index("EXT&&")+5:external_uart_data.index("??")].split("&")
+
+		
+		for data in ext_data:
+			print (data)
+			if data.find("DIS") > -1:
+				extDistance = eval(data[3:])
+				print ("External distance -->",extDistance)
+			if data.find("BTP") > -1:
+				extBatPower = eval(data[3:])
+				print ("External battery power -->",extBatPower)
+			if data.find("BTV") > -1:
+				extBatVolt = eval(data[3:])
+				print ("External battery volt -->",extBatVolt)
+			if data.find("BTA") > -1:
+				extBatAmp = eval(data[3:])
+				print ("External battery amp -->",extBatAmp)
+			if data.find("WHR") > -1:
+				extWattHr = eval(data[3:])
+				print ("External watt hr -->",extWattHr)
+			if data.find("SPD") > -1:
+				extSpeed = eval(data[3:])
+				print ("External speed -->",extSpeed)
+			if data.find("BTC") > -1:
+				extBatCapacity = eval(data[3:])
+				print ("External battery capacity -->",extBatCapacity)
+		print(ext_data)
+
+		
+	
+	except Exception as e:
+		print ("Not an expected Data-->",e)
+
+	try:
+		EXTDataObject = EXTData()
+		EXTDataObject.date = datetime.datetime.now().strftime("%Y-%m-%d")
+		EXTDataObject.time = datetime.datetime.now().strftime("%H:%M:%S")
+		EXTDataObject.device_id = tracker_device.objects.get(device_id = device_imei)
+		EXTDataObject.distance = extDistance
+		EXTDataObject.batt_amp = extBatAmp
+		EXTDataObject.batt_voltage = extBatVolt
+		EXTDataObject.batt_capacity = extBatCapacity
+		EXTDataObject.batt_power = extBatPower
+		EXTDataObject.watt_hr = extWattHr
+		EXTDataObject.speed = extSpeed
+		EXTDataObject.save()
+
+	except Exception as e:
+		print ("Data was not saved ---> ", e)
+	
+
 	return external_uart_data
 
 def json_printer(io_dict, device_imei): #function to write JSON file with data
@@ -478,6 +594,24 @@ def device_time_stamper(timestamp):
 	formatted_timestamp = f"{formatted_timestamp_local} (local) / {formatted_timestamp_utc} (utc)"
 
 	return formatted_timestamp
+
+def extract_device_date(timestamp):
+	timestamp_ms = int(timestamp, 16) / 1000
+	timestamp_utc = datetime.datetime.utcfromtimestamp(timestamp_ms)
+	utc_offset = datetime.datetime.fromtimestamp(timestamp_ms) - datetime.datetime.utcfromtimestamp(timestamp_ms)
+	timestamp_local = timestamp_utc + utc_offset
+	formatted_timestamp_local = timestamp_local.strftime("%Y-%m-%d")
+	
+	return formatted_timestamp_local
+
+def extract_device_time(timestamp):
+	timestamp_ms = int(timestamp, 16) / 1000
+	timestamp_utc = datetime.datetime.utcfromtimestamp(timestamp_ms)
+	utc_offset = datetime.datetime.fromtimestamp(timestamp_ms) - datetime.datetime.utcfromtimestamp(timestamp_ms)
+	timestamp_local = timestamp_utc + utc_offset
+	formatted_timestamp_local = timestamp_local.strftime("%H:%M:%S")
+	
+	return formatted_timestamp_local
 
 def record_delay_counter(timestamp):
 	timestamp_ms = int(timestamp, 16) / 1000

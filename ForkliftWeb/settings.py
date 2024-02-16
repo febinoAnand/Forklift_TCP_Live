@@ -25,18 +25,22 @@ SECRET_KEY = 'django-insecure-z5g2-d*gw*c#171djfgiew8tllydse$fw#jz_uo_wa4e+@-)1+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["do.febinosolutions.com"]
+
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'forklift',
+    'deviceData',
 ]
 
 MIDDLEWARE = [
@@ -106,6 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+# TIME_ZONE = 'Asia/Calcutta'
 
 USE_I18N = True
 
@@ -121,3 +126,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+JAZZMIN_SETTINGS={
+    "site_brand": "Innospace",
+}
