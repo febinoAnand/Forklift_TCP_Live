@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-z5g2-d*gw*c#171djfgiew8tllydse$fw#jz_uo_wa4e+@-)1+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["do.febinosolutions.com","localhost"]
+ALLOWED_HOSTS = ["do.febinosolutions.com","localhost","165.232.181.228"]
 
 
 
@@ -132,7 +132,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1','http://do.febinosolutions.com','http://localhost']
+CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1','http://do.febinosolutions.com','http://localhost','http://165.232.181.228/']
 
 JAZZMIN_SETTINGS={
     "site_brand": "Innospace",
