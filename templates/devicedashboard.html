@@ -1,0 +1,722 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Device Dashboard</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- favicon
+		============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico">
+    <!-- Google Fonts
+		============================================ -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <!-- Bootstrap CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <!-- Bootstrap CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/font-awesome.min.css">
+    <!-- owl.carousel CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/owl.carousel.css">
+    <link rel="stylesheet" href="static/css/owl.theme.css">
+    <link rel="stylesheet" href="static/css/owl.transitions.css">
+    <!-- meanmenu CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/meanmenu/meanmenu.min.css">
+    <!-- animate CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/animate.css">
+    <!-- normalize CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/normalize.css">
+    <!-- mCustomScrollbar CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/scrollbar/jquery.mCustomScrollbar.min.css">
+    <!-- jvectormap CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/jvectormap/jquery-jvectormap-2.0.3.css">
+    <!-- notika icon CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/notika-custom-icon.css">
+    <!-- wave CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/wave/waves.min.css">
+    <!-- main CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/main.css">
+    <!-- style CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/cssstyle.css">
+    <!-- responsive CSS
+		============================================ -->
+    <link rel="stylesheet" href="static/css/responsive.css">
+    <!-- modernizr JS
+		============================================ -->
+    <script src="static/js/vendor/modernizr-2.8.3.min.js"></script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+	
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	
+
+</head>
+
+<body onload="startUpdateTable('{{device.device_id}}')">
+    <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <!-- Start Header Top Area -->
+    <div class="header-top-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <div class="logo-area">
+                       <a href="/dashboard"><p style="color:white; font-size: 25px;">INNOSPACE</P></a>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                    <div class="header-top-menu">
+                        <ul class="nav navbar-nav notika-top-nav">
+							<li class="nav-item">
+								<a href="#" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span class="glyphicon">&#xe081;</span></a>
+                            </li>
+							<li class="nav-item">
+								<a href="/" role="button" ><span>Logout</span></a>
+							</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><br><br>
+	<!-- End Header Top Area -->
+	<!-- Form Element area Start-->
+    <div class="form-element-area">
+        <div class="container">
+            <div class="row">
+				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                    <div class="form-element-list" style="width: 100%; height: 485px;">
+                        <div class="basic-tb-hd">
+                            <h2>Vehicles Details</h2>
+                        </div>
+                            <table id="data-table-basic" class="table table-striped" >
+                                    
+									<tr>
+                                        <th>Device ID</th>
+										<td>{{device.device_id}}</td>
+									</tr>
+									<tr>
+                                        <th>Vehicle Name</th>
+										<td>{{device.vehicle_name}}</td>
+									</tr>
+									<tr>
+                                        <th>Manufacturer</th>
+										<td>{{device.manufacturer}}</td>
+									</tr>
+                                    <tr>
+                                        <th>Vehicle ID</th>
+										<td>{{device.vehicle_id}}</td>
+									</tr>
+									<tr>
+                                        <th>Device Model</th>
+										<td>{{device.device_model}}</td>
+									</tr>
+									<tr>
+                                        <th>Hardware Version</th>
+										<td>{{device.hardware_version}}</td>
+                                    </tr>
+									<tr>
+                                        <th>Software Version</th>
+										<td>{{device.software_version}}</td>
+                                    </tr>
+									<tr>
+                                        <th>Driver</th>
+										<td>{{device.driver}}</td>
+                                    </tr>
+                            </table>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                    <div class="form-element-list" >
+                        <div class="basic-tb-hd">
+                            <h2>Speed</h2>
+						</div>
+						<div class="gauge" style="width: 300px; --rotation:83deg; --color:#566573; --background:#e9ecef;">
+							<div class="percentage"></div>
+							<div class="mask"></div>
+							<span class="value">46 Km/Hr</span>
+						</div><br><br>
+
+                        <div class="basic-tb-hd">
+                            <h2>Watts</h2>
+						</div>
+						<div class="gauge" style="width: 300px; --rotation:160deg; --color:#643873; --background:#e9ecef;">
+							<div class="percentage"></div>
+							<div class="mask"></div>
+							<span class="value">100 Watts</span>
+						</div><br>
+						<!-- <p>This Speedometer shows the speed of the Vehicle</p><br>
+						<input type="radio" id="age1" name="age" value="30" checked>
+						<label for="age1">Active</label><br>
+						<input type="radio" id="age2" name="age" value="60">
+						<label for="age2">Inactive</label><br>  
+						<input type="radio" id="age3" name="age" value="100">
+						<label for="age3">Idle</label><br><br>
+						<p>While the Vehicle is moving It will be marked as Active.
+						when the engine is ON but the Vehicle is not moving it marked as Inactive and 
+						when the engine is OFF it will be marked as Idle.</p> -->
+                    </div>
+                </div>
+				
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                    <div class="form-element-list" style="width: 100%; height: 485px;">
+                        <div class="basic-tb-hd">
+                            <h2>Live Status</h2>
+                        </div>
+                            <table id="data-table-basic" class="table table-striped" >
+                                    
+									<tr>
+                                        <th>Device ID</th>
+										<td>{{device.device_id}}</td>
+									</tr>
+									<tr>
+                                        
+                                        <th>State</th>
+										<td id="live_state_widget">
+                                            <!-- rgba(255, 99, 132, 0.8) -->
+                                            <!-- rgba(54, 162, 235, 0.8) -->
+                                            <!-- rgba(255, 206, 86, 0.8) -->
+                                            <div style="width: 100px;background-color:rgba(255, 99, 132, 0.8);text-align: center; padding-top: 3px; padding-bottom: 3px; border-radius: 10px;">InActive</div>
+                                        </td>
+									</tr>
+									<tr>
+                                        <th>Speed</th>
+										<td id="live_speed_widget">{{device.vehicle_name}}</td>
+									</tr>
+                                    <tr>
+                                        <th>Battery Voltage</th>
+										<td id="live_batt_volt_widget">{{device.vehicle_id}}</td>
+									</tr>
+									<tr>
+                                        <th>Battery Amps</th>
+										<td id="live_batt_amp_widget">{{device.device_model}}</td>
+									</tr>
+									<tr>
+                                        <th>Battery Capacity</th>
+										<td id="live_batt_cap_widget"><div class="battery-widget">
+                                                <div class="battery-bar">
+                                                    <div class="battery-fill-1" style="width: 20%;"></div>
+                                                </div>
+                                            </div></td>
+                                    </tr>
+									<tr>
+                                        <th>Battery Power</th>
+										<td id="live_batt_pow_widget">{{device.software_version}}</td>
+                                    </tr>
+									<tr>
+                                        <th>Watt Hour</th>
+										<td id="live_batt_watt_widget">{{device.driver}}</td>
+                                    </tr>
+                            </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<br><br>
+    <div class="form-element-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-4 col-sm-4 col-xs-6">
+					<div class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>GPS Distance</h2>
+						</div>
+						<div class="container">
+							<div class="circle-content">
+								<div class="circle">15 km/h</div>
+								<p>Current Speed</p>
+							</div>
+							<div class="circle-content">
+								<div class="circle">40 km/h</div>
+								<p>Speed limit</p>
+							</div>
+							<div class="circle-content">
+								<div class="circle">01:20:59</div>
+								<p>Duration</p>
+							</div>
+						</div><br>
+						<p>Straight Line Distance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GPS Accuracy</p>
+						<hr class="solid">
+						<p>1.7 km&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16 m</p><br>
+						<p>Odometer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						Stoped</p>
+						<hr class="solid">
+						<p>18.6 km&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11:46</p><br>
+						<p>Device Temp.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total Time
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+						<hr class="solid">
+						<p>32.0 C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12:51</p>
+					</div>
+				</div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>Speed of Vehicles</h2>
+                        </div>
+						<canvas id="myChart" width="400" height="385"></canvas>
+                    </div>
+                </div>
+				<!-- <div class="col-lg-6 col-md-4 col-sm-4 col-xs-6">
+					<div class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>Capacity Measurment</h2>
+						</div><br>
+						<div class="table-responsive">
+                            <table id="data-table-basic" class="table table-striped">
+                                <thead>
+                                    <tr>
+										<th>MODEL</th>
+                                        <th>SIZE INCHES</th>
+                                        <th>FORK WIDTH</th>
+                                        <th>FORK LENGTH</th>
+                                        <th>WEIGHT LBS/PR</th>
+                                        <th>CAPACITY</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+										<td>448-ST</td>
+                                        <td>5X48</td>
+                                        <td>4"</td>
+                                        <td>32"</td>
+                                        <td>60</td>
+                                        <td>2500@24"</td>
+                                    </tr>
+                                    <tr>
+										<td>454-ST</td>
+                                        <td>5X54</td>
+                                        <td>4"</td>
+                                        <td>36"</td>
+                                        <td>62</td>
+                                        <td>2500@27"</td>
+                                    </tr>
+                                    <tr>
+										<td>460-ST</td>
+                                        <td>5X60</td>
+                                        <td>4"</td>
+                                        <td>40"</td>
+                                        <td>72</td>
+                                        <td>2500@30"</td>
+                                    </tr>
+                                    <tr>
+										<td>463-ST</td>
+                                        <td>5X63</td>
+                                        <td>4"</td>
+                                        <td>42"</td>
+                                        <td>76</td>
+                                        <td>2500@32"</td>
+                                    </tr>
+                                    <tr>
+										<td>472-ST</td>
+                                        <td>5X72</td>
+                                        <td>4"</td>
+                                        <td>48"</td>
+                                        <td>84</td>
+                                        <td>2500@36"</td>
+                                    </tr>
+                                    <tr>
+										<td>484-ST</td>
+                                        <td>5X84</td>
+                                        <td>4"</td>
+                                        <td>56"</td>
+                                        <td>100</td>
+                                        <td>2500@42"</td>
+                                    </tr>
+									<tr>
+										<td>490-ST</td>
+                                        <td>5X90</td>
+                                        <td>4"</td>
+                                        <td>60"</td>
+                                        <td>104</td>
+                                        <td>2500@45"</td>
+                                    </tr>
+                                    <tr>
+										<td>496-ST</td>
+                                        <td>5X96</td>
+                                        <td>4"</td>
+                                        <td>64"</td>
+                                        <td>106</td>
+                                        <td>2500@48"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+					</div>
+				</div> -->
+			</div>
+		</div>
+	</div><br><br>
+
+    	<!-- Google Map area End-->
+        <div class="google-map-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
+                        <div class="google-map-single" style="height: 500px;">
+                            <h2>MAP</h2>
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d31840778.15188319!2d59.125561445491066!3d13.047524999999998!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0x6e61a70b6863d433!2sChennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1707734198509!5m2!1sen!2sin" width="1100" height="420" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Google Map area End-->
+    <!-- Form Element area End-->
+	<div class="form-element-area">
+        <div class="container">
+            <div class="row">
+                <!-- <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                    <div class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>Battery Capacity</h2>
+                        </div>
+						<div class="battery-widget">
+						<div class="battery-label">Fortlift 1: <span id="source1">20%</span></div>
+							<div class="battery-bar">
+								<div class="battery-fill-1" style="width: 20%;"></div>
+							</div>
+						</div><br>
+						<div class="battery-widget">
+						<div class="battery-label">Fortlift 2: <span id="source2">70%</span></div>
+							<div class="battery-bar">
+								<div class="battery-fill-2" style="width: 70%;"></div>
+							</div>
+						</div><br>
+						<div class="battery-widget">
+						<div class="battery-label">Fortlift 3: <span id="source3">90%</span></div>
+							<div class="battery-bar">
+								<div class="battery-fill-3" style="width: 90%;"></div>
+							</div>
+						</div><br>
+						<div class="battery-widget">
+						<div class="battery-label">Fortlift 4: <span id="source4">60%</span></div>
+							<div class="battery-bar">
+								<div class="battery-fill-4" style="width: 60%;"></div>
+							</div>
+						</div><br>
+						<div class="battery-widget">
+						<div class="battery-label">Fortlift 5: <span id="source5">40%</span></div>
+							<div class="battery-bar">
+								<div class="battery-fill-5" style="width: 40%;"></div>
+							</div>
+						</div><br>
+						<div class="battery-widget">
+						<div class="battery-label">Fortlift 6: <span id="source6">100%</span></div>
+							<div class="battery-bar">
+								<div class="battery-fill-6" style="width: 100%;"></div>
+							</div>
+						</div>
+                    </div>
+                </div> -->
+				 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <div class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>Unit Consumption</h2>
+							<p>The total unit consumed for a week</p>
+						</div>
+						<table class="graph">
+						<thead>
+							<tr>
+								<th scope="col">Item</th>
+								<th scope="col">Percent</th>
+							</tr>
+						</thead><tbody>
+							<tr style="height:55%">
+								<th scope="row">Day 1</th>
+								<td><span>55%</span></td>
+							</tr>
+							<tr style="height:65%">
+								<th scope="row">Day 2</th>
+								<td><span>65%</span></td>
+							</tr>
+							<tr style="height:90%">
+								<th scope="row">Day 3</th>
+								<td><span>90%</span></td>
+							</tr>
+							<tr style="height:70%">
+								<th scope="row">Day 4</th>
+								<td><span>70%</span></td>
+							</tr>
+							<tr style="height:40%">
+								<th scope="row">Day 5</th>
+								<td><span>40%</span></td>
+							</tr>
+							<tr style="height:30%">
+								<th scope="row">Day 6</th>
+								<td><span>30%</span></td>
+							</tr>
+						</tbody>
+					</table>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                    <div class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>State of Vehicles</h2>
+                        </div>
+						 <div style="width: 100%; height: 400px; padding-top: 20px;">
+							<canvas id="myPieChart"></canvas>
+						</div>
+						<!-- <div>
+							<input type="radio" name="entity" value="entity1" id="entity1">
+							<label for="entity1">Active Vehicles</label><br>
+							<input type="radio" name="entity" value="entity2" id="entity2">
+							<label for="entity2">Inactive Vehicles</label><br>
+							<input type="radio" name="entity" value="entity3" id="entity3">
+							<label for="entity3">Idle Vehicles</label><br>
+						</div> -->
+                    </div>
+                </div>
+				
+            </div>
+        </div>
+    </div>
+	<br><br>
+	
+
+	<!-- Data Table area Start-->
+    <div class="data-table-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="data-table-list">
+                        <div class="basic-tb-hd">
+                            <h2>GPS Table</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="data-table-basic" class="table table-striped">
+                                <thead>
+                                    <tr>
+										<th>S/NO</th>
+                                        <th>DATE</th>
+                                        <th>TIME</th>
+                                        <th>DISTANCE</th>
+                                        <th>SPEED</th>
+                                        <th>LATITUDE</th>
+										<th>LONGITUDE</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gps_data_table">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><br><br>
+    <!-- Table area End-->
+
+    	<!-- Data Table area Start-->
+        <div class="data-table-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="data-table-list">
+                            <div class="basic-tb-hd">
+                                <h2>External Table</h2>
+                            </div>
+                            <div class="table-responsive">
+                                <table id="data-table-basic" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>S/NO</th>
+                                            <th>DATE</th>
+                                            <th>TIME</th>
+                                            <th>DISTANCE</th>
+                                            <th>SPEED</th>
+                                            <th>WATT HR</th>
+                                            <th>BATT VOLTAGE</th>
+                                            <th>BATT AMP</th>
+                                            <th>BATT POWER</th>
+                                            <th>BATT CHARGE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="external_data_table">
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br><br>
+        <!-- Table area End-->
+	<!-- Start Footer area-->
+    <div class="footer-copyright-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="footer-copy-right">
+                        <p>Copyright © 2024 . All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Footer area-->
+    <!-- jquery
+		============================================ -->
+    <script src="static/js/vendor/jquery-1.12.4.min.js"></script>
+    <!-- bootstrap JS
+		============================================ -->
+    <script src="static/js/bootstrap.min.js"></script>
+    <!-- wow JS
+		============================================ -->
+    <script src="static/js/wow.min.js"></script>
+    <!-- price-slider JS
+		============================================ -->
+    <script src="static/js/jquery-price-slider.js"></script>
+    <!-- owl.carousel JS
+		============================================ -->
+    <script src="static/js/owl.carousel.min.js"></script>
+    <!-- scrollUp JS
+		============================================ -->
+    <script src="static/js/jquery.scrollUp.min.js"></script>
+    <!-- meanmenu JS
+		============================================ -->
+    <script src="static/js/meanmenu/jquery.meanmenu.js"></script>
+    <!-- counterup JS
+		============================================ -->
+    <script src="static/js/counterup/jquery.counterup.min.js"></script>
+    <script src="static/js/counterup/waypoints.min.js"></script>
+    <script src="static/js/counterup/counterup-active.js"></script>
+    <!-- mCustomScrollbar JS
+		============================================ -->
+    <script src="static/js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+    <!-- jvectormap JS
+		============================================ -->
+    <script src="static/js/jvectormap/jquery-jvectormap-2.0.2.min.js"></script>
+    <script src="static/js/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="static/js/jvectormap/jvectormap-active.js"></script>
+    <!-- sparkline JS
+		============================================ -->
+    <script src="static/js/sparkline/jquery.sparkline.min.js"></script>
+    <script src="static/js/sparkline/sparkline-active.js"></script>
+    <!-- sparkline JS
+		============================================ -->
+    <script src="static/js/flot/jquery.flot.js"></script>
+    <script src="static/js/flot/jquery.flot.resize.js"></script>
+    <script src="static/js/flot/curvedLines.js"></script>
+    <script src="static/js/flot/flot-active.js"></script>
+    <!-- knob JS
+		============================================ -->
+    <script src="static/js/knob/jquery.knob.js"></script>
+    <script src="static/js/knob/jquery.appear.js"></script>
+    <script src="static/js/knob/knob-active.js"></script>
+    <!--  wave JS
+		============================================ -->
+    <script src="static/js/wave/waves.min.js"></script>
+    <script src="static/js/wave/wave-active.js"></script>
+    <!--  todo JS
+		============================================ -->
+    <script src="static/js/todo/jquery.todo.js"></script>
+    <!-- plugins JS
+		============================================ -->
+    <script src="static/js/plugins.js"></script>
+	<!--  Chat JS
+		============================================ -->
+    <script src="static/js/chat/moment.min.js"></script>
+    <script src="static/js/chat/jquery.chat.js"></script>
+	
+    <!-- main JS
+		============================================ -->
+    <script src="static/js/main.js"></script>
+	
+    <script src="static/js/custom.js"></script>
+
+
+	</style>
+	 <script>
+        var ctx = document.getElementById('myPieChart').getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Active Vehicles', 'Inactive Vehicles', 'Idle Vehicles'],
+                datasets: [{
+                    label: 'Pie Chart',
+                    data: [30, 30, 40],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // document.getElementById('entity1').addEventListener('change', function() {
+        //     myPieChart.data.datasets[0].data = [60, 20, 20];
+        //     myPieChart.update();
+        // });
+
+        // document.getElementById('entity2').addEventListener('change', function() {
+        //     myPieChart.data.datasets[0].data = [20, 60, 20];
+        //     myPieChart.update();
+        // });
+
+        // document.getElementById('entity3').addEventListener('change', function() {
+        //     myPieChart.data.datasets[0].data = [20, 20, 60];
+        //     myPieChart.update();
+        // });
+  </script>
+   <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6'],
+                datasets: [{
+                    label: 'Fortlift 1',
+                    data: [50, 40, 70, 30, 60, 60],
+                    borderColor: 'red',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -16,8 +16,8 @@ class RAWData(models.Model):
 class GPSData(models.Model):
     state_choice = [ (1,"Inactive"), (2,"Idle"), (3,"Active")]    # 1-Inactive  2-Idle  3-Active
     device_id = models.ForeignKey(tracker_device, on_delete=models.CASCADE, related_name= "imei_id")
-    latitude = models.IntegerField()
-    longitude = models.IntegerField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     distance = models.DecimalField(default=0,decimal_places = 2, max_digits = 10)
     speed = models.DecimalField(default=0,decimal_places = 2, max_digits = 5)
     state = models.IntegerField(choices = state_choice)

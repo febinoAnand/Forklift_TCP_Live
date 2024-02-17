@@ -280,12 +280,19 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 			currentDevice = tracker_device.objects.get(device_id=device_imei)
 			# print ("current Device -->",currentDevice)
 			if currentDevice != None:
+				logi = str(io_dict["longtitude"])
+				lati = str(str(io_dict["latitude"]))
+
+				logi = logi[:2] + "." + logi[2:]
+				lati = lati[:2] + "." + lati[2:]
+				print ("lat-->",lati)
+				print ("log-->",logi)
 				GPSDataObject = GPSData()
 				GPSDataObject.date = extract_device_date(timestamp)
 				GPSDataObject.time = extract_device_time(timestamp)
 				GPSDataObject.device_id = currentDevice
-				GPSDataObject.longitude = io_dict["longtitude"]
-				GPSDataObject.latitude = io_dict["latitude"]
+				GPSDataObject.longitude = float(logi)
+				GPSDataObject.latitude = float(lati)
 				GPSDataObject.speed = io_dict["speed"]	
 				GPSDataObject.distance = 0.0
 				GPSDataObject.state = 3
