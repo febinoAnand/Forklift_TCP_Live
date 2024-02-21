@@ -4950,25 +4950,25 @@ body, table, input, select, textarea {
 		}
 	}
 }
-.circle-content {
-    width:15%;
-    float:left;
-}
 .circle {
-  width: 137px;
-  height: 135px;
-  line-height: 150px;
-  border-radius: 50%;
-  font-size: 25px;
-  color: #fff;
-  text-align: center;
-  background: #f3b574;
+    background: #229954;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: inline-block;
+    text-align: center;
+    margin:7px;
+    overflow:hidden;
+    padding:45px;
+    position:relative;
 }
-.circle-content p {
-    font-size:16px;
-    text-align:center;
-    color:#000;
+.text{
+  transform:translate(-50%,-50%);
+  position:absolute;
+  top:50%;
+  left:50%;
 }
-hr.solid {
-  border-top: 3px solid #bbb;
+
+#map {
+  height: 100%;
 }

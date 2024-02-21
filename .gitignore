@@ -1,4 +1,4 @@
-venv
+env
 db.sqlite3
 runforklift_django.sh
 runforklift_tcp.sh
