@@ -114,6 +114,8 @@ TIME_ZONE = 'Asia/Calcutta'
 
 USE_I18N = True
 
+USE_L10N = False
+
 USE_TZ = True
 
 
