@@ -4635,14 +4635,6 @@ body.box-layout {
 /*----------------------------------------*/
 .mCS-light-1.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{ background-color: #00c292; }
 .mCS-light-1.mCSB_scrollTools .mCSB_draggerRail{ background-color: #ccc; }
-    .battery {
-      width: 200px;
-      height: 30px;
-      border: 2px solid #000;
-      border-radius: 7px;
-      position: relative;
-      background-color: #fff;
-    }
 
     .level {
       height: 100%;
@@ -4657,6 +4649,7 @@ body.box-layout {
       transform: translate(10px, -50%);
       white-space: nowrap;
     }
+
 .gauge {
     position: relative;
     border-radius: 50%/100% 100% 0 0;
