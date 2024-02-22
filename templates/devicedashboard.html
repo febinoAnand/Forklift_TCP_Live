@@ -50,7 +50,7 @@
     <link rel="stylesheet" href="static/css/main.css">
     <!-- style CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/cssstyle.css">
+    <link rel="stylesheet" href="static/css/cssstyles.css">
     <!-- responsive CSS
 		============================================ -->
     <link rel="stylesheet" href="static/css/responsive.css">
@@ -62,6 +62,7 @@
 	
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
@@ -103,9 +104,8 @@
                         <div class="basic-tb-hd">
                             <h2>Vehicles Details</h2>
                         </div>
-                            <table id="data-table-basic" class="table table-striped" >
-                                    
-									<tr>
+                            <table id="data-table-basic" class="table table-striped">
+                                    <tr>
                                         <th>Device ID</th>
 										<td>{{device.device_id}}</td>
 									</tr>
@@ -114,10 +114,10 @@
 										<td>{{device.vehicle_name}}</td>
 									</tr>
 									<tr>
-                                        <th>Manufacturer</th>
+                                        <th>Manufracture</th>
 										<td>{{device.manufacturer}}</td>
 									</tr>
-                                    <tr>
+									<tr>
                                         <th>Vehicle ID</th>
 										<td>{{device.vehicle_id}}</td>
 									</tr>
@@ -141,90 +141,61 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <div class="form-element-list" >
+                    <div class="form-element-list">
                         <div class="basic-tb-hd">
-                            <h2>Speed</h2>
-						</div>
+                            <h2>GPS Speed</h2>
+                        </div>
 						<div class="gauge" style="width: 300px; --rotation:83deg; --color:#566573; --background:#e9ecef;">
 							<div class="percentage"></div>
 							<div class="mask"></div>
 							<span class="value">8 Km/Hr</span>
-						</div><br><br>
-
-                        <div class="basic-tb-hd">
-                            <h2>Watts</h2>
 						</div>
-						<div class="gauge" style="width: 300px; --rotation:160deg; --color:#643873; --background:#e9ecef;">
+						<br>
+						<br>
+						<div class="basic-tb-hd">
+                            <h2>EXT Speed</h2>
+                        </div>
+						<div class="gauge" style="width: 300px; --rotation:100deg; --color:#643873; --background:#e9ecef;">
 							<div class="percentage"></div>
 							<div class="mask"></div>
-							<span class="value">100 Watts</span>
-						</div><br>
-						<!-- <p>This Speedometer shows the speed of the Vehicle</p><br>
-						<input type="radio" id="age1" name="age" value="30" checked>
-						<label for="age1">Active</label><br>
-						<input type="radio" id="age2" name="age" value="60">
-						<label for="age2">Inactive</label><br>  
-						<input type="radio" id="age3" name="age" value="100">
-						<label for="age3">Idle</label><br><br>
-						<p>While the Vehicle is moving It will be marked as Active.
-						when the engine is ON but the Vehicle is not moving it marked as Inactive and 
-						when the engine is OFF it will be marked as Idle.</p> -->
+							<span class="value">10 Km/Hr</span>
+						</div>
+						<br>
                     </div>
                 </div>
-				
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
                     <div class="form-element-list" style="width: 100%; height: 485px;">
                         <div class="basic-tb-hd">
                             <h2>Live Status</h2>
-                        </div>
-                            <table id="data-table-basic" class="table table-striped" >
-                                    
+                        </div><br>
+                            <table id="data-table-basic" class="table table-striped">
 									<tr>
-                                        <th>Device ID</th>
-										<td>{{device.device_id}}</td>
-									</tr>
-									<tr>
-                                        
-                                        <th>State</th>
+                                        <th>Status</th>
 										<td id="live_state_widget">
-                                            <!-- rgba(255, 99, 132, 0.8) -->
-                                            <!-- rgba(54, 162, 235, 0.8) -->
-                                            <!-- rgba(255, 206, 86, 0.8) -->
-                                            <div style="width: 100px;background-color:rgba(255, 99, 132, 0.8);text-align: center; padding-top: 3px; padding-bottom: 3px; border-radius: 10px;">InActive</div>
-                                        </td>
+											<div style="width: 100px;background-color:rgba(225, 99, 132, 0.8);text-align: center; padding-top: 3px; padding-bottom:3px; border-radius: 10px;">InActive</div>
+										</td>
 									</tr>
 									<tr>
-                                        <th>Speed</th>
-										<td id="live_speed_widget">8 Km/Hr</td>
-										<!-- <td id="live_speed_widget">{{device.vehicle_name}}</td> -->
-									</tr>
-                                    <tr>
-                                        <th>Battery Voltage</th>
-										<td id="live_batt_volt_widget">12.34 V</td>
-										<!-- <td id="live_batt_volt_widget">{{device.vehicle_id}}</td> -->
+                                        <th>Ignition State</th>
+										<td>ON</td>
 									</tr>
 									<tr>
-                                        <th>Battery Amps</th>
-										<td id="live_batt_amp_widget">60 Amp</td>
-										<!-- <td id="live_batt_amp_widget">{{device.device_model}}</td> -->
+                                        <th>Movement State</th>
+										<td>Moving</td>
 									</tr>
 									<tr>
-                                        <th>Battery Capacity</th>
-										<td id="live_batt_cap_widget"><div class="battery-widget">
-                                                <div class="battery-bar">
-                                                    <div class="battery-fill-1" style="width: 20%;"></div>
-                                                </div>
-                                            </div></td>
+                                        <th>GSM Operator</th>
+										<td>Jhon Deo</td>
                                     </tr>
 									<tr>
-                                        <th>Battery Power</th>
-										<td id="live_batt_pow_widget">740.4 W</td>
-										<!-- <td id="live_batt_pow_widget">{{device.software_version}}</td> -->
+                                        <th>GSM Signal</th>
+										<td>
+											<i style="font-size:24px" class="fa">&#xf012;</i>
+										</td>
                                     </tr>
 									<tr>
-                                        <th>Watt Hour</th>
-										<td id="live_batt_watt_widget">30912.3</td>
-										<!-- <td id="live_batt_watt_widget">{{device.driver}}</td> -->
+                                        <th>GSM Area</th>
+										<td>Chennai</td>
                                     </tr>
                             </table>
                     </div>
@@ -233,148 +204,101 @@
         </div>
     </div>
 	<br><br>
-    <div class="form-element-area">
+    <!-- Form Element area End-->
+	<div class="form-element-area">
         <div class="container">
             <div class="row">
-                <div class="col-lg-6 col-md-4 col-sm-4 col-xs-6">
+				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+					<div id="widget" class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>Battery Capacity</h2>
+                        </div>
+						<div class="gauge" style="width: 300px; --rotation:163deg; --color:#76C9E2; --background:#e9ecef;">
+							<div class="percentage"></div>
+							<div class="mask"></div>
+							<span class="value">100 Watts</span>
+						</div><br><br>
+						<table id="data-table-basic" class="table table-striped">
+                            <tr>
+                                <th>Battery</th>
+								<td id="live_cap_widget">
+									<div class="battery-bar">
+										<div class="battery-fill-1" style="width: 20%;"></div>
+									</div>
+								</td>
+                            </tr>
+							<tr>
+                                <th>Battery Voltage</th>
+								<td>{{device.batt_voltage}}</td>
+							</tr>
+							<tr>
+                                <th>Battery Amps</th>
+								<td>{{device.batt_amp}}</td>
+							</tr>
+							<tr>
+                                <th>Watt Hour</th>
+								<td>{{device.watt_hr}}</td>
+							</tr>
+                        </table>
+                    </div>
+				</div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
 					<div class="form-element-list">
                         <div class="basic-tb-hd">
-                            <h2>GPS Distance</h2>
+                            <h2>GPS</h2>
 						</div>
-						<div class="container">
-							<div class="circle-content">
-								<div class="circle">15 km/h</div>
-								<p>Current Speed</p>
+						<div class="email-round-nock">
+							<div class="circle">
+								<div class="text" style= "color: white; font-size: 12px;">
+									Current Speed: {{device.Speed}}
+								</div>
 							</div>
-							<div class="circle-content">
-								<div class="circle">40 km/h</div>
-								<p>Speed limit</p>
+							<div class="circle" style= "color: white; font-size: 12px;">
+								<div class="text">
+									Top Speed: 30 Km/Hr
+								</div>
 							</div>
-							<div class="circle-content">
-								<div class="circle">01:20:59</div>
-								<p>Duration</p>
+							<div class="circle" style= "color: white; font-size: 12px;">
+								<div class="text">
+									Duration: {{device.time}}
+								</div>
 							</div>
-						</div><br>
-						<p>Straight Line Distance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GPS Accuracy</p>
-						<hr class="solid">
-						<p>1.7 km&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16 m</p><br>
-						<p>Odometer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						Stoped</p>
-						<hr class="solid">
-						<p>18.6 km&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11:46</p><br>
-						<p>Device Temp.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total Time
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-						<hr class="solid">
-						<p>32.0 C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12:51</p>
+						</div>
+						<br>
+						<div class="form-element-list" style="width: 100%; height: 255px;">
+						<table id="data-table-basic" class="table table-striped">
+							<tr>
+                                <th>Satellite Connected</th>
+								<td>11</td>
+							</tr>
+                            <tr>
+                                <th>LONGITUDE</th>
+								<td>{{device.longitude}}</td>
+							</tr>
+							<tr>
+                                <th>LATITUDE</th>
+								<td>{{device.latitude}}</td>
+							</tr>
+							<tr>
+                                <th>ASL</th>
+								<td>560.7 m</td>
+							</tr>
+                        </table>
+						</div>
 					</div>
 				</div>
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
                     <div class="form-element-list">
                         <div class="basic-tb-hd">
                             <h2>Speed of Vehicles</h2>
                         </div>
-						<canvas id="myChart" width="400" height="385"></canvas>
+						<canvas id="myChart" width="400" height="505"></canvas>
                     </div>
                 </div>
-				<!-- <div class="col-lg-6 col-md-4 col-sm-4 col-xs-6">
-					<div class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>Capacity Measurment</h2>
-						</div><br>
-						<div class="table-responsive">
-                            <table id="data-table-basic" class="table table-striped">
-                                <thead>
-                                    <tr>
-										<th>MODEL</th>
-                                        <th>SIZE INCHES</th>
-                                        <th>FORK WIDTH</th>
-                                        <th>FORK LENGTH</th>
-                                        <th>WEIGHT LBS/PR</th>
-                                        <th>CAPACITY</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-										<td>448-ST</td>
-                                        <td>5X48</td>
-                                        <td>4"</td>
-                                        <td>32"</td>
-                                        <td>60</td>
-                                        <td>2500@24"</td>
-                                    </tr>
-                                    <tr>
-										<td>454-ST</td>
-                                        <td>5X54</td>
-                                        <td>4"</td>
-                                        <td>36"</td>
-                                        <td>62</td>
-                                        <td>2500@27"</td>
-                                    </tr>
-                                    <tr>
-										<td>460-ST</td>
-                                        <td>5X60</td>
-                                        <td>4"</td>
-                                        <td>40"</td>
-                                        <td>72</td>
-                                        <td>2500@30"</td>
-                                    </tr>
-                                    <tr>
-										<td>463-ST</td>
-                                        <td>5X63</td>
-                                        <td>4"</td>
-                                        <td>42"</td>
-                                        <td>76</td>
-                                        <td>2500@32"</td>
-                                    </tr>
-                                    <tr>
-										<td>472-ST</td>
-                                        <td>5X72</td>
-                                        <td>4"</td>
-                                        <td>48"</td>
-                                        <td>84</td>
-                                        <td>2500@36"</td>
-                                    </tr>
-                                    <tr>
-										<td>484-ST</td>
-                                        <td>5X84</td>
-                                        <td>4"</td>
-                                        <td>56"</td>
-                                        <td>100</td>
-                                        <td>2500@42"</td>
-                                    </tr>
-									<tr>
-										<td>490-ST</td>
-                                        <td>5X90</td>
-                                        <td>4"</td>
-                                        <td>60"</td>
-                                        <td>104</td>
-                                        <td>2500@45"</td>
-                                    </tr>
-                                    <tr>
-										<td>496-ST</td>
-                                        <td>5X96</td>
-                                        <td>4"</td>
-                                        <td>64"</td>
-                                        <td>106</td>
-                                        <td>2500@48"</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-					</div>
-				</div> -->
-			</div>
-		</div>
-	</div><br><br>
+            </div>
+        </div>
+    </div>
+	<br><br>
 
     	<!-- Google Map area End-->
         <div class="google-map-area">
@@ -382,8 +306,8 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
                         <div class="google-map-single" style="height: 500px;">
-                            <h2>MAP</h2>
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d31840778.15188319!2d59.125561445491066!3d13.047524999999998!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0x6e61a70b6863d433!2sChennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1707734198509!5m2!1sen!2sin" width="1100" height="420" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <div id="map"></div>
+                                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcErlQMQKVQmqlnSmo9lIgEHp5e9MIjTE"></script>
                         </div>
                     </div>
                 </div>
@@ -394,56 +318,13 @@
 	<div class="form-element-area">
         <div class="container">
             <div class="row">
-                <!-- <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <div class="form-element-list">
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+					<div class="form-element-list">
                         <div class="basic-tb-hd">
-                            <h2>Battery Capacity</h2>
-                        </div>
-						<div class="battery-widget">
-						<div class="battery-label">Fortlift 1: <span id="source1">20%</span></div>
-							<div class="battery-bar">
-								<div class="battery-fill-1" style="width: 20%;"></div>
-							</div>
-						</div><br>
-						<div class="battery-widget">
-						<div class="battery-label">Fortlift 2: <span id="source2">70%</span></div>
-							<div class="battery-bar">
-								<div class="battery-fill-2" style="width: 70%;"></div>
-							</div>
-						</div><br>
-						<div class="battery-widget">
-						<div class="battery-label">Fortlift 3: <span id="source3">90%</span></div>
-							<div class="battery-bar">
-								<div class="battery-fill-3" style="width: 90%;"></div>
-							</div>
-						</div><br>
-						<div class="battery-widget">
-						<div class="battery-label">Fortlift 4: <span id="source4">60%</span></div>
-							<div class="battery-bar">
-								<div class="battery-fill-4" style="width: 60%;"></div>
-							</div>
-						</div><br>
-						<div class="battery-widget">
-						<div class="battery-label">Fortlift 5: <span id="source5">40%</span></div>
-							<div class="battery-bar">
-								<div class="battery-fill-5" style="width: 40%;"></div>
-							</div>
-						</div><br>
-						<div class="battery-widget">
-						<div class="battery-label">Fortlift 6: <span id="source6">100%</span></div>
-							<div class="battery-bar">
-								<div class="battery-fill-6" style="width: 100%;"></div>
-							</div>
+                            <h2>Utilization Hour</h2>
+							<p>The total Utilization Hour for a week</p>
 						</div>
-                    </div>
-                </div> -->
-				 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                    <div class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>Unit Consumption</h2>
-							<p>The total unit consumed for a week</p>
-						</div>
-						<table class="graph">
+					<table class="graph">
 						<thead>
 							<tr>
 								<th scope="col">Item</th>
@@ -477,30 +358,22 @@
 						</tbody>
 					</table>
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
                     <div class="form-element-list">
                         <div class="basic-tb-hd">
                             <h2>State of Vehicles</h2>
                         </div>
 						 <div style="width: 100%; height: 400px; padding-top: 20px;">
-							<canvas id="myPieChart"></canvas>
+							<canvas id="myPieChart" width="320" style="display: block; box-sizing: border-box; height: 320px; width: 320px;"></canvas>
 						</div>
-						<!-- <div>
-							<input type="radio" name="entity" value="entity1" id="entity1">
-							<label for="entity1">Active Vehicles</label><br>
-							<input type="radio" name="entity" value="entity2" id="entity2">
-							<label for="entity2">Inactive Vehicles</label><br>
-							<input type="radio" name="entity" value="entity3" id="entity3">
-							<label for="entity3">Idle Vehicles</label><br>
-						</div> -->
                     </div>
                 </div>
-				
-            </div>
-        </div>
-    </div>
-	<br><br>
+			</div>
+		</div>
+	</div>
+	<br>
+	<br>
 	
 
 	<!-- Data Table area Start-->
@@ -656,72 +529,194 @@
 	
     <script src="static/js/custom.js"></script>
 
-
-	</style>
-	 <script>
-        var ctx = document.getElementById('myPieChart').getContext('2d');
-        var myPieChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Active Vehicles', 'Inactive Vehicles', 'Idle Vehicles'],
-                datasets: [{
-                    label: 'Pie Chart',
-                    data: [30, 30, 40],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 206, 86, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
-
-        // document.getElementById('entity1').addEventListener('change', function() {
-        //     myPieChart.data.datasets[0].data = [60, 20, 20];
-        //     myPieChart.update();
-        // });
-
-        // document.getElementById('entity2').addEventListener('change', function() {
-        //     myPieChart.data.datasets[0].data = [20, 60, 20];
-        //     myPieChart.update();
-        // });
-
-        // document.getElementById('entity3').addEventListener('change', function() {
-        //     myPieChart.data.datasets[0].data = [20, 20, 60];
-        //     myPieChart.update();
-        // });
-  </script>
-   <script>
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6'],
-                datasets: [{
-                    label: 'Fortlift 1',
-                    data: [50, 40, 70, 30, 60, 60],
-                    borderColor: 'red',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    </script>
-
+    <script src="static/js/web_fort.js"></script>
+    <script>
+        function initMap() {
+          const map = new google.maps.Map(document.getElementById("map"), {
+            center: new google.maps.LatLng(0, 0),
+            zoom: 0,
+            center: new google.maps.LatLng(0, 0),
+            styles: [{
+              "featureType": "water",
+              "elementType": "geometry",
+              "stylers": [{
+                "color": "#e9e9e9"
+              }, {
+                "lightness": 17
+              }]
+            }, {
+              "featureType": "landscape",
+              "elementType": "geometry",
+              "stylers": [{
+                "color": "#f5f5f5"
+              }, {
+                "lightness": 20
+              }]
+            }, {
+              "featureType": "road.highway",
+              "elementType": "geometry.fill",
+              "stylers": [{
+                "color": "#ffffff"
+              }, {
+                "lightness": 17
+              }]
+            }, {
+              "featureType": "road.highway",
+              "elementType": "geometry.stroke",
+              "stylers": [{
+                "color": "#ffffff"
+              }, {
+                "lightness": 29
+              }, {
+                "weight": 0.2
+              }]
+            }, {
+              "featureType": "road.arterial",
+              "elementType": "geometry",
+              "stylers": [{
+                "color": "#ffffff"
+              }, {
+                "lightness": 18
+              }]
+            }, {
+              "featureType": "road.local",
+              "elementType": "geometry",
+              "stylers": [{
+                "color": "#ffffff"
+              }, {
+                "lightness": 16
+              }]
+            }, {
+              "featureType": "poi",
+              "elementType": "geometry",
+              "stylers": [{
+                "color": "#f5f5f5"
+              }, {
+                "lightness": 21
+              }]
+            }, {
+              "featureType": "poi.park",
+              "elementType": "geometry",
+              "stylers": [{
+                "color": "#dedede"
+              }, {
+                "lightness": 21
+              }]
+            }, {
+              "elementType": "labels.text.stroke",
+              "stylers": [{
+                "visibility": "on"
+              }, {
+                "color": "#ffffff"
+              }, {
+                "lightness": 16
+              }]
+            }, {
+              "elementType": "labels.text.fill",
+              "stylers": [{
+                "saturation": 36
+              }, {
+                "color": "#333333"
+              }, {
+                "lightness": 40
+              }]
+            }, {
+              "elementType": "labels.icon",
+              "stylers": [{
+                "visibility": "off"
+              }]
+            }, {
+              "featureType": "transit",
+              "elementType": "geometry",
+              "stylers": [{
+                "color": "#f2f2f2"
+              }, {
+                "lightness": 19
+              }]
+            }, {
+              "featureType": "administrative",
+              "elementType": "geometry.fill",
+              "stylers": [{
+                "color": "#fefefe"
+              }, {
+                "lightness": 20
+              }]
+            }, {
+              "featureType": "administrative",
+              "elementType": "geometry.stroke",
+              "stylers": [{
+                "color": "#fefefe"
+              }, {
+                "lightness": 17
+              }, {
+                "weight": 1.2
+              }]
+            }]
+          });
+          setMarkers(map);
+        }
+        const beaches = [
+          [, 13.031665687299899, 80.21010285247694],
+          [, 13.031971618021048, 80.21026330467988],
+          [, 13.03202649368258, 80.20995216843065],
+          [, 13.03173121021757, 80.21002592917938],
+          [, 13.033540385088923, 80.21162835322411],
+        ];
+        
+        function setMarkers(map) {
+          const image = {
+            url: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
+            labelOrigin: new google.maps.Point(130, 10),
+            size: new google.maps.Size(50, 32),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(11, 40),
+          };
+          const shape = {
+            coords: [1, 1, 1, 20, 18, 20, 18, 1],
+            type: "poly",
+          };
+          
+          const bounds = new google.maps.LatLngBounds();
+          for (let i = 0; i < beaches.length; i++) {
+            const beach = beaches[i];
+            marker = new google.maps.Marker({
+              position: {
+                lat: beach[1],
+                lng: beach[2]
+              },
+              map,
+              icon: image,
+              shape: shape,
+              label: {
+                color: 'black',
+                fontWeight: 'bold',
+                text: beach[0],
+              },
+              zIndex: beach[3],
+            });
+            bounds.extend(marker.position);
+          }
+          map.fitBounds(bounds);
+        
+          var listener = google.maps.event.addListener(map, "idle", function () {
+            map.setZoom(15);
+            google.maps.event.removeListener(listener);
+          });
+        }
+        initMap();
+     </script>
+     <script>
+        function fetchData() {
+            setTimeout(function() {
+             updateWidget(newData);
+            }, 3000);
+        }
+        function updateWidget(data) {
+             var widget = document.getElementById("widget");
+             widget.innerHTML = data;
+        }
+        fetchData();
+        setInterval(fetchData, 5000);
+     </script>
 </body>
 </html>
