@@ -285,8 +285,8 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 
 				logi = logi[:2] + "." + logi[2:]
 				lati = lati[:2] + "." + lati[2:]
-				print ("lat-->",lati)
-				print ("log-->",logi)
+				# print ("lat-->",lati)
+				# print ("log-->",logi)
 				GPSDataObject = GPSData()
 				GPSDataObject.date = extract_device_date(timestamp)
 				GPSDataObject.time = extract_device_time(timestamp)
@@ -294,9 +294,10 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 				GPSDataObject.longitude = float(logi)
 				GPSDataObject.latitude = float(lati)
 				GPSDataObject.speed = io_dict["speed"]	
-				GPSDataObject.distance = 0.0
+				# GPSDataObject.distance = 0.0
 				GPSDataObject.state = 3
-				GPSDataObject.save()
+				GPSDataObject.satilite = io_dict["satelites"]
+				
 		except Exception as e:
 			print ("GPSData was not added because--> ",e)
 
@@ -311,8 +312,11 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 				data_field_position += len(value)
 				print (f"avl_ID: {int(key, 16)} : {io_dict[int(key, 16)]}")
 				i += 1
+				
 		else:
 			pass
+
+		
 
 		byte2_io_number = avl_data_start[data_field_position:data_field_position+data_step]
 		byte2_io_number_parsed = int(byte2_io_number, 16)
@@ -370,6 +374,22 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 				i += 1
 		else:
 			pass
+		try:
+			GPSDataObject.ignition = io_dict[239] 	#ignition
+			GPSDataObject.movementState = io_dict[240]	#movement
+			GPSDataObject.gsmSignal = io_dict[21]
+			GPSDataObject.gsmOperatorCode = io_dict[241]
+			GPSDataObject.gsmAreaCode = io_dict[206]
+			GPSDataObject.distance = io_dict[199]
+			GPSDataObject.odometer = io_dict[16]
+			
+		except Exception as e:
+			print (e)
+
+		try:
+			GPSDataObject.save()
+		except Exception as e:
+			print(e)
 
 		if codec_type.upper() == "8E":
 

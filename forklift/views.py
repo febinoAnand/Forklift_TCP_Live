@@ -4,16 +4,18 @@ from django.http import HttpResponse
 from deviceData.models import GPSData,EXTData
 
 from django.core import serializers
-
-
-# Create your views here.
+import random
 
 def loginView(request):
     return render(request,'login.html')
 
 def deviceDashborad(request):
     currentDevice = tracker_device.objects.get(device_id = '352592573193224')
-    return render(request,"devicedashboard.html", {"device":currentDevice})
+    gpsData = GPSData.objects.all().order_by('-pk')[0]
+    extData = EXTData.objects.all().order_by('-pk')[0]
+    rand = random.randint(1,10)
+    # print(gpsData)
+    return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gpsData,"random":rand,"extData":extData})
 
 
 def updateGPSTableView(request):

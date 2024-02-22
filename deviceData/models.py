@@ -23,6 +23,13 @@ class GPSData(models.Model):
     state = models.IntegerField(choices = state_choice)
     date = models.DateField()
     time = models.TimeField()
+    ignition = models.BooleanField(default=0)
+    movementState = models.BooleanField(default=0)
+    gsmOperatorCode = models.IntegerField(default=0)
+    gsmSignal = models.IntegerField(default=0)
+    gsmAreaCode = models.IntegerField(default=0)
+    odometer = models.IntegerField(default=0)
+    satellite = models.IntegerField(default=0)
 
     def __str__(self):
         return ( str(self.date) +"_"+ str(self.time) + " // " + self.device_id.device_id)
