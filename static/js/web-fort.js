@@ -103,41 +103,39 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
  
-function generateRandomTime() {
+  function generateRandomTime() {
     var hours = Math.floor(Math.random() * 12) + 1; 
     var minutes = Math.floor(Math.random() * 60); 
     var ampm = Math.random() < 0.5 ? 'AM' : 'PM'; 
     return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
-  }
-  
-  function generateRandomData() {
+}
+
+function generateRandomData() {
     var data = [];
     for (var i = 0; i < 6; i++) {
-      data.push(Math.floor(Math.random() * 100));
+        data.push(Math.floor(Math.random() * 100));
     }
     return data;
-  }
-  
-  function updateTable() {
+}
+
+function updateTable() {
     var timeLabels = [];
     var newData = generateRandomData();
-  
-    for (var i = 0; i < 6; i++) {
-      timeLabels.push(generateRandomTime());
-    }
-  
-    var rows = document.querySelectorAll('.graph tbody tr');
-  
-    rows.forEach(function(row, index) {
-      var span = row.querySelector('span');
-      var percent = newData[index] + '%';
-      row.style.height = percent;
-      row.querySelector('th').textContent = timeLabels[index];
-      span.textContent = percent;
-    });
-  }
-  
 
-  updateTable();
- 
-  
+    for (var i = 0; i < 6; i++) {
+        timeLabels.push(generateRandomTime());
+    }
+
+    var rows = document.querySelectorAll('.graph tbody tr');
+
+    rows.forEach(function(row, index) {
+        var span = row.querySelector('span');
+        var percent = newData[index] + '%';
+        row.style.height = percent;
+        row.querySelector('th').textContent = timeLabels[index];
+        span.textContent = percent;
+    });
+}
+
+updateTable();
+setInterval(updateTable, 3000);
