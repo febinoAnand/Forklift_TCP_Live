@@ -88,15 +88,18 @@
         border-radius: 10px;
       }
       .active {
-        background-color: rgba(247, 119, 69, 0.8); /* Green color for active status */
+        background-color: rgba(40, 255, 226, 0.8); 
       }
       .idle {
-        background-color: rgba(255, 193, 7, 0.8); /* Yellow color for idle status */
+        background-color: rgba(255, 193, 7, 0.8); 
       }
       .inactive {
-        background-color: rgba(225, 99, 132, 0.8); /* Red color for inactive status */
+        background-color: rgba(225, 99, 132, 0.8);
       }
-    </style>
+      .alert {
+        background-color: rgba(255, 0, 0, 0.8);
+      }
+    </style>        
 
   </head>
 
@@ -920,14 +923,19 @@
             statusView.className = 'status idle';
           }
         } else {
-          statusView.innerText = 'Inactive';
-          statusView.className = 'status inactive';
+          if (movementState === 'Moving') {
+            statusView.innerText = 'Alert';
+            statusView.className = 'status alert';
+          } else {
+            statusView.innerText = 'Inactive';
+            statusView.className = 'status inactive';
+          }
         }
       }
       updateStatus();
       setInterval(function() {
         updateStatus();
       }, 3000);
-</script>
+    </script>       
   </body>
 </html>

@@ -14,7 +14,6 @@ $(document).ready(function(){
 
 // pie chart start//
 var ctx = document.getElementById('myPieChart').getContext('2d');
-
 var data = {
   labels: ['Active Vehicles', 'Inactive Vehicles', 'Idle Vehicles'],
   datasets: [{
@@ -51,13 +50,13 @@ function updatePieChart() {
 
   myPieChart.update();
 }
-
-updatePieChart();
+setInterval(updatePieChart, 3000);
 // pie chart end//
 
 // line chart start //
 document.addEventListener('DOMContentLoaded', function() {
   var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart;
 
   function generateRandomData() {
     var labels = [];
@@ -80,15 +79,23 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 
-  var randomData = generateRandomData();
+  function updateChart() {
+    var newData = generateRandomData();
 
-  var myChart = new Chart(ctx, {
+    myChart.data.labels = newData.labels;
+    myChart.data.datasets[0].data = newData.data;
+
+    myChart.update();
+  }
+
+  var initialData = generateRandomData();
+  myChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: randomData.labels,
+      labels: initialData.labels,
       datasets: [{
         label: 'Speed',
-        data: randomData.data,
+        data: initialData.data,
         borderColor: 'red',
         borderWidth: 1
       }]
@@ -101,6 +108,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
+
+
+  setInterval(updateChart, 3000);
 });
 //line chart end //
 
@@ -140,15 +150,8 @@ function updateTable() {
 }
 
 function fetchDataAndUpdate() {
-  // Simulate AJAX call to fetch new data
-  // Replace this with your actual AJAX call
-  // For example, using fetch or jQuery.ajax
-  
-  // generate random data for demonstration
+
   updateTable();
 }
-
-// Call fetchDataAndUpdate every 5 seconds (5000 milliseconds)
 setInterval(fetchDataAndUpdate, 3000);
-
-// bar chart end //
+// bar chart ens //
