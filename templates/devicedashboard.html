@@ -1,472 +1,539 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <title>Device Dashboard</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- favicon
 		============================================ -->
-    <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico">
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="static/img/favicon.ico"
+    />
     <!-- Google Fonts
 		============================================ -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900"
+      rel="stylesheet"
+    />
     <!-- Bootstrap CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css" />
     <!-- Bootstrap CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="static/css/font-awesome.min.css" />
     <!-- owl.carousel CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/owl.carousel.css">
-    <link rel="stylesheet" href="static/css/owl.theme.css">
-    <link rel="stylesheet" href="static/css/owl.transitions.css">
+    <link rel="stylesheet" href="static/css/owl.carousel.css" />
+    <link rel="stylesheet" href="static/css/owl.theme.css" />
+    <link rel="stylesheet" href="static/css/owl.transitions.css" />
     <!-- meanmenu CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/meanmenu/meanmenu.min.css">
+    <link rel="stylesheet" href="static/css/meanmenu/meanmenu.min.css" />
     <!-- animate CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/animate.css">
+    <link rel="stylesheet" href="static/css/animate.css" />
     <!-- normalize CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/normalize.css">
+    <link rel="stylesheet" href="static/css/normalize.css" />
     <!-- mCustomScrollbar CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/scrollbar/jquery.mCustomScrollbar.min.css">
+    <link
+      rel="stylesheet"
+      href="static/css/scrollbar/jquery.mCustomScrollbar.min.css"
+    />
     <!-- jvectormap CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/jvectormap/jquery-jvectormap-2.0.3.css">
+    <link
+      rel="stylesheet"
+      href="static/css/jvectormap/jquery-jvectormap-2.0.3.css"
+    />
     <!-- notika icon CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/notika-custom-icon.css">
+    <link rel="stylesheet" href="static/css/notika-custom-icon.css" />
     <!-- wave CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/wave/waves.min.css">
+    <link rel="stylesheet" href="static/css/wave/waves.min.css" />
     <!-- main CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/main.css">
+    <link rel="stylesheet" href="static/css/main.css" />
     <!-- style CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/cssstyles.css">
+    <link rel="stylesheet" href="static/css/cssstyles.css" />
     <!-- responsive CSS
 		============================================ -->
-    <link rel="stylesheet" href="static/css/responsive.css">
+    <link rel="stylesheet" href="static/css/responsive.css" />
     <!-- modernizr JS
 		============================================ -->
     <script src="static/js/vendor/modernizr-2.8.3.min.js"></script>
-	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-	
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-</head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 
-<body onload="startUpdateTable('{{device.device_id}}')">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  {% load mathfilters %}
-  
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      .status {
+        width: 100px;
+        text-align: center;
+        padding-top: 100px;
+        padding-bottom: 5px;
+        border-radius: 10px;
+      }
+      .active {
+        background-color: rgba(247, 119, 69, 0.8); /* Green color for active status */
+      }
+      .idle {
+        background-color: rgba(255, 193, 7, 0.8); /* Yellow color for idle status */
+      }
+      .inactive {
+        background-color: rgba(225, 99, 132, 0.8); /* Red color for inactive status */
+      }
+    </style>
+
+  </head>
+
+  <body onload="startUpdateTable('{{device.device_id}}')">
+    {% load mathfilters %}
 
     <!--[if lt IE 8]>
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+      <p class="browserupgrade">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="http://browsehappy.com/">upgrade your browser</a> to improve
+        your experience.
+      </p>
+    <![endif]-->
     <!-- Start Header Top Area -->
     <div class="header-top-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                    <div class="logo-area">
-                       <a href="/dashboard"><p style="color:white; font-size: 25px;">INNOSPACE</P></a>
-                    </div>
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                    <div class="header-top-menu">
-                        <ul class="nav navbar-nav notika-top-nav">
-							<li class="nav-item">
-								<a href="#" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span class="glyphicon">&#xe081;</span></a>
-                            </li>
-							<li class="nav-item">
-								<a href="/" role="button" ><span>Logout</span></a>
-							</li>
-                        </ul>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <div class="logo-area">
+              <a href="/dashboard"
+                ><p style="color: white; font-size: 25px">INNOSPACE</p></a
+              >
             </div>
+          </div>
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+            <div class="header-top-menu">
+              <ul class="nav navbar-nav notika-top-nav">
+                <li class="nav-item">
+                  <a
+                    href="#"
+                    role="button"
+                    aria-expanded="false"
+                    class="nav-link dropdown-toggle"
+                    ><span class="glyphicon">&#xe081;</span></a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a href="/" role="button"><span>Logout</span></a>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-    </div><br><br>
-	<!-- End Header Top Area -->
-	<!-- Form Element area Start-->
+      </div>
+    </div>
+    <br /><br />
+    <!-- End Header Top Area -->
+    <!-- Form Element area Start-->
     <div class="form-element-area">
-        <div class="container">
-            <div class="row">
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <div class="form-element-list" style="width: 100%; height: 485px;">
-                        <div class="basic-tb-hd">
-                            <h2>Vehicles Details</h2>
-                        </div>
-                            <table id="data-table-basic" class="table table-striped">
-                                    <tr>
-                                        <th>Device ID</th>
-										<td>{{device.device_id}}</td>
-									</tr>
-									<tr>
-                                        <th>Vehicle Name</th>
-										<td>{{device.vehicle_name}}</td>
-									</tr>
-									<tr>
-                                        <th>Manufracture</th>
-										<td>{{device.manufacturer}}</td>
-									</tr>
-									<tr>
-                                        <th>Vehicle ID</th>
-										<td>{{device.vehicle_id}}</td>
-									</tr>
-									<tr>
-                                        <th>Device Model</th>
-										<td>{{device.device_model}}</td>
-									</tr>
-									<tr>
-                                        <th>Hardware Version</th>
-										<td>{{device.hardware_version}}</td>
-                                    </tr>
-									<tr>
-                                        <th>Software Version</th>
-										<td>{{device.software_version}}</td>
-                                    </tr>
-									<tr>
-                                        <th>Driver</th>
-										<td>{{device.driver}}</td>
-                                    </tr>
-                            </table>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <div class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>GPS Speed</h2>
-                        </div>
-						<div class="gauge" style="width: 300px; --rotation:{{gpsData.speed | div:"25" | mul:'180'}}deg; --color:#566573; --background:#e9ecef;">
-							<div class="percentage"></div>
-							<div class="mask"></div>
-							<span class="value">{{gpsData.speed}} Km/Hr</span>
-						</div>
-						<br>
-						<br>
-						<div class="basic-tb-hd">
-                            <h2>EXT Speed</h2>
-                        </div>
-						<div class="gauge" style="width: 300px; --rotation:{{gpsData.speed | div:"25" | mul:'180' | add:random}}deg; --color:#643873; --background:#e9ecef;">
-							<div class="percentage"></div>
-							<div class="mask"></div>
-							<span class="value">{{gpsData.speed | add:random}} Km/Hr</span>
-						</div>
-						<br>
-                    </div>
-                </div>
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <div class="form-element-list" style="width: 100%; height: 485px;">
-                        <div class="basic-tb-hd">
-                            <h2>Live Status</h2>
-                        </div><br>
-                            <table id="data-table-basic" class="table table-striped">
-									<tr>
-                                        <th>Status</th>
-										<td id="live_state_widget">
-											<div style="width: 100px;background-color:rgba(225, 99, 132, 0.8);text-align: center; padding-top: 3px; padding-bottom:3px; border-radius: 10px;">InActive</div>
-										</td>
-									</tr>
-									<tr>
-                    <th>Ignition State</th>
-                    {%if gpsData.ignition %}
-										<td>ON</td>
-                    {% else %}
-                    <td>OFF</td>
-                    {%endif%}
-									</tr>
-									<tr>
-                                        <th>Movement State</th>
-                                        {%if gpsData.movementState %}
-                                        <td>Moving</td>
-                                        {% else %}
-                                        <td>Not Moving</td>
-                                        {%endif%}
-									</tr>
-									<tr>
-                                        <th>GSM Operator</th>
-										<td>{{gsmData.gsmOperatorCode}}</td>
-                                    </tr>
-									<tr>
-                                        <th>GSM Signal</th>
-										<td>
-											<!-- <i style="font-size:24px" class="fa">&#xf012;</i> -->
-                      {{gsmData.gsmSignal}}
-										</td>
-                                    </tr>
-									<tr>
-                                        <th>GSM Area</th>
-										<td>{{gsmData.gsmAreaCode}}</td>
-                                    </tr>
-                            </table>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <div class="form-element-list" style="width: 100%; height: 485px">
+              <div class="basic-tb-hd">
+                <h2>Vehicles Details</h2>
+              </div>
+              <table id="data-table-basic" class="table table-striped">
+                <tr>
+                  <th>Device ID</th>
+                  <td>{{device.device_id}}</td>
+                </tr>
+                <tr>
+                  <th>Vehicle Name</th>
+                  <td>{{device.vehicle_name}}</td>
+                </tr>
+                <tr>
+                  <th>Manufracture</th>
+                  <td>{{device.manufacturer}}</td>
+                </tr>
+                <tr>
+                  <th>Vehicle ID</th>
+                  <td>{{device.vehicle_id}}</td>
+                </tr>
+                <tr>
+                  <th>Device Model</th>
+                  <td>{{device.device_model}}</td>
+                </tr>
+                <tr>
+                  <th>Hardware Version</th>
+                  <td>{{device.hardware_version}}</td>
+                </tr>
+                <tr>
+                  <th>Software Version</th>
+                  <td>{{device.software_version}}</td>
+                </tr>
+                <tr>
+                  <th>Driver</th>
+                  <td>{{device.driver}}</td>
+                </tr>
+              </table>
             </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <div class="form-element-list">
+              <div class="basic-tb-hd">
+                <h2>GPS Speed</h2>
+              </div>
+              <div
+                id="gps-data-container"
+                class="gauge"
+                style="width: 300px; --rotation: {{gpsData.speed | div:'25' | mul:'180'}}deg; --color:#566573; --background:#e9ecef;"
+              >
+                <div class="percentage"></div>
+                <div class="mask"></div>
+                <span id="gps-speed" class="value">{{gpsData.speed}} Km/Hr</span>
+              </div>
+              <br />
+              <br />
+              <div class="basic-tb-hd">
+                <h2>EXT Speed</h2>
+              </div>
+              <div
+                id="ext-data-container" class="gauge" style="width: 300px; --rotation: {{extData.speed | div:'25' | mul:'180' | add:random}}deg; --color:#643873; --background:#e9ecef;"
+              >
+                <div class="percentage"></div>
+                <div class="mask"></div>
+                <span id="ext_speed" class="value">{{extData.speed}} Km/Hr</span>
+              </div>
+              <br />
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <div class="form-element-list" style="width: 100%; height: 485px">
+              <div class="basic-tb-hd">
+                <h2>Live Status</h2>
+              </div>
+              <br />
+              <table id="data-table-basic" class="table table-striped">
+                <tr>
+                  <th>Status</th>
+                     <td id="status_view" class="inactive">Inactive</td>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Ignition State</th>
+                  {%if gpsData.ignition %}
+                  <td id="ignition_state">ON</td>
+                  {% else %}
+                  <td  id="ignition_state">OFF</td>
+                  {%endif%}
+                </tr>
+                <tr>
+                  <th>Movement State</th>
+                  {%if gpsData.movementState %}
+                  <td id="movementState_view">Moving</td>
+                  {% else %}
+                  <td id="movementState_view">Not Moving</td>
+                  {%endif%}
+                </tr>
+                <tr>
+                  <th>GSM Operator</th>
+                  <td id="gsm_operator">{{gsmData.gsmOperatorCode}}</td>
+                </tr>
+                <tr>
+                  <th>GSM Signal</th>
+                  <td id="gsm_signal">
+                    <!-- <i style="font-size:24px" class="fa">&#xf012;</i> -->
+                    {{gsmData.gsmSignal}}
+                  </td>
+                </tr>
+                <tr>
+                  <th>GSM Area</th>
+                  <td id="gsm_area">{{gsmData.gsmAreaCode}}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-	<br><br>
+    <br /><br />
     <!-- Form Element area End-->
-	<div class="form-element-area">
-        <div class="container">
-            <div class="row">
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-					<div id="widget" class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>Battery Capacity</h2>
-                        </div>
-						<div class="gauge" style="width: 300px; --rotation:{{ extData.batt_power | div:'10000' | mul:'180'}}deg; --color:#76C9E2; --background:#e9ecef;">
-							<div class="percentage"></div>
-							<div class="mask"></div>
-							<span class="value">{{extData.batt_power}} Watts</span>
-						</div><br><br>
-						<table id="data-table-basic" class="table table-striped">
-                            <tr>
-                                <th>Battery</th>
-								<td id="live_cap_widget">
-									<div class="battery-bar">
-										<div class="battery-fill-1" style="width: {{extData.batt_capacity | div:'5'| mul:'100'}}%;"></div>
-									</div>
-								</td>
-                            </tr>
-							<tr>
-                                <th>Battery Voltage </th>
-								<td>{{extData.batt_voltage}}</td>
-							</tr>
-							<tr>
-                                <th>Battery Amps</th>
-								<td>{{extData.batt_amp}}</td>
-							</tr>
-							<tr>
-                                <th>Watt Hour</th>
-								<td>{{extData.watt_hr}}</td>
-							</tr>
-                        </table>
+    <div class="form-element-area">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <div id="ext-data-container" class="form-element-list">
+              <div class="basic-tb-hd">
+                <h2>Battery Capacity</h2>
+              </div>
+              <div
+                class="gauge"
+                style="width: 300px; --rotation: {{ extData.batt_power | div:'10000' | mul:'180'}}deg; --color:#76C9E2; --background:#e9ecef;"
+              >
+                <div class="percentage"></div>
+                <div class="mask"></div>
+                <span id="battery_power" class="value">{{extData.batt_power}} Watts</span>
+              </div>
+              <br /><br />
+              <table id="data-table-basic" class="table table-striped">
+                <tr>
+                  <th>Battery</th>
+                  <td id="live_cap_widget">
+                    <div class="battery-bar">
+                      <div 
+                        class="battery-fill-1"
+                        style="width: {{extData.batt_capacity | div:'5'| mul:'100%'}};"
+                      ></div>
                     </div>
-				</div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-					<div class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>GPS</h2>
-						</div>
-						<div class="email-round-nock">
-							<div class="circle">
-								<div class="text" style= "color: white; font-size: 12px;">
-									Current Speed: {{device.Speed}}
-								</div>
-							</div>
-							<div class="circle" style= "color: white; font-size: 12px;">
-								<div class="text">
-									Top Speed: 12 Km/Hr
-								</div>
-							</div>
-							<div class="circle" style= "color: white; font-size: 12px;">
-								<div class="text">
-									Duration: {{device.time}}
-								</div>
-							</div>
-						</div>
-						<br>
-						<div class="form-element-list" style="width: 100%; height: 255px;">
-						<table id="data-table-basic" class="table table-striped">
-							<tr>
-                                <th>Satellite Connected</th>
-								<td>{{gpsData.satellite}}</td>
-							</tr>
-                            <tr>
-                                <th>LONGITUDE</th>
-								<td>{{gpsData.longitude}}</td>
-							</tr>
-							<tr>
-                                <th>LATITUDE</th>
-								<td>{{gpsData.latitude}}</td>
-							</tr>
-							
-                        </table>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <div class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>Speed of Vehicles</h2>
-                        </div>
-						<canvas id="myChart" width="400" height="505"></canvas>
-                    </div>
-                </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Battery Voltage</th>
+                  <td id="battery_voltage">{{extData.batt_voltage}}</td>
+                </tr>
+                <tr>
+                  <th>Battery Amps</th>
+                  <td id="battery_amps">{{extData.batt_amp}}</td>
+                </tr>
+                <tr>
+                  <th>Watt Hour</th>
+                  <td id="watt_hour">{{extData.watt_hr}}</td>
+                </tr>
+              </table>
             </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <div class="form-element-list">
+              <div class="basic-tb-hd">
+                <h2>GPS</h2>
+              </div>
+              <div id="gps-data-container" class="email-round-nock">
+                <div class="circle">
+                  <div id="gps_speed" class="text" style="color: white; font-size: 12px">
+                    Current Speed: {{gpsData.speed}}
+                  </div>
+                </div>
+                <div class="circle" style="color: white; font-size: 12px">
+                  <div class="text">Top Speed: 12 Km/Hr</div>
+                </div>
+                <div class="circle" style="color: white; font-size: 12px">
+                  <div id="gps_time" class="text">Duration: {{gpsData.time}}</div>
+                </div>
+              </div>
+              <br />
+              <div class="form-element-list" style="width: 100%; height: 255px">
+                <table id="data-table-basic" class="table table-striped">
+                  <tr>
+                    <th>Satellite Connected</th>
+                    <td id="satellite_connect">{{gpsData.satellite}}</td>
+                  </tr>
+                  <tr>
+                    <th>LONGITUDE</th>
+                    <td id="latitude_view">{{gpsData.longitude}}</td>
+                  </tr>
+                  <tr>
+                    <th>LATITUDE</th>
+                    <td id="longitude_view">{{gpsData.latitude}}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <div class="form-element-list">
+              <div class="basic-tb-hd">
+                <h2>Speed of Vehicles</h2>
+              </div>
+              <canvas id="myChart" width="400" height="505"></canvas>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-	<br><br>
+    <br /><br />
 
-    	<!-- Google Map area End-->
-        <div class="google-map-area">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
-                        <div class="google-map-single" style="height: 500px;">
-                            <div id="map"></div>
-                                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcErlQMQKVQmqlnSmo9lIgEHp5e9MIjTE"></script>
-                        </div>
-                    </div>
-                </div>
+    <!-- Google Map area End-->
+    <div class="google-map-area">
+      <div class="container">
+        <div class="row">
+          <div
+            class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+            style="margin-bottom: 30px"
+          >
+            <div class="google-map-single" style="height: 500px">
+              <div id="map"></div>
+              <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcErlQMQKVQmqlnSmo9lIgEHp5e9MIjTE"></script>
             </div>
+          </div>
         </div>
-        <!-- Google Map area End-->
+      </div>
+    </div>
+    <!-- Google Map area End-->
     <!-- Form Element area End-->
-	<div class="form-element-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-					<div class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>Utilization Hour</h2>
-							<p>The total Utilization Hour for a week</p>
-						</div>
-					<table class="graph">
-						<thead>
-							<tr>
-								<th scope="col">Item</th>
-								<th scope="col">Percent</th>
-							</tr>
-						</thead><tbody>
-							<tr style="height:55%">
-								<th scope="row">Day 1</th>
-								<td><span>55%</span></td>
-							</tr>
-							<tr style="height:65%">
-								<th scope="row">Day 2</th>
-								<td><span>65%</span></td>
-							</tr>
-							<tr style="height:90%">
-								<th scope="row">Day 3</th>
-								<td><span>90%</span></td>
-							</tr>
-							<tr style="height:70%">
-								<th scope="row">Day 4</th>
-								<td><span>70%</span></td>
-							</tr>
-							<tr style="height:40%">
-								<th scope="row">Day 5</th>
-								<td><span>40%</span></td>
-							</tr>
-							<tr style="height:30%">
-								<th scope="row">Day 6</th>
-								<td><span>30%</span></td>
-							</tr>
-						</tbody>
-					</table>
-                    </div>
-				</div>
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <div class="form-element-list">
-                        <div class="basic-tb-hd">
-                            <h2>State of Vehicles</h2>
-                        </div>
-						 <div style="width: 100%; height: 400px; padding-top: 20px;">
-							<canvas id="myPieChart" width="320" style="display: block; box-sizing: border-box; height: 320px; width: 320px;"></canvas>
-						</div>
-                    </div>
-                </div>
-			</div>
-		</div>
-	</div>
-	<br>
-	<br>
-	
+    <div class="form-element-area">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+            <div class="form-element-list">
+              <div class="basic-tb-hd">
+                <h2>Utilization Hour</h2>
+                <p>The total Utilization Hour for a week</p>
+              </div>
+              <table class="graph">
+                <thead>
+                  <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Percent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="height: 55%">
+                    <th scope="row">Day 1</th>
+                    <td><span>55%</span></td>
+                  </tr>
+                  <tr style="height: 65%">
+                    <th scope="row">Day 2</th>
+                    <td><span>65%</span></td>
+                  </tr>
+                  <tr style="height: 90%">
+                    <th scope="row">Day 3</th>
+                    <td><span>90%</span></td>
+                  </tr>
+                  <tr style="height: 70%">
+                    <th scope="row">Day 4</th>
+                    <td><span>70%</span></td>
+                  </tr>
+                  <tr style="height: 40%">
+                    <th scope="row">Day 5</th>
+                    <td><span>40%</span></td>
+                  </tr>
+                  <tr style="height: 30%">
+                    <th scope="row">Day 6</th>
+                    <td><span>30%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <div class="form-element-list">
+              <div class="basic-tb-hd">
+                <h2>State of Vehicles</h2>
+              </div>
+              <div style="width: 100%; height: 400px; padding-top: 20px">
+                <canvas
+                  id="myPieChart"
+                  width="320"
+                  style="
+                    display: block;
+                    box-sizing: border-box;
+                    height: 320px;
+                    width: 320px;
+                  "
+                ></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <br />
 
-	<!-- Data Table area Start-->
+    <!-- Data Table area Start-->
     <div class="data-table-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="data-table-list">
-                        <div class="basic-tb-hd">
-                            <h2>GPS Table</h2>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="data-table-basic" class="table table-striped">
-                                <thead>
-                                    <tr>
-										<th>S/NO</th>
-                                        <th>DATE</th>
-                                        <th>TIME</th>
-                                        <th>DISTANCE</th>
-                                        <th>SPEED</th>
-                                        <th>LATITUDE</th>
-										<th>LONGITUDE</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="gps_data_table">
-                                    
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+              <div class="basic-tb-hd">
+                <h2>GPS Table</h2>
+              </div>
+              <div class="table-responsive">
+                <table id="data-table-basic" class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>S/NO</th>
+                      <th>DATE</th>
+                      <th>TIME</th>
+                      <th>DISTANCE</th>
+                      <th>SPEED</th>
+                      <th>LATITUDE</th>
+                      <th>LONGITUDE</th>
+                    </tr>
+                  </thead>
+                  <tbody id="gps_data_table"></tbody>
+                </table>
+              </div>
             </div>
+          </div>
         </div>
-    </div><br><br>
+      </div>
+    </div>
+    <br /><br />
     <!-- Table area End-->
 
-    	<!-- Data Table area Start-->
-        <!-- <div class="data-table-area">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        <div class="data-table-list">
-                            <div class="basic-tb-hd">
-                                <h2>External Table</h2>
-                            </div>
-                            <div class="table-responsive">
-                                <table id="data-table-basic" class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>S/NO</th>
-                                            <th>DATE</th>
-                                            <th>TIME</th>
-                                            <th>DISTANCE</th>
-                                            <th>SPEED</th>
-                                            <th>WATT HR</th>
-                                            <th>BATT VOLTAGE</th>
-                                            <th>BATT AMP</th>
-                                            <th>BATT POWER</th>
-                                            <th>BATT CHARGE</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="external_data_table">
-                                       
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Data Table area Start-->
+    <div class="data-table-area">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+              <div class="basic-tb-hd">
+                <h2>External Table</h2>
+              </div>
+              <div class="table-responsive">
+                <table id="data-table-basic" class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>S/NO</th>
+                      <th>DATE</th>
+                      <th>TIME</th>
+                      <th>DISTANCE</th>
+                      <th>SPEED</th>
+                      <th>WATT HR</th>
+                      <th>BATT VOLTAGE</th>
+                      <th>BATT AMP</th>
+                      <th>BATT POWER</th>
+                      <th>BATT CHARGE</th>
+                    </tr>
+                  </thead>
+                  <tbody id="external_data_table"></tbody>
+                </table>
+              </div>
             </div>
-        </div><br><br> -->
-        <!-- Table area End-->
-	<!-- Start Footer area-->
-    <div class="footer-copyright-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="footer-copy-right">
-                        <p>Copyright © 2024 . All rights reserved.</p>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
+    </div>
+    <br /><br />
+    <!-- Table area End-->
+    <!-- Start Footer area-->
+    <div class="footer-copyright-area">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="footer-copy-right">
+              <p>Copyright © 2024 . All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- End Footer area-->
     <!-- jquery
@@ -528,205 +595,330 @@
     <!-- plugins JS
 		============================================ -->
     <script src="static/js/plugins.js"></script>
-	<!--  Chat JS
+    <!--  Chat JS
 		============================================ -->
     <script src="static/js/chat/moment.min.js"></script>
     <script src="static/js/chat/jquery.chat.js"></script>
-	
+
     <!-- main JS
 		============================================ -->
     <script src="static/js/main.js"></script>
-	
+
     <script src="static/js/custom.js"></script>
 
-    <script src="static/js/web_fort.js"></script>
+    <script src="static/js/web-fort.js"></script>
     <script>
-        function initMap() {
-          const map = new google.maps.Map(document.getElementById("map"), {
-            center: new google.maps.LatLng(0, 0),
-            zoom: 0,
-            center: new google.maps.LatLng(0, 0),
-            styles: [{
-              "featureType": "water",
-              "elementType": "geometry",
-              "stylers": [{
-                "color": "#e9e9e9"
-              }, {
-                "lightness": 17
-              }]
+      function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: new google.maps.LatLng(0, 0),
+          zoom: 0,
+          center: new google.maps.LatLng(0, 0),
+          styles: [{
+            "featureType": "water",
+            "elementType": "geometry",
+            "stylers": [{
+              "color": "#e9e9e9"
             }, {
-              "featureType": "landscape",
-              "elementType": "geometry",
-              "stylers": [{
-                "color": "#f5f5f5"
-              }, {
-                "lightness": 20
-              }]
-            }, {
-              "featureType": "road.highway",
-              "elementType": "geometry.fill",
-              "stylers": [{
-                "color": "#ffffff"
-              }, {
-                "lightness": 17
-              }]
-            }, {
-              "featureType": "road.highway",
-              "elementType": "geometry.stroke",
-              "stylers": [{
-                "color": "#ffffff"
-              }, {
-                "lightness": 29
-              }, {
-                "weight": 0.2
-              }]
-            }, {
-              "featureType": "road.arterial",
-              "elementType": "geometry",
-              "stylers": [{
-                "color": "#ffffff"
-              }, {
-                "lightness": 18
-              }]
-            }, {
-              "featureType": "road.local",
-              "elementType": "geometry",
-              "stylers": [{
-                "color": "#ffffff"
-              }, {
-                "lightness": 16
-              }]
-            }, {
-              "featureType": "poi",
-              "elementType": "geometry",
-              "stylers": [{
-                "color": "#f5f5f5"
-              }, {
-                "lightness": 21
-              }]
-            }, {
-              "featureType": "poi.park",
-              "elementType": "geometry",
-              "stylers": [{
-                "color": "#dedede"
-              }, {
-                "lightness": 21
-              }]
-            }, {
-              "elementType": "labels.text.stroke",
-              "stylers": [{
-                "visibility": "on"
-              }, {
-                "color": "#ffffff"
-              }, {
-                "lightness": 16
-              }]
-            }, {
-              "elementType": "labels.text.fill",
-              "stylers": [{
-                "saturation": 36
-              }, {
-                "color": "#333333"
-              }, {
-                "lightness": 40
-              }]
-            }, {
-              "elementType": "labels.icon",
-              "stylers": [{
-                "visibility": "off"
-              }]
-            }, {
-              "featureType": "transit",
-              "elementType": "geometry",
-              "stylers": [{
-                "color": "#f2f2f2"
-              }, {
-                "lightness": 19
-              }]
-            }, {
-              "featureType": "administrative",
-              "elementType": "geometry.fill",
-              "stylers": [{
-                "color": "#fefefe"
-              }, {
-                "lightness": 20
-              }]
-            }, {
-              "featureType": "administrative",
-              "elementType": "geometry.stroke",
-              "stylers": [{
-                "color": "#fefefe"
-              }, {
-                "lightness": 17
-              }, {
-                "weight": 1.2
-              }]
+              "lightness": 17
             }]
+          }, {
+            "featureType": "landscape",
+            "elementType": "geometry",
+            "stylers": [{
+              "color": "#f5f5f5"
+            }, {
+              "lightness": 20
+            }]
+          }, {
+            "featureType": "road.highway",
+            "elementType": "geometry.fill",
+            "stylers": [{
+              "color": "#ffffff"
+            }, {
+              "lightness": 17
+            }]
+          }, {
+            "featureType": "road.highway",
+            "elementType": "geometry.stroke",
+            "stylers": [{
+              "color": "#ffffff"
+            }, {
+              "lightness": 29
+            }, {
+              "weight": 0.2
+            }]
+          }, {
+            "featureType": "road.arterial",
+            "elementType": "geometry",
+            "stylers": [{
+              "color": "#ffffff"
+            }, {
+              "lightness": 18
+            }]
+          }, {
+            "featureType": "road.local",
+            "elementType": "geometry",
+            "stylers": [{
+              "color": "#ffffff"
+            }, {
+              "lightness": 16
+            }]
+          }, {
+            "featureType": "poi",
+            "elementType": "geometry",
+            "stylers": [{
+              "color": "#f5f5f5"
+            }, {
+              "lightness": 21
+            }]
+          }, {
+            "featureType": "poi.park",
+            "elementType": "geometry",
+            "stylers": [{
+              "color": "#dedede"
+            }, {
+              "lightness": 21
+            }]
+          }, {
+            "elementType": "labels.text.stroke",
+            "stylers": [{
+              "visibility": "on"
+            }, {
+              "color": "#ffffff"
+            }, {
+              "lightness": 16
+            }]
+          }, {
+            "elementType": "labels.text.fill",
+            "stylers": [{
+              "saturation": 36
+            }, {
+              "color": "#333333"
+            }, {
+              "lightness": 40
+            }]
+          }, {
+            "elementType": "labels.icon",
+            "stylers": [{
+              "visibility": "off"
+            }]
+          }, {
+            "featureType": "transit",
+            "elementType": "geometry",
+            "stylers": [{
+              "color": "#f2f2f2"
+            }, {
+              "lightness": 19
+            }]
+          }, {
+            "featureType": "administrative",
+            "elementType": "geometry.fill",
+            "stylers": [{
+              "color": "#fefefe"
+            }, {
+              "lightness": 20
+            }]
+          }, {
+            "featureType": "administrative",
+            "elementType": "geometry.stroke",
+            "stylers": [{
+              "color": "#fefefe"
+            }, {
+              "lightness": 17
+            }, {
+              "weight": 1.2
+            }]
+          }]
+        });
+        setMarkers(map);
+      }
+      const beaches = [
+        [,{{gpsData.latitude}}, {{gpsData.longitude}}],
+        // [, 13.031971618021048, 80.21026330467988],
+        // [, 13.03202649368258, 80.20995216843065],
+        // [, 13.03173121021757, 80.21002592917938],
+        // [, 13.033540385088923, 80.21162835322411],
+      ];
+
+      function setMarkers(map) {
+        const image = {
+          url: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
+          labelOrigin: new google.maps.Point(130, 10),
+          size: new google.maps.Size(50, 32),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(11, 40),
+        };
+        const shape = {
+          coords: [1, 1, 1, 20, 18, 20, 18, 1],
+          type: "poly",
+        };
+
+        const bounds = new google.maps.LatLngBounds();
+        for (let i = 0; i < beaches.length; i++) {
+          const beach = beaches[i];
+          marker = new google.maps.Marker({
+            position: {
+              lat: beach[1],
+              lng: beach[2]
+            },
+            map,
+            icon: image,
+            shape: shape,
+            label: {
+              color: 'black',
+              fontWeight: 'bold',
+              text: beach[0],
+            },
+            zIndex: beach[3],
           });
-          setMarkers(map);
+          bounds.extend(marker.position);
         }
-        const beaches = [
-          [,{{gpsData.latitude}}, {{gpsData.longitude}}],
-          // [, 13.031971618021048, 80.21026330467988],
-          // [, 13.03202649368258, 80.20995216843065],
-          // [, 13.03173121021757, 80.21002592917938],
-          // [, 13.033540385088923, 80.21162835322411],
-        ];
+        map.fitBounds(bounds);
+
+        var listener = google.maps.event.addListener(map, "idle", function () {
+          map.setZoom(15);
+          google.maps.event.removeListener(listener);
+        });
+      }
+      initMap();
+    </script>
+    <script>
+      $(document).ready(function () {
+        function updateExtData() {
+          $.ajax({
+            url: "ext-data/",
+            type: "GET",
+            success: function (data) {
+              // $('#ext-data-table').html(JSON.stringify(data));
+             // console.log("Received DAta -> ", data);
+             let datacount = data.length;
+        console.log(data[datacount - 1]);
         
-        function setMarkers(map) {
-          const image = {
-            url: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
-            labelOrigin: new google.maps.Point(130, 10),
-            size: new google.maps.Size(50, 32),
-            origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(11, 40),
-          };
-          const shape = {
-            coords: [1, 1, 1, 20, 18, 20, 18, 1],
-            type: "poly",
-          };
-          
-          const bounds = new google.maps.LatLngBounds();
-          for (let i = 0; i < beaches.length; i++) {
-            const beach = beaches[i];
-            marker = new google.maps.Marker({
-              position: {
-                lat: beach[1],
-                lng: beach[2]
-              },
-              map,
-              icon: image,
-              shape: shape,
-              label: {
-                color: 'black',
-                fontWeight: 'bold',
-                text: beach[0],
-              },
-              zIndex: beach[3],
-            });
-            bounds.extend(marker.position);
+        let lastEXTData = data[datacount - 1]; // Assuming you want to access the last element of data
+
+        if (lastEXTData["batt_voltage"]) {
+            $('#battery_voltage').text(lastEXTData.batt_voltage);
+        }
+        if (lastEXTData["batt_amp"]) {
+            $('#battery_amps').text(lastEXTData.batt_amp);
+        }
+        if (lastEXTData["watt_hr"]) {
+            $('#watt_hour').text(lastEXTData.watt_hr);
+        }
+        if (lastEXTData["speed"]) {
+            $('#ext_speed').text(lastEXTData.speed +"Km/Hr" );
+        }
+        if (lastEXTData["batt_power"]) {
+            $('#battery_power').text(lastEXTData.batt_power + "Watt");
+        }
+  
+    },
+    error: function (xhr, textStatus, errorThrown) {
+        console.log("Error:", errorThrown);
+            },
+          });
+        }
+        function updateGpsData() {
+          $.ajax({
+    url: "gps-data/",
+    type: "GET",
+    success: function (data) {
+        console.log("Received GPS Data -> ", data);
+        let datacount = data.length;
+        let lastGPSData = data[datacount - 1];
+
+        if (lastGPSData["ignition"]) {
+            $('#ignition_state').text("ON");
+        } else {
+            $('#ignition_state').text("OFF");
+        }
+
+        if (lastGPSData["movementState"]) {
+            $('#movementState_view').text("Moving");
+        } else {
+            $('#movementState_view').text("Not Moving");
+        }
+
+        if (lastGPSData["ignition"]) {
+          if (lastGPSData["movementState"]) {
+              $('#status_view').text("Active").removeClass("inactive").addClass("active");
+          } else {
+             $('#status_view').text("Idle").removeClass("inactive").addClass("idle");
           }
-          map.fitBounds(bounds);
-        
-          var listener = google.maps.event.addListener(map, "idle", function () {
-            map.setZoom(15);
-            google.maps.event.removeListener(listener);
-          });
+        } else {
+            $('#status_view').text("Inactive").removeClass("active idle").addClass("inactive");
         }
-        initMap();
-     </script>
-     <script>
-        function fetchData() {
-            setTimeout(function() {
-             updateWidget(newData);
-            }, 3000);
+
+        if (lastGPSData["gsmOperatorCode"]) {
+            $('#gsm_operator').text(lastGPSData.gsmOperatorCode);
         }
-        function updateWidget(data) {
-             var widget = document.getElementById("widget");
-             widget.innerHTML = data;
+
+        if (lastGPSData["gsmSignal"]) {
+            $('#gsm_signal').text(lastGPSData.gsmSignal);
         }
-        fetchData();
-        setInterval(fetchData, 5000);
-     </script>
-</body>
+
+        if (lastGPSData["gsmAreaCode"]) {
+            $('#gsm_area').text(lastGPSData.gsmAreaCode);
+        }
+
+        if (lastGPSData["speed"]) {
+            $('#gps_speed').text('Current Speed: ' + lastGPSData.speed + 'KM/Hr');
+        }
+
+        if (lastGPSData["time"]) {
+            $('#gps_time').text('Current Time: ' + lastGPSData.time);
+        }
+
+        if (lastGPSData["satellite"]) {
+            $('#satellite_connect').text(lastGPSData.satellite);
+        }
+
+        if (lastGPSData["latitude"]) {
+            $('#latitude_view').text(lastGPSData.latitude);
+        }
+
+        if (lastGPSData["longitude"]) {
+            $('#longitude_view').text(lastGPSData.longitude);
+        }
+
+    },
+    error: function (xhr, textStatus, errorThrown) {
+        console.log("Error:", errorThrown);
+    }
+});
+        }
+        updateGpsData();
+        updateExtData();
+
+        setInterval(function () {
+          updateGpsData();
+          updateExtData();
+        }, 5000);
+      });
+    </script>
+    <script>
+      function updateStatus() {
+        var ignitionState = document.getElementById('ignition_state').innerText;
+        var movementState = document.getElementById('movementState_view').innerText;
+        var statusView = document.getElementById('status_view');
+    
+        if (ignitionState === 'ON') {
+          if (movementState === 'Moving') {
+            statusView.innerText = 'Active';
+            statusView.className = 'status active';
+          } else {
+            statusView.innerText = 'Idle';
+            statusView.className = 'status idle';
+          }
+        } else {
+          statusView.innerText = 'Inactive';
+          statusView.className = 'status inactive';
+        }
+      }
+      updateStatus();
+      setInterval(function() {
+        updateStatus();
+      }, 3000);
+</script>
+  </body>
 </html>
