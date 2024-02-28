@@ -1,39 +1,67 @@
+$(document).ready(function(){
+    $("#loginForm").submit(function(e){
+        e.preventDefault();
+        var password = $("#password").val();
+        if(password !== "123456"){
+            alert("Incorrect password! Please try again.");
+        } else {
+			window.location.href="MAP.html";
+            alert("Login successful!");
+        }
+    });
+});
+
+
 
 var ctx = document.getElementById('myPieChart').getContext('2d');
+
+var data = {
+    labels: ['Active Vehicles', 'Inactive Vehicles', 'Idle Vehicles'],
+    datasets: [{
+        label: 'Pie Chart',
+        data: [30, 30, 40],
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.8)', 
+            'rgba(54, 162, 235, 0.8)', 
+            'rgba(255, 206, 86, 0.8)' 
+        ],
+        borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)'
+        ],
+        borderWidth: 1
+    }]
+};
+
 var myPieChart = new Chart(ctx, {
     type: 'pie',
-    data: {
-        labels: ['Active Vehicles', 'Inactive Vehicles', 'Idle Vehicles'],
-        datasets: [{
-            label: 'Pie Chart',
-            data: [30, 30, 40],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 206, 86, 0.8)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
+    data: data,
     options: {
         responsive: true
     }
 });
 
+function updatePieChart() {
+    var active = Math.floor(Math.random() * 100);
+    var inactive = Math.floor(Math.random() * (100 - active));
+    var idle = 100 - active - inactive;
+
+    myPieChart.data.datasets[0].data = [active, inactive, idle];
+
+    myPieChart.update();
+}
+
+updatePieChart();
+
+
 document.addEventListener('DOMContentLoaded', function() {
     var ctx = document.getElementById('myChart').getContext('2d');
 
-    // Function to generate random data
     function generateRandomData() {
       var labels = [];
       var data = [];
 
-      // Generate random time labels
       for (var i = 0; i < 6; i++) {
         var hour = Math.floor(Math.random() * 12) + 1;
         var minute = Math.floor(Math.random() * 60);
@@ -41,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         labels.push(time);
       }
 
-      // Generate random speed data
       for (var i = 0; i < 6; i++) {
         data.push(Math.floor(Math.random() * 12));
       }
@@ -52,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
       };
     }
 
-    // Generate random data
     var randomData = generateRandomData();
 
     var myChart = new Chart(ctx, {
@@ -76,6 +102,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+ 
+function generateRandomTime() {
+    var hours = Math.floor(Math.random() * 12) + 1; 
+    var minutes = Math.floor(Math.random() * 60); 
+    var ampm = Math.random() < 0.5 ? 'AM' : 'PM'; 
+    return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
+  }
+  
+  function generateRandomData() {
+    var data = [];
+    for (var i = 0; i < 6; i++) {
+      data.push(Math.floor(Math.random() * 100));
+    }
+    return data;
+  }
+  
+  function updateTable() {
+    var timeLabels = [];
+    var newData = generateRandomData();
+  
+    for (var i = 0; i < 6; i++) {
+      timeLabels.push(generateRandomTime());
+    }
+  
+    var rows = document.querySelectorAll('.graph tbody tr');
+  
+    rows.forEach(function(row, index) {
+      var span = row.querySelector('span');
+      var percent = newData[index] + '%';
+      row.style.height = percent;
+      row.querySelector('th').textContent = timeLabels[index];
+      span.textContent = percent;
+    });
+  }
+  
 
-
-
+  updateTable();
+ 
+  

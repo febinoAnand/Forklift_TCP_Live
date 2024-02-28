@@ -79,9 +79,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
       .status {
         width: 100px;
@@ -134,6 +131,15 @@
                     aria-expanded="false"
                     class="nav-link dropdown-toggle"
                     ><span class="glyphicon">&#xe081;</span></a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    href="#"
+                    role="button"
+                    aria-expanded="false"
+                    class="nav-link dropdown-toggle"
+                    ><span class="glyphicon">&#xf56e;</span></a>
                   >
                 </li>
                 <li class="nav-item">
@@ -295,7 +301,7 @@
                   <th>Battery</th>
                   <td id="live_cap_widget">
                     <div class="battery-bar">
-                      <div 
+                      <div id="battery_capacity"
                         class="battery-fill-1"
                         style="width: {{extData.batt_capacity | div:'5'| mul:'100%'}};"
                       ></div>
@@ -394,36 +400,36 @@
                 <h2>Utilization Hour</h2>
                 <p>The total Utilization Hour for a week</p>
               </div>
-              <table class="graph">
+              <table class="graph" id="barChart">
                 <thead>
                   <tr>
-                    <th scope="col">Item</th>
+                    <th scope="col">Time</th>
                     <th scope="col">Percent</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr style="height: 55%">
-                    <th scope="row">Day 1</th>
+                    <th scope="row">12:00 AM</th>
                     <td><span>55%</span></td>
                   </tr>
                   <tr style="height: 65%">
-                    <th scope="row">Day 2</th>
+                    <th scope="row">03:00 AM</th>
                     <td><span>65%</span></td>
                   </tr>
                   <tr style="height: 90%">
-                    <th scope="row">Day 3</th>
+                    <th scope="row">06:00 AM</th>
                     <td><span>90%</span></td>
                   </tr>
                   <tr style="height: 70%">
-                    <th scope="row">Day 4</th>
+                    <th scope="row">09:00 AM</th>
                     <td><span>70%</span></td>
                   </tr>
                   <tr style="height: 40%">
-                    <th scope="row">Day 5</th>
+                    <th scope="row">12:00 PM</th>
                     <td><span>40%</span></td>
                   </tr>
                   <tr style="height: 30%">
-                    <th scope="row">Day 6</th>
+                    <th scope="row">03:00 PM</th>
                     <td><span>30%</span></td>
                   </tr>
                 </tbody>
@@ -794,7 +800,7 @@
              let datacount = data.length;
         console.log(data[datacount - 1]);
         
-        let lastEXTData = data[datacount - 1]; // Assuming you want to access the last element of data
+        let lastEXTData = data[datacount - 1];
 
         if (lastEXTData["batt_voltage"]) {
             $('#battery_voltage').text(lastEXTData.batt_voltage);
@@ -810,6 +816,9 @@
         }
         if (lastEXTData["batt_power"]) {
             $('#battery_power').text(lastEXTData.batt_power + "Watt");
+        }
+        if (lastEXTData["batt_capacity"]) {
+            $('#battery_capacity').text(lastEXTData.batt_capacity);
         }
   
     },
@@ -862,7 +871,7 @@
         }
 
         if (lastGPSData["speed"]) {
-            $('#gps_speed').text('Current Speed: ' + lastGPSData.speed + 'KM/Hr');
+            $('#gps_speed').text('Current Speed: ' + lastGPSData.speed + ' Km/Hr');
         }
 
         if (lastGPSData["time"]) {
