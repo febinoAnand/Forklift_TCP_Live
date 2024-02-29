@@ -64,7 +64,7 @@ body {background:#F6F8FA;}
 a:focus {outline:0px solid}
 img {max-width:100%;height:auto}
 .fix {overflow:hidden}
-p {margin:0 0 15px;}
+p {margin:0 0 0px;}
 h1, h2, h3, h4, h5, h6 {
   margin: 0 0 10px;
   font-weight:700;
@@ -187,7 +187,7 @@ body {}
 	background:#ffb1a7;
 }
 .logo-area{
-	padding: 8px 0px;
+	padding: 14px 0px;
 }
 .nav.navbar-nav.notika-top-nav{
 	float: right;
