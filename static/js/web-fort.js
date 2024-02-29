@@ -58,54 +58,38 @@ document.addEventListener('DOMContentLoaded', function() {
   var ctx = document.getElementById('myChart').getContext('2d');
   var myChart;
 
-  function generateRandomData() {
-    var labels = [];
-    var gpsData = [];
-    var extData = [];
+  function updateChartWithData(data) {
+    var labels = data.gps_speed.map(entry => entry[0]); // Extract time from GPS speed data
+    var gpsSpeedData = data.gps_speed.map(entry => entry[1]); // Extract GPS speed values
+    var extSpeedData = data.ext_speed.map(entry => entry[1]); // Extract EXT speed values
 
-    for (var i = 0; i < 6; i++) {
-      var hour = Math.floor(Math.random() * 12) + 1;
-      var minute = Math.floor(Math.random() * 60);
-      var time = hour + ':' + (minute < 10 ? '0' : '') + minute + (hour < 12 ? ' AM' : ' PM');
-      labels.push(time);
-    }
-
-    for (var i = 0; i < 6; i++) {
-      gpsData.push(Math.floor(Math.random() * 12)); 
-      extData.push(Math.floor(Math.random() * 12)); 
-    }
-
-    return {
-      labels: labels,
-      gpsData: gpsData,
-      extData: extData
-    };
-  }
-
-  function updateChart() {
-    var newData = generateRandomData();
-
-    myChart.data.labels = newData.labels;
-    myChart.data.datasets[0].data = newData.gpsData; 
-    myChart.data.datasets[1].data = newData.extData; 
+    myChart.data.labels = labels;
+    myChart.data.datasets[0].data = gpsSpeedData;
+    myChart.data.datasets[1].data = extSpeedData;
 
     myChart.update();
   }
 
-  var initialData = generateRandomData();
+  function fetchDataAndUpdateChart() {
+    fetch('/get_speed_data/') // URL to fetch data from
+      .then(response => response.json())
+      .then(data => updateChartWithData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }
+
   myChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: initialData.labels,
+      labels: [],
       datasets: [{
         label: 'GPS-Speed',
-        data: initialData.gpsData,
+        data: [],
         borderColor: 'red',
         borderWidth: 1
       },
       {
         label: 'EXT-Speed',
-        data: initialData.extData,
+        data: [],
         borderColor: 'blue',
         borderWidth: 1
       }]
@@ -118,7 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
-  setInterval(updateChart, 5000);
+
+  setInterval(fetchDataAndUpdateChart, 5000);
 });
 //line chart end //
 

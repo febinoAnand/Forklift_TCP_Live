@@ -15,3 +15,4 @@ def gps_data_list(request):
         gps_data = GPSData.objects.all()
         serializer = GPSDataSerializer(gps_data, many=True)
         return JsonResponse(serializer.data, safe=False)
+    

@@ -35,3 +35,6 @@ def updateEXTTableView(request):
         ext_table_json = serializers.serialize('json', ext_table_list)
         # print (ext_table_json)
     return HttpResponse(ext_table_json,content_type='application/json')
+
+def report_page_view(request):
+    return render(request, 'reportpage.html')
