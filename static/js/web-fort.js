@@ -50,7 +50,7 @@ function updatePieChart() {
 
   myPieChart.update();
 }
-setInterval(updatePieChart, 3000);
+setInterval(updatePieChart, 5000);
 // pie chart end//
 
 // line chart start //
@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function generateRandomData() {
     var labels = [];
-    var data = [];
+    var gpsData = [];
+    var extData = [];
 
     for (var i = 0; i < 6; i++) {
       var hour = Math.floor(Math.random() * 12) + 1;
@@ -70,12 +71,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     for (var i = 0; i < 6; i++) {
-      data.push(Math.floor(Math.random() * 12));
+      gpsData.push(Math.floor(Math.random() * 12)); 
+      extData.push(Math.floor(Math.random() * 12)); 
     }
 
     return {
       labels: labels,
-      data: data
+      gpsData: gpsData,
+      extData: extData
     };
   }
 
@@ -83,7 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var newData = generateRandomData();
 
     myChart.data.labels = newData.labels;
-    myChart.data.datasets[0].data = newData.data;
+    myChart.data.datasets[0].data = newData.gpsData; 
+    myChart.data.datasets[1].data = newData.extData; 
 
     myChart.update();
   }
@@ -94,9 +98,15 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
       labels: initialData.labels,
       datasets: [{
-        label: 'Speed',
-        data: initialData.data,
+        label: 'GPS-Speed',
+        data: initialData.gpsData,
         borderColor: 'red',
+        borderWidth: 1
+      },
+      {
+        label: 'EXT-Speed',
+        data: initialData.extData,
+        borderColor: 'blue',
         borderWidth: 1
       }]
     },
@@ -108,9 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
-
-
-  setInterval(updateChart, 3000);
+  setInterval(updateChart, 5000);
 });
 //line chart end //
 
@@ -153,5 +161,5 @@ function fetchDataAndUpdate() {
 
   updateTable();
 }
-setInterval(fetchDataAndUpdate, 3000);
+setInterval(fetchDataAndUpdate, 5000);
 // bar chart ens //
