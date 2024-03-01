@@ -35,7 +35,6 @@ class GPSData(models.Model):
         return ( str(self.date) +"_"+ str(self.time) + " // " + self.device_id.device_id)
 
 
-
 class EXTData(models.Model):
     device_id = models.ForeignKey(tracker_device, on_delete=models.CASCADE)
     server_date = models.DateField(auto_now_add = True)

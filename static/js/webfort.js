@@ -42,14 +42,23 @@ var myPieChart = new Chart(ctx, {
 });
 
 function updatePieChart() {
-  var active = Math.floor(Math.random() * 100);
-  var inactive = Math.floor(Math.random() * (100 - active));
-  var idle = 100 - active - inactive;
+  var start_date = '2024-01-19';
+  var end_date = '2024-02-27';
 
-  myPieChart.data.datasets[0].data = [active, inactive, idle];
-
-  myPieChart.update();
+  $.ajax({
+      url: '/get_gps_data/',
+      data: {
+          start_date: start_date,
+          end_date: end_date
+      },
+      dataType: 'json',
+      success: function(data) {
+          myPieChart.data.datasets[0].data = [data.active, data.inactive, data.idle];
+          myPieChart.update();
+      }
+  });
 }
+
 setInterval(updatePieChart, 5000);
 // pie chart end//
 
