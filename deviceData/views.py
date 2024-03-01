@@ -48,3 +48,4 @@ def get_gps_data(request):
             data['active'] = entry['count']
 
     return JsonResponse(data)
+    

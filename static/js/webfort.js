@@ -42,8 +42,8 @@ var myPieChart = new Chart(ctx, {
 });
 
 function updatePieChart() {
-  var start_date = '2024-01-19';
-  var end_date = '2024-02-27';
+  var start_date = '2024-01-19'; 
+  var end_date = '2024-02-27';  
 
   $.ajax({
       url: '/get_gps_data/',

@@ -128,6 +128,11 @@
             <div class="header-top-menu">
               <ul class="nav navbar-nav notika-top-nav">
                 <li class="nav-item">
+                  <a href="#" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                    <span class="glyphicon glyphicon-arrow-left"></span>
+                  </a>
+                </li>
+                <li class="nav-item">
                   <a href="/reportpage/" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
                     <span class="glyphicon glyphicon-save-file"></span>
                   </a>
@@ -200,7 +205,7 @@
               >
                 <div class="percentage"></div>
                 <div class="mask"></div>
-                <span id="gps-speed" class="value">{{gpsData.speed}} Km/Hr</span>
+                <span id="gps_speed" class="value">{{gpsData.speed}} Km/Hr</span>
               </div>
               <br />
               <br />
@@ -320,7 +325,7 @@
               </div>
               <div id="gps-data-container" class="email-round-nock">
                 <div class="circle">
-                  <div id="gps_speed" class="text" style="color: white; font-size: 12px">
+                  <div id="gps-speed" class="text" style="color: white; font-size: 12px">
                     Current Speed: {{gpsData.speed}}
                   </div>
                 </div>
@@ -393,33 +398,33 @@
               <table class="graph" id="barChart">
                 <thead>
                   <tr>
-                    <th scope="col">Time</th>
+                    <th scope="col">Day</th>
                     <th scope="col">Percent</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr style="height: 55%">
-                    <th scope="row">12:00 AM</th>
+                    <th scope="row">Sunday</th>
                     <td><span>55%</span></td>
                   </tr>
                   <tr style="height: 65%">
-                    <th scope="row">03:00 AM</th>
+                    <th scope="row">Monday</th>
                     <td><span>65%</span></td>
                   </tr>
                   <tr style="height: 90%">
-                    <th scope="row">06:00 AM</th>
+                    <th scope="row">Tuesday</th>
                     <td><span>90%</span></td>
                   </tr>
                   <tr style="height: 70%">
-                    <th scope="row">09:00 AM</th>
+                    <th scope="row">Wednesday</th>
                     <td><span>70%</span></td>
                   </tr>
                   <tr style="height: 40%">
-                    <th scope="row">12:00 PM</th>
+                    <th scope="row">Thursday</th>
                     <td><span>40%</span></td>
                   </tr>
                   <tr style="height: 30%">
-                    <th scope="row">03:00 PM</th>
+                    <th scope="row">Friday</th>
                     <td><span>30%</span></td>
                   </tr>
                 </tbody>
@@ -861,7 +866,7 @@
         }
 
         if (lastGPSData["speed"]) {
-            $('#gps_speed').text('Current Speed: ' + lastGPSData.speed + ' Km/Hr');
+            $('#gps_speed').text( lastGPSData.speed + ' Km/Hr');
         }
 
         if (lastGPSData["time"]) {

@@ -54,7 +54,14 @@
     <!-- modernizr JS
 		============================================ -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-      
+     
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+
     <style>
         .data-table-area {
             position: relative;
@@ -83,6 +90,11 @@
           <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
             <div class="header-top-menu">
               <ul class="nav navbar-nav notika-top-nav">
+                <li class="nav-item">
+                  <a href="#" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                    <span class="glyphicon glyphicon-arrow-left"></span>
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a href="/" role="button"><span class="glyphicon glyphicon-log-out"></span></a>
                 </li>
@@ -149,13 +161,15 @@
                                     <!-- Table body content goes here -->
                                 </tbody>
                             </table>
+                            <div>
+                              <button id="excelButton">Download Excel</button>
+                              <button id="csvButton">Download CSV</button>
+                              <button id="pdfButton">Download PDF</button>
+                          </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="search-container-1">
-            <button id="download-btn">Download</button>
         </div>
     </div>
     <br />
@@ -243,15 +257,37 @@
         
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        <script src="static/js/web-fort.js"></script>
+        <script src="static/js/webfort.js"></script>
         
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#data-table-basic').DataTable();
-        });
-    </script>
+        <script>
+          $(document).ready(function() {
+
+              var dataTable = $('#data-table-basic').DataTable();
+      
+              new $.fn.dataTable.Buttons(dataTable, {
+                  buttons: [
+                      'excel', 'csv', 'pdf'
+                  ]
+              });
+
+              dataTable.buttons().container().appendTo($('#buttons'));
+
+              $('#excelButton').on('click', function() {
+                  dataTable.buttons('.buttons-excel').trigger();
+              });
+      
+              $('#csvButton').on('click', function() {
+                  dataTable.buttons('.buttons-csv').trigger();
+              });
+      
+              $('#pdfButton').on('click', function() {
+                  dataTable.buttons('.buttons-pdf').trigger();
+              });
+          });
+      </script>
+      
 
 <script>
     function search() {
