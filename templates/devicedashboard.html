@@ -327,7 +327,7 @@
               <div id="gps-data-container" class="email-round-nock">
                 <div class="circle">
                   <div id="gps-speed" class="text" style="color: white; font-size: 12px">
-                    Current Speed: {{gpsData.speed}}
+                    Satellite Details
                   </div>
                 </div>
                 <div class="circle" style="color: white; font-size: 12px">
@@ -610,12 +610,20 @@
 
     <script src="static/js/webfort.js"></script>
     <script>
-      function initMap() {
+      function updateMapWithData() {
+        fetch('/api/get-gps-data/') 
+            .then(response => response.json())
+            .then(data => {
+                setMarkers(data);
+            })
+            .catch(error => console.error('Error fetching GPS data:', error));
+    }
+
+    function setMarkers(data) {
         const map = new google.maps.Map(document.getElementById("map"), {
-          center: new google.maps.LatLng(0, 0),
-          zoom: 0,
-          center: new google.maps.LatLng(0, 0),
-          styles: [{
+            center: { lat: 0, lng: 0 },
+            zoom: 2,
+            styles: [{
             "featureType": "water",
             "elementType": "geometry",
             "stylers": [{
@@ -732,57 +740,27 @@
             }]
           }]
         });
-        setMarkers(map);
-      }
-      const beaches = [
-        [,{{gpsData.latitude}}, {{gpsData.longitude}}],
-        // [, 13.031971618021048, 80.21026330467988],
-        // [, 13.03202649368258, 80.20995216843065],
-        // [, 13.03173121021757, 80.21002592917938],
-        // [, 13.033540385088923, 80.21162835322411],
-      ];
-
-      function setMarkers(map) {
         const image = {
-          url: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
-          labelOrigin: new google.maps.Point(130, 10),
-          size: new google.maps.Size(50, 32),
-          origin: new google.maps.Point(0, 0),
-          anchor: new google.maps.Point(11, 40),
-        };
-        const shape = {
-          coords: [1, 1, 1, 20, 18, 20, 18, 1],
-          type: "poly",
+            url: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
+            labelOrigin: new google.maps.Point(130, 10),
+            size: new google.maps.Size(50, 32),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(11, 40),
         };
 
         const bounds = new google.maps.LatLngBounds();
-        for (let i = 0; i < beaches.length; i++) {
-          const beach = beaches[i];
-          marker = new google.maps.Marker({
-            position: {
-              lat: beach[1],
-              lng: beach[2]
-            },
-            map,
-            icon: image,
-            shape: shape,
-            label: {
-              color: 'black',
-              fontWeight: 'bold',
-              text: beach[0],
-            },
-            zIndex: beach[3],
-          });
-          bounds.extend(marker.position);
-        }
-        map.fitBounds(bounds);
-
-        var listener = google.maps.event.addListener(map, "idle", function () {
-          map.setZoom(15);
-          google.maps.event.removeListener(listener);
+        data.forEach(markerData => {
+            const marker = new google.maps.Marker({
+                position: { lat: markerData.latitude, lng: markerData.longitude },
+                map: map,
+                icon: image,
+            });
+            bounds.extend(marker.getPosition());
         });
-      }
-      initMap();
+        map.fitBounds(bounds);
+    }
+
+    updateMapWithData();
     </script>
     <script>
       $(document).ready(function () {

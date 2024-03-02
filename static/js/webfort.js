@@ -114,31 +114,28 @@ document.addEventListener('DOMContentLoaded', function() {
 //line chart end //
 
 // bar chart start //
-function generateRandomData() {
-  var data = [];
-  for (var i = 0; i < 6; i++) {
-    data.push(Math.floor(Math.random() * 100));
-  }
-  return data;
-}
-
-function updateTable() {
+function updateBarChart(data) {
   var daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var reorderedDays = daysOfWeek.slice(1).concat(daysOfWeek.slice(0, 1)); 
-  var newData = generateRandomData();
 
   for (var i = 0; i < 6; i++) {
-    var day = reorderedDays[i];
-    var percent = newData[i] + '%';
-    var row = document.querySelectorAll('.graph tbody tr')[i];
-    row.style.height = percent;
-    row.querySelector('th').textContent = day;
-    row.querySelector('span').textContent = percent;
+      var day = daysOfWeek[i];
+      var utilizationHours = data[day] || 0;
+      var percent = (utilizationHours / MAX_HOURS) * 100;
+
+      var row = document.querySelectorAll('.graph tbody tr')[i];
+      row.style.height = percent + '%';
+      row.querySelector('th').textContent = day;
+      row.querySelector('span').textContent = percent.toFixed(2) + '%';
   }
 }
 
 function fetchDataAndUpdate() {
-  updateTable();
+  fetch('/utilization-hours/')
+      .then(response => response.json())
+      .then(data => updateBarChart(data))
+      .catch(error => console.error('Error fetching data:', error));
 }
+
+const MAX_HOURS = 24 * 6;
 setInterval(fetchDataAndUpdate, 5000);
 // bar chart ens //

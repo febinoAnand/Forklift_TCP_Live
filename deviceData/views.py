@@ -3,8 +3,9 @@ from rest_framework import serializers
 from .models import EXTData, GPSData
 from .serializers import EXTDataSerializer, GPSDataSerializer
 from .import views
-from datetime import datetime, date ,time
+from datetime import datetime, date ,time ,timedelta
 from django.db.models import Count
+from django.shortcuts import render
 
 
 def ext_data_list(request):
@@ -18,6 +19,10 @@ def gps_data_list(request):
         gps_data = GPSData.objects.all()
         serializer = GPSDataSerializer(gps_data, many=True)
         return JsonResponse(serializer.data, safe=False)
+    
+def get_gps_data(request):
+    gps_data = GPSData.objects.all().values('latitude', 'longitude') 
+    return JsonResponse(list(gps_data), safe=False)
     
 def get_last_data(request):
     last_gps_data = GPSData.objects.order_by('-date', '-time')[:5]
@@ -50,3 +55,18 @@ def get_today_gps_data(request):
             active = item['count']
 
     return JsonResponse({'active': active, 'idle': idle, 'inactive': inactive})
+
+def get_utilization_hours(request):
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=6)
+
+    gps_data = GPSData.objects.filter(date__range=[start_date, end_date])
+
+    utilization_hours = {}
+    for day in range(6):
+        current_date = start_date + timedelta(days=day)
+        day_data = gps_data.filter(date=current_date)
+        total_utilization_hours = sum([data.distance for data in day_data])
+        utilization_hours[current_date.strftime('%A')] = total_utilization_hours
+
+    return JsonResponse(utilization_hours)
