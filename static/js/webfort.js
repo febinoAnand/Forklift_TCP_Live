@@ -14,52 +14,50 @@ $(document).ready(function(){
 
 // pie chart start//
 var ctx = document.getElementById('myPieChart').getContext('2d');
-var data = {
-  labels: ['Active Vehicles', 'Inactive Vehicles', 'Idle Vehicles'],
-  datasets: [{
-      label: 'Pie Chart',
-      data: [30, 30, 40],
-      backgroundColor: [
-          'rgba(54, 162, 235, 0.8)', 
-          'rgba(255, 99, 132, 0.8)', 
-          'rgba(255, 206, 86, 0.8)' 
-      ],
-      borderColor: [
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 99, 132, 1)',
-          'rgba(255, 206, 86, 1)'
-      ],
-      borderWidth: 1
-  }]
-};
-
-var myPieChart = new Chart(ctx, {
-  type: 'pie',
-  data: data,
-  options: {
-      responsive: true
-  }
-});
+var myPieChart;
 
 function updatePieChart() {
-  var start_date = '2024-01-19'; 
-  var end_date = '2024-02-27';  
+    fetch('/get_today_gps_data/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.active === 0 && data.idle === 0 && data.inactive === 0) {
+                data.inactive = 100;
+            }
 
-  $.ajax({
-      url: '/get_gps_data/',
-      data: {
-          start_date: start_date,
-          end_date: end_date
-      },
-      dataType: 'json',
-      success: function(data) {
-          myPieChart.data.datasets[0].data = [data.active, data.inactive, data.idle];
-          myPieChart.update();
-      }
-  });
+            myPieChart.data.datasets[0].data = [data.active, data.inactive, data.idle];
+            myPieChart.update();
+        })
+        .catch(error => console.error('Error fetching data:', error));
 }
+document.addEventListener('DOMContentLoaded', function() {
+    myPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Active Vehicles', 'Inactive Vehicles', 'Idle Vehicles'],
+            datasets: [{
+                label: 'Today',
+                data: [0, 0, 0],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(255, 206, 86, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
 
-setInterval(updatePieChart, 5000);
+    updatePieChart();
+    setInterval(updatePieChart, 5000);
+});
 // pie chart end//
 
 // line chart start //
