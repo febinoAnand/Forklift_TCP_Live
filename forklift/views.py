@@ -10,7 +10,7 @@ def loginView(request):
     return render(request,'login.html')
 
 def deviceDashborad(request):
-    currentDevice = tracker_device.objects.get(device_id = '352592573193224')
+    currentDevice = tracker_device.objects.get(device_id = '352592573198322')
     gpsData = GPSData.objects.all().order_by('-pk')[0]
     extData = EXTData.objects.all().order_by('-pk')[0]
     rand = random.randint(1,10)
