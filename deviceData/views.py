@@ -6,6 +6,10 @@ from .import views
 from datetime import datetime, date ,time ,timedelta
 from django.db.models import Count
 from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
+from rest_framework import status
+import json
 
 
 def ext_data_list(request):
@@ -13,12 +17,26 @@ def ext_data_list(request):
         ext_data = EXTData.objects.all()
         serializer = EXTDataSerializer(ext_data, many=True)
         return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        serializer = EXTDataSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
 
 def gps_data_list(request):
     if request.method == 'GET':
         gps_data = GPSData.objects.all()
         serializer = GPSDataSerializer(gps_data, many=True)
         return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = GPSDataSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 def get_gps_data(request):
     gps_data = GPSData.objects.all().values('latitude', 'longitude') 
