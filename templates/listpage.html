@@ -6,7 +6,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Report page</title>
+    <title>List page</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	
@@ -54,25 +54,7 @@
     <!-- modernizr JS
 		============================================ -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-
-    <style>
-        .data-table-area {
-            position: relative;
-        }
-        .search-container-1 {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-    </style>
+    <link rel="stylesheet" href="../static/css/mystyle.css">
 
 </head>
 <body>
@@ -82,7 +64,7 @@
         <div class="row">
           <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
             <div class="logo-area">
-              <a href="/"
+              <a href="#"
                 ><p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a
               >
             </div>
@@ -91,89 +73,151 @@
             <div class="header-top-menu">
               <ul class="nav navbar-nav notika-top-nav">
                 <li class="nav-item">
-                  <a href="/devicedashboard" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
-                    <span class="glyphicon glyphicon-arrow-left"></span>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/" role="button"><span class="glyphicon glyphicon-log-out"></span></a>
-                </li>
+                    <a href="/" role="button"><span class="glyphicon glyphicon-log-out"></span></a>
+                  </li>
               </ul>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <br /><br />
-    <!-- table area start -->
-    <div class="mobile-menu-area">
+    <br /><br /><br><br><br>
+    <!-- Start Status area -->
+    <div class="notika-status-area">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="search-container">
-                        <label for="fromDate">From :</label>
-                        <input type="date" id="fromDate">
-
-                        <label for="toDate">To :</label>
-                        <input type="date" id="toDate">
-
-                        <label for="category">Select :</label>
-                        <select id="category">
-                            <option value="all">Option 1</option>
-                            <option value="books">Option 2</option>
-                            <option value="movies">Option 3</option>
-                            <option value="music">Option 4</option>
-                        </select>
-
-                        <button onclick="search()">Search</button>
-                        <button onclick="clearFields()">Clear</button>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <a href="/devicedashboard">
+                    <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                        <div class="website-traffic-ctn">
+                            <div class="widget-img-head">
+                                <div class="widget-status">
+                                </div>
+                                <div style="display: flex; flex-direction: column;margin-left: 20px; justify-content: center;">
+                                    <h2 class="widget-head">Forklift 1</h2>
+                                    <p style="margin-top: -10px;">ID:23984</p>
+                                </div>
+                            </div>
+                            <div class="widget-head-value">
+                                
+                                <div>
+                                    <div class="widget-distance-head">Distance</div>
+                                    <div class="widget-distance-value">33 Kms</div>
+                                </div>
+                                 <div>
+                                    <div class="widget-distance-head">Hours</div>
+                                    <div class="widget-distance-value">3Hr</div>
+                                </div>
+                                <div>
+                                    <div class="widget-distance-head">Voltage</div>
+                                    <div class="widget-distance-value">24.34 V</div>
+                                </div>
+                            </div>  
+                        </div> 
                     </div>
+                    </a>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <a href="/devicedashboard">
+                    <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                        <div class="website-traffic-ctn">
+                            <div class="widget-img-head">
+                                <div class="widget-status" style="background-color: lightcoral;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;margin-left: 20px; justify-content: center;">
+                                    <h2 class="widget-head">Forklift 2</h2>
+                                    <p style="margin-top: -10px;">ID:23984</p>
+                                </div>
+                            </div>
+                            <div class="widget-head-value">
+                                
+                                <div>
+                                    <div class="widget-distance-head">Distance</div>
+                                    <div class="widget-distance-value">33 Kms</div>
+                                </div>
+                                 <div>
+                                    <div class="widget-distance-head">Hours</div>
+                                    <div class="widget-distance-value">3Hr</div>
+                                </div>
+                                <div>
+                                    <div class="widget-distance-head">Voltage</div>
+                                    <div class="widget-distance-value">24.34 V</div>
+                                </div>
+                            </div>  
+                        </div> 
+                    </div>
+                    </a>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <a href="/devicedashboard">
+                    <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                        <div class="website-traffic-ctn">
+                            <div class="widget-img-head">
+                                <div class="widget-status" style="background-color: yellow;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;margin-left: 20px; justify-content: center;">
+                                    <h2 class="widget-head">Forklift 3</h2>
+                                    <p style="margin-top: -10px;">ID:23984</p>
+                                </div>
+                            </div>
+                            <div class="widget-head-value">
+                                
+                               <div>
+                                    <div class="widget-distance-head">Distance</div>
+                                    <div class="widget-distance-value">33 Kms</div>
+                                </div>
+                                 <div>
+                                    <div class="widget-distance-head">Hours</div>
+                                    <div class="widget-distance-value">3Hr</div>
+                                </div>
+                                <div>
+                                    <div class="widget-distance-head">Voltage</div>
+                                    <div class="widget-distance-value">24.34 V</div>
+                                </div> 
+                            </div>  
+                        </div> 
+                    </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <a href="/devicedashboard">
+                    <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                        <div class="website-traffic-ctn">
+                            <div class="widget-img-head">
+                                <div class="widget-status" style="background-color: yellow;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;margin-left: 20px; justify-content: center;">
+                                    <h2 class="widget-head">Forklift 4</h2>
+                                    <p style="margin-top: -10px;">ID:23984</p>
+                                </div>
+                            </div>
+                            <div class="widget-head-value">
+                                
+                               <div>
+                                    <div class="widget-distance-head">Distance</div>
+                                    <div class="widget-distance-value">33 Kms</div>
+                                </div>
+                                 <div>
+                                    <div class="widget-distance-head">Hours</div>
+                                    <div class="widget-distance-value">3Hr</div>
+                                </div>
+                                <div>
+                                    <div class="widget-distance-head">Voltage</div>
+                                    <div class="widget-distance-value">24.34 V</div>
+                                </div> 
+                            </div>  
+                        </div> 
+                    </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-    <br/>
-    <div class="data-table-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="data-table-list">
-                        <div class="basic-tb-hd">
-                            <h2>Report</h2>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="data-table-basic" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>S/NO</th>
-                                        <th>DATE</th>
-                                        <th>TIME</th>
-                                        <th>DISTANCE</th>
-                                        <th>SPEED</th>
-                                        <th>WATT HR</th>
-                                        <th>BATT VOLTAGE</th>
-                                        <th>BATT AMP</th>
-                                        <th>BATT POWER</th>
-                                        <th>BATT CHARGE</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Table body content goes here -->
-                                </tbody>
-                            </table>
-                            <div>
-                              <button id="excelButton">Download Excel</button>
-                              <button id="csvButton">Download CSV</button>
-                              <button id="pdfButton">Download PDF</button>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- End Status area-->
+    
     <br />
-    <!-- Table area End-->
     <!-- Start Footer area-->
     <div class="footer-copyright-area">
       <div class="container">
@@ -186,6 +230,7 @@
         </div>
       </div>
     </div>
+    
      <!-- jquery
 		============================================ -->
         <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
@@ -258,49 +303,5 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-        <script>
-          $(document).ready(function() {
 
-              var dataTable = $('#data-table-basic').DataTable();
-      
-              new $.fn.dataTable.Buttons(dataTable, {
-                  buttons: [
-                      'excel', 'csv', 'pdf'
-                  ]
-              });
-
-              dataTable.buttons().container().appendTo($('#buttons'));
-
-              $('#excelButton').on('click', function() {
-                  dataTable.buttons('.buttons-excel').trigger();
-              });
-      
-              $('#csvButton').on('click', function() {
-                  dataTable.buttons('.buttons-csv').trigger();
-              });
-      
-              $('#pdfButton').on('click', function() {
-                  dataTable.buttons('.buttons-pdf').trigger();
-              });
-          });
-      </script>
-      
-
-<script>
-    function search() {
-        var fromDate = document.getElementById('fromDate').value;
-        var toDate = document.getElementById('toDate').value;
-        var category = document.getElementById('category').value;
-        console.log("Searching from:", fromDate, "to:", toDate, "for category:", category);
-    }
-
-    function clearFields() {
-        document.getElementById('fromDate').value = '';
-        document.getElementById('toDate').value = '';
-        document.getElementById('category').value = 'all';
-    }
-</script>
-         
-  </body>
-</html>
+</body>

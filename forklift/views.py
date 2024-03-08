@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from forklift.models import tracker_device
 from django.http import HttpResponse
 from deviceData.models import GPSData,EXTData
@@ -38,3 +38,12 @@ def updateEXTTableView(request):
 
 def report_page_view(request):
     return render(request, 'reportpage.html')
+
+def registration_view(request):
+    if request.method == 'POST':
+        return redirect('login')
+    else:
+        return render(request, 'registration.html')
+
+def list_page_view(request):
+    return render(request, 'listpage.html')

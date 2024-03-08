@@ -6,7 +6,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Login page</title>
+    <title>Registration page</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	
@@ -61,28 +61,40 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
     <!-- Login Register area Start-->
-	<form id="loginForm">
-    <div class="login-content">
-        <!-- Login -->
-        <div class="nk-block toggled" id="l-login">
-            <div class="nk-form">
-                <div class="input-group">
-                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-support"></i></span>
-                    <div class="nk-int-st">
-                        <input type="text" id="username" class="form-control" placeholder="Username" required>
-                    </div>
-                </div>
-                <div class="input-group mg-t-15">
-                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
-                    <div class="nk-int-st">
-                        <input type="password" id ="password" class="form-control" placeholder="Password" required>
-                    </div>
-                </div><br>
-                <button>Login</button>
-                <button id="registerBtn">Register</button>
-            </div>
-        </div>
-    </div>
+    <form id="registrationForm" action="{% url 'register' %}" method="post">
+      <div class="login-content">
+          <div class="nk-block toggled" id="l-login">
+              <div class="nk-form">
+                  <div class="input-group">
+                      <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-support"></i></span>
+                      <div class="nk-int-st">
+                          <input type="text" id="fullname" class="form-control" placeholder="Full Name" required>
+                      </div>
+                  </div>
+                  <div class="input-group mg-t-15">
+                      <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-mail"></i></span>
+                      <div class="nk-int-st">
+                          <input type="email" id="email" class="form-control" placeholder="Email" required>
+                      </div>
+                  </div>
+                  <div class="input-group mg-t-15">
+                      <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
+                      <div class="nk-int-st">
+                          <input type="password" id="password" class="form-control" placeholder="Password" required>
+                      </div>
+                  </div>
+                  <div class="input-group mg-t-15">
+                      <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
+                      <div class="nk-int-st">
+                          <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm Password" required>
+                          <p id="error-message" style="color: red; display: none;">Passwords do not match.</p>
+                      </div>
+                  </div><br>
+                  <button type="submit">Register</button>
+              </div>
+          </div>
+      </div>
+  </form>    
     <!-- jquery
 		============================================ -->
     <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
@@ -151,31 +163,24 @@
     <script src="../static/js/main.js"></script>
 	
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	
-	<script>
-$(document).ready(function(){
-    $("#loginForm").submit(function(e){
-        e.preventDefault();
-        var password = $("#password").val();
-        var username = $("#username").val();
-		    var errorMessage = $("#errorMessage");
-        if(password === "admin" && username === "admin"){
-          window.location.href="/listpage";
-        } 
-        else {
-          alert("Incorrect password! Please try again.");
-			    $("#password").attr("type", "text");
-			      
+
+  <script>
+    document.getElementById("registrationForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+            document.getElementById("error-message").style.display = "block";
+        } else {
+            document.getElementById("error-message").style.display = "none";
+            this.submit();
+            window.location.href = "/";
         }
     });
-});
 </script>
-<script>
-  document.getElementById("registerBtn").addEventListener("click", function() {
-      window.location.href = "/register";
-  });
-</script>
-</form>
+
 </body>
 
 </html>
