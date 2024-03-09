@@ -62,6 +62,7 @@
         <![endif]-->
     <!-- Login Register area Start-->
     <form id="registrationForm" action="{% url 'register' %}" method="post">
+      {% csrf_token %}
       <div class="login-content">
           <div class="nk-block toggled" id="l-login">
               <div class="nk-form">
@@ -187,6 +188,7 @@
     <script src="../static/js/main.js"></script>
 	
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 </body>
 

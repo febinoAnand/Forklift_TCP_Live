@@ -47,3 +47,30 @@ def registration_view(request):
 
 def list_page_view(request):
     return render(request, 'listpage.html')
+
+def register(request):
+    if request.method == 'POST':
+
+        device_id = request.POST.get('deviceId')
+        vehicle_name = request.POST.get('vehicleName')
+        device_model = request.POST.get('deviceModel')
+        vehicle_id = request.POST.get('vehicleId')
+        driver = request.POST.get('driver')
+        manufacturer = request.POST.get('manufacturer')
+        hardware_version = request.POST.get('hardwareVersion')
+        software_version = request.POST.get('softwareVersion')
+
+        new_device = tracker_device.objects.create(
+            device_id=device_id,
+            vehicle_name=vehicle_name,
+            device_model=device_model,
+            vehicle_id=vehicle_id,
+            driver=driver,
+            manufacturer=manufacturer,
+            hardware_version=hardware_version,
+            software_version=software_version
+        )
+        new_device.save()
+        return redirect('login')
+    else:
+        return render(request, 'registration.html')
