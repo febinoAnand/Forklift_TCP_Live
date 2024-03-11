@@ -304,14 +304,11 @@
                 <tr>
                   <th>Battery</th>
                   <td id="live_cap_widget">
-                    <div class="battery-bar">
-                      <div id="battery_capacity"
-                        class="battery-fill-1"
-                        style="width: {{extData.batt_capacity | div:'5'| mul:'100%'}};"
-                      ></div>
-                    </div>
+                      <div class="battery-bar">
+                          <div id="battery_capacity" class="battery-fill-1" style="width: {{ extData.batt_capacity | div:'5' | mul:'100%' }}"></div>
+                      </div>
                   </td>
-                </tr>
+              </tr>
                 <tr>
                   <th>Battery Voltage</th>
                   <td id="battery_voltage">{{extData.batt_voltage}}</td>
@@ -385,7 +382,7 @@
             class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
             style="margin-bottom: 30px"
           >
-            <div class="google-map-single" style="height: 500px">
+            <div class="google-map-single" style="height: 450px">
               <div id="map"></div>
             </div>
           </div>
@@ -405,38 +402,38 @@
               </div>
               <table class="graph" id="barChart">
                 <thead>
-                  <tr>
-                    <th scope="col">Day</th>
-                    <th scope="col">Percent</th>
-                  </tr>
+                    <tr>
+                        <th scope="col">Day</th>
+                        <th scope="col">Percent</th>
+                    </tr>
                 </thead>
                 <tbody>
-                  <tr style="height: 55%">
-                    <th scope="row">Sunday</th>
-                    <td><span>55%</span></td>
-                  </tr>
-                  <tr style="height: 65%">
-                    <th scope="row">Monday</th>
-                    <td><span>65%</span></td>
-                  </tr>
-                  <tr style="height: 90%">
-                    <th scope="row">Tuesday</th>
-                    <td><span>90%</span></td>
-                  </tr>
-                  <tr style="height: 70%">
-                    <th scope="row">Wednesday</th>
-                    <td><span>70%</span></td>
-                  </tr>
-                  <tr style="height: 40%">
-                    <th scope="row">Thursday</th>
-                    <td><span>40%</span></td>
-                  </tr>
-                  <tr style="height: 30%">
-                    <th scope="row">Friday</th>
-                    <td><span>30%</span></td>
-                  </tr>
+                    <tr style="height: 55%">
+                        <th scope="row">Monday</th>
+                        <td><span>55%</span></td>
+                    </tr>
+                    <tr style="height: 65%">
+                        <th scope="row">Tuesday</th>
+                        <td><span>65%</span></td>
+                    </tr>
+                    <tr style="height: 90%">
+                        <th scope="row">Wednesday</th>
+                        <td><span>90%</span></td>
+                    </tr>
+                    <tr style="height: 70%">
+                        <th scope="row">Thursday</th>
+                        <td><span>70%</span></td>
+                    </tr>
+                    <tr style="height: 40%">
+                        <th scope="row">Friday</th>
+                        <td><span>40%</span></td>
+                    </tr>
+                    <tr style="height: 30%">
+                        <th scope="row">Saturday</th>
+                        <td><span>30%</span></td>
+                    </tr>
                 </tbody>
-              </table>
+            </table>
             </div>
           </div>
           <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">

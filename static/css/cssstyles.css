@@ -4704,188 +4704,157 @@ body.box-layout {
  }
 
 
-    .battery-widget {
-      border: 2px solid #ccc;
-      border-radius: 5px;
-      padding: 8.7px;
-      margin-bottom: 1px;
-    }
-    .battery-label {
-      font-weight: bold;
-    }
-	.battery-bar {
-      height: 26px;
-      background-color: #ddd;
-      border-radius: 3px;
-      margin-top: 5px;
-    }
-    .battery-fill-1 {
-      height: 100%;
-      background-color: #f58267;
-      border-radius: 3px;
-    }
-	.battery-fill-2 {
-      height: 100%;
-      background-color: #A0F768;
-      border-radius: 3px;
-    }
-	.battery-fill-3 {
-      height: 100%;
-      background-color: #54C169;
-      border-radius: 3px;
-    }
-	.battery-fill-4 {
-      height: 100%;
-      background-color: #F1FA5A;
-      border-radius: 3px;
-    }
-	.battery-fill-5 {
-      height: 100%;
-      background-color: #FBC051;
-      border-radius: 3px;
-    }
-	.battery-fill-6 {
-      height: 100%;
-      background-color: #4CAF50;
-      border-radius: 3px;
-    }
+ .battery-bar {
+    width: 100px;
+    height: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.battery-fill-1 {
+    height: 100%;
+    background-color: #f58267;
+    border-radius: 3px;
+}
 
   
 /* CSS styles for the bar chart */
 body, table, input, select, textarea {
 }
 .graph {
-	margin-bottom:1em;
-  font:normal 100%/150% arial,helvetica,sans-serif;
+    margin-bottom: 1em;
+    font: normal 100%/150% arial, helvetica, sans-serif;
 }
 
 .graph caption {
-	font:bold 150%/120% arial,helvetica,sans-serif;
-	padding-bottom:0.33em;
+    font: bold 150%/120% arial, helvetica, sans-serif;
+    padding-bottom: 0.33em;
 }
+
 .graph tbody th {
-	text-align:right;
+    text-align: right;
 }
-@supports (display:grid) {
-	@media (min-width:32em) {
-		.graph {
-			display:block;
-      /* width:325px; */
-      padding-right: 20px;
-      height:335px;
-		}
 
-		.graph caption {
-			display:block;
-		}
+@supports (display: grid) {
+    @media (min-width: 32em) {
+        .graph {
+            display: block;
+            /* width:325px; */
+            padding-right: 20px;
+            height: 335px;
+        }
 
-		.graph thead {
-			display:none;
-		}
+        .graph caption {
+            display: block;
+        }
 
-		.graph tbody {
-			position:relative;
-			display:grid;
-			grid-template-columns:repeat(auto-fit, minmax(2em, 1fr));
-			column-gap:2.5%;
-			align-items:end;
-			height:100%;
-			margin:3em 0 1em 2.8em;
-			padding:0 1em;
-			border-bottom:2px solid rgba(0,0,0,0.5);
-			background:repeating-linear-gradient(
-				180deg,
-				rgba(170,170,170,0.7) 0,
-				rgba(170,170,170,0.7) 1px,
-				transparent 1px,
-				transparent 20%
-			);
-		}
+        .graph thead {
+            display: none;
+        }
 
-		.graph tbody:before,
-		.graph tbody:after {
-			position:absolute;
-			left:-3.2em;
-			width:2.8em;
-			text-align:right;
-			font:bold 80%/120% arial,helvetica,sans-serif;
-		}
+        .graph tbody {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(2em, 1fr));
+            column-gap: 2.5%;
+            align-items: end;
+            height: 100%;
+            margin: 3em 0 1em 2.8em;
+            padding: 0 1em;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+        }
 
-		.graph tbody:before {
-			content:"100%";
-			top:-0.6em;
-		}
+        .graph tbody:before,
+        .graph tbody:after {
+            position: absolute;
+            left: -3.2em;
+            width: 2.8em;
+            text-align: right;
+            font: bold 80%/120% arial, helvetica, sans-serif;
+        }
 
-		.graph tbody:after {
-			content:"0%";
-			bottom:-0.6em;
-		}
+        .graph tbody:before {
+            content: "100%";
+            top: -0.6em;
+        }
 
-		.graph tr {
-			position:relative;
-			display:block;
-		}
+        .graph tbody:after {
+            content: "0%";
+            bottom: -0.6em;
+        }
 
-		.graph tr:hover {
-			z-index:999;
-		}
+        .graph tr {
+            position: relative;
+            display: block;
+        }
 
-		.graph th,
-		.graph td {
-			display:block;
-			text-align:center;
-		}
+        .graph tr:hover {
+            z-index: 999;
+        }
 
-		.graph tbody th {
-			position:absolute;
-			top:-3em;
-			left:0;
-			width:100%;
-			font-weight:normal;
-			text-align:center;
-      white-space:nowrap;
-			text-indent:0;
-			transform:rotate(-45deg);
-		}
+        .graph th,
+        .graph td {
+            display: block;
+            text-align: center;
+        }
 
-		.graph tbody th:after {
-			content:"";
-		}
+        .graph tbody th {
+            position: absolute;
+            top: -3em;
+            left: 0;
+            width: 100%;
+            font-weight: normal;
+            text-align: center;
+            white-space: nowrap;
+            text-indent: 0;
+            transform: rotate(-45deg);
+        }
 
-		.graph td {
-			width:100%;
-			height:100%;
-			background:#F63;
-			border-radius:0.5em 0.5em 0 0;
-			transition:background 0.5s;
-		}
+        .graph tbody th:after {
+            content: "";
+        }
 
-		.graph tr:hover td {
-			opacity:0.7;
-		}
+        .graph td {
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5em 0.5em 0 0;
+            transition: background 0.5s;
+        }
 
-		.graph td span {
-			overflow:hidden;
-			position:absolute;
-			left:50%;
-			top:50%;
-			width:0;
-			padding:0.5em 0;
-			margin:-1em 0 0;
-			font:normal 85%/120% arial,helvetica,sans-serif;
-			font-weight:bold;
-			opacity:0;
-			transition:opacity 0.5s;
-      color:white;
-		}
+        .graph tr:hover td {
+            opacity: 0.7;
+        }
 
-		.toggleGraph:checked + table td span,
-		.graph tr:hover td span {
-			width:4em;
-			margin-left:-2em;
-			opacity:1;
-		}
-	}
+        .graph td span {
+            overflow: hidden;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 0;
+            padding: 0.5em 0;
+            margin: -1em 0 0;
+            font: normal 85%/120% arial, helvetica, sans-serif;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s;
+            color: white;
+        }
+
+        .toggleGraph:checked + table td span,
+        .graph tr:hover td span {
+            width: 4em;
+            margin-left: -2em;
+            opacity: 1;
+        }
+
+        .graph tbody tr:nth-child(1) td { background-color: #F37265; }
+        .graph tbody tr:nth-child(2) td { background-color: #5BADFF; }
+        .graph tbody tr:nth-child(3) td { background-color: #FBFC9C; }
+        .graph tbody tr:nth-child(4) td { background-color: #F37265; }
+        .graph tbody tr:nth-child(5) td { background-color: #5BADFF; }
+        .graph tbody tr:nth-child(6) td { background-color: #FBFC9C; }
+    }
 }
 
 .circle {
