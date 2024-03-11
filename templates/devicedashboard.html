@@ -634,16 +634,13 @@
           fetch("/api/get-gps-data/")
             .then((response) => response.json())
             .then((data) => {
-              data.forEach((item) => {
+              markers.forEach((marker) => marker.setMap(null));
+              markers.length = 0;
+              const lastTwentyData = data.slice(-20);
+
+              lastTwentyData.forEach((item) => {
                 const location = { lat: item.latitude, lng: item.longitude };
-                const existingMarker = markers.find(
-                  (marker) =>
-                    marker.getPosition().lat() === location.lat &&
-                    marker.getPosition().lng() === location.lng
-                );
-                if (!existingMarker) {
-                  addMarker(location);
-                }
+                addMarker(location);
               });
             })
             .catch((error) => {
