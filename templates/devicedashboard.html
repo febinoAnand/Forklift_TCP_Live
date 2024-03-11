@@ -92,12 +92,12 @@
       .status {
         width: 100px;
         text-align: center;
-        padding-top: 100px;
+        padding-top: 5px;
         padding-bottom: 5px;
-        border-radius: 10px;
+        border-radius: 100px;
       }
-      .active {
-        background-color: rgba(40, 255, 226, 0.8); 
+      .active-1 {
+        background-color: rgba(97, 240, 109, 0.8); 
       }
       .idle {
         background-color: rgba(255, 193, 7, 0.8); 
@@ -276,6 +276,8 @@
                   <td id="gsm_area">{{gsmData.gsmAreaCode}}</td>
                 </tr>
               </table>
+              <div id="ignition_state" style="display: none;">OFF</div>
+              <div id="movementState_view" style="display: none;">Stationary</div>
             </div>
           </div>
         </div>
@@ -784,7 +786,7 @@
         if (ignitionState === 'ON') {
           if (movementState === 'Moving') {
             statusView.innerText = 'Active';
-            statusView.className = 'status active';
+            statusView.className = 'status active-1';
           } else {
             statusView.innerText = 'Idle';
             statusView.className = 'status idle';

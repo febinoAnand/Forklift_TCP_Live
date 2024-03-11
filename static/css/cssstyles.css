@@ -4850,10 +4850,10 @@ body, table, input, select, textarea {
 
         .graph tbody tr:nth-child(1) td { background-color: #F37265; }
         .graph tbody tr:nth-child(2) td { background-color: #5BADFF; }
-        .graph tbody tr:nth-child(3) td { background-color: #FBFC9C; }
+        .graph tbody tr:nth-child(3) td { background-color: #FF6E26; }
         .graph tbody tr:nth-child(4) td { background-color: #F37265; }
         .graph tbody tr:nth-child(5) td { background-color: #5BADFF; }
-        .graph tbody tr:nth-child(6) td { background-color: #FBFC9C; }
+        .graph tbody tr:nth-child(6) td { background-color: #FF6E26; }
     }
 }
 
