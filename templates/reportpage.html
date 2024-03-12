@@ -107,60 +107,45 @@
     <br /><br />
     <!-- table area start -->
     <div class="mobile-menu-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="search-container">
-                        <label for="fromDate">From :</label>
-                        <input type="date" id="fromDate">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="search-container">
+                      <label for="fromDate">From :</label>
+                      <input type="date" id="fromDate">
 
-                        <label for="toDate">To :</label>
-                        <input type="date" id="toDate">
+                      <label for="toDate">To :</label>
+                      <input type="date" id="toDate">
 
-                        <label for="category">Select :</label>
-                        <select id="category">
-                            <option value="all">Option 1</option>
-                            <option value="books">Option 2</option>
-                            <option value="movies">Option 3</option>
-                            <option value="music">Option 4</option>
-                        </select>
-
-                        <button onclick="search()">Search</button>
-                        <button onclick="clearFields()">Clear</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <br/>
-    <div class="data-table-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="data-table-list">
-                        <div class="basic-tb-hd">
-                            <h2>Report</h2>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="data-table-basic" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>S/NO</th>
-                                        <th>DATE</th>
-                                        <th>TIME</th>
-                                        <th>DISTANCE</th>
-                                        <th>SPEED</th>
-                                        <th>WATT HR</th>
-                                        <th>BATT VOLTAGE</th>
-                                        <th>BATT AMP</th>
-                                        <th>BATT POWER</th>
-                                        <th>BATT CHARGE</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-body">
-                                    <!-- Table body content goes here -->
-                                </tbody>
-                            </table>
+                      <button onclick="search()">Search</button>
+                      <button onclick="clearFields()">Clear</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <br/>
+  <div class="data-table-area">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="data-table-list">
+                      <div class="basic-tb-hd">
+                          <h2>Report</h2>
+                      </div>
+                      <div class="table-responsive">
+                          <table id="data-table-basic" class="table table-striped">
+                              <thead>
+                                  <tr>
+                                      <th>GPS DISTANCE</th>
+                                      <th>EXT DISTANCE</th>
+                                      <th>WATT HR</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="table-body">
+                                  <!-- Table body content goes here -->
+                              </tbody>
+                          </table>
                             <div>
                               <button id="excelButton">Download Excel</button>
                               <button id="csvButton">Download CSV</button>
@@ -287,50 +272,32 @@
       </script>
       
 
-<script>
-    function search() {
-    var fromDate = document.getElementById('fromDate').value;
-    var toDate = document.getElementById('toDate').value;
-    var category = document.getElementById('category').value;
+      <script>
+        function search() {
+            var fromDate = document.getElementById("fromDate").value;
+            var toDate = document.getElementById("toDate").value;
 
-    $.ajax({
-        url: '/search_data/',
-        type: 'GET',
-        data: {
-            fromDate: fromDate,
-            toDate: toDate,
-            category: category
-        },
-        success: function(data) {
-            populateTable(data);
-        },
-        error: function(xhr, errmsg, err) {
-            console.log(xhr.status + ": " + xhr.responseText);
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/search_data/?fromDate=" + fromDate + "&toDate=" + toDate, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var responseData = JSON.parse(xhr.responseText);
+                    updateTable(responseData);
+                }
+            };
+            xhr.send();
         }
-    });
-}
 
-function populateTable(data) {
-    var tableBody = document.getElementById('table-body');
-    tableBody.innerHTML = '';
-
-    data.forEach(function(row) {
-        var newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td>${row.date}</td>
-            <td>${row.time}</td>
-            <td>${row.distance}</td>
-            <td>${row.speed}</td>
-            <td>${row.watt_hr}</td>
-            <td>${row.batt_voltage}</td>
-            <td>${row.batt_amp}</td>
-            <td>${row.batt_power}</td>
-            <td>${row.batt_capacity}</td>
-        `;
-        tableBody.appendChild(newRow);
-    });
-}
-</script>
+        function updateTable(data) {
+            document.getElementById("table-body").innerHTML = `
+                <tr>
+                    <td>${data.gps_distance}</td>
+                    <td>${data.ext_distance}</td>
+                    <td>${data.watt_hr}</td>
+                </tr>
+            `;
+        }
+    </script>
          
   </body>
 </html>

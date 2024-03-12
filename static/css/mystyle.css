@@ -1,0 +1,59 @@
+.inno-logo{
+    color:white;
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 3px;
+    
+}
+.widget-status{
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    background-color: lightgreen;
+}
+
+.widget-img-head{
+    display: flex;
+    align-items: center;
+}
+
+.widget-head{
+    /* margin-left: 20px; */
+    display: inline-block;
+    
+}
+
+.widget-head-value{
+    display: flex;
+    justify-content: space-around;
+    
+}
+
+.widget-distance-head{
+    font-weight: bold;
+    font-size: 15px;
+}
+.wb-traffic-inner{
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.header-top-area{
+    position:fixed;
+    width: 100%;
+    z-index: 1;
+}
+
+.footer-copyright-area{
+    position:fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.coner-radius{
+    border-radius: 25px;
+}

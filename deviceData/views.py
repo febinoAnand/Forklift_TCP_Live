@@ -4,7 +4,7 @@ from .models import EXTData, GPSData
 from .serializers import EXTDataSerializer, GPSDataSerializer
 from .import views
 from datetime import datetime, date ,time ,timedelta
-from django.db.models import Count
+from django.db.models import Count ,Sum
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
@@ -90,11 +90,18 @@ def get_utilization_hours(request):
     return JsonResponse(utilization_hours)
 
 def search_data(request):
-    from_date = request.GET.get('fromDate')
-    to_date = request.GET.get('toDate')
+    if request.method == 'GET':
+        from_date = request.GET.get('fromDate')
+        to_date = request.GET.get('toDate')
+        gps_data = GPSData.objects.filter(date__range=[from_date, to_date])
+        ext_data = EXTData.objects.filter(date__range=[from_date, to_date])
+        total_gps_distance = gps_data.aggregate(Sum('distance'))['distance__sum'] or 0
+        total_ext_distance = ext_data.aggregate(Sum('distance'))['distance__sum'] or 0
+        total_watt_hr = ext_data.aggregate(Sum('watt_hr'))['watt_hr__sum'] or 0
+        data = {
+            'gps_distance': total_gps_distance,
+            'ext_distance': total_ext_distance,
+            'watt_hr': total_watt_hr
+        }
 
-    filtered_data = EXTData.objects.filter(
-        date__range=[from_date, to_date]
-    ).values('date', 'time', 'distance', 'speed', 'watt_hr', 'batt_voltage', 'batt_amp', 'batt_power', 'batt_capacity')
-
-    return JsonResponse(list(filtered_data), safe=False)
+        return JsonResponse(data)
