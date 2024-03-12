@@ -157,7 +157,7 @@
                                         <th>BATT CHARGE</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="table-body">
                                     <!-- Table body content goes here -->
                                 </tbody>
                             </table>
@@ -289,17 +289,47 @@
 
 <script>
     function search() {
-        var fromDate = document.getElementById('fromDate').value;
-        var toDate = document.getElementById('toDate').value;
-        var category = document.getElementById('category').value;
-        console.log("Searching from:", fromDate, "to:", toDate, "for category:", category);
-    }
+    var fromDate = document.getElementById('fromDate').value;
+    var toDate = document.getElementById('toDate').value;
+    var category = document.getElementById('category').value;
 
-    function clearFields() {
-        document.getElementById('fromDate').value = '';
-        document.getElementById('toDate').value = '';
-        document.getElementById('category').value = 'all';
-    }
+    $.ajax({
+        url: '/search_data/',
+        type: 'GET',
+        data: {
+            fromDate: fromDate,
+            toDate: toDate,
+            category: category
+        },
+        success: function(data) {
+            populateTable(data);
+        },
+        error: function(xhr, errmsg, err) {
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+}
+
+function populateTable(data) {
+    var tableBody = document.getElementById('table-body');
+    tableBody.innerHTML = '';
+
+    data.forEach(function(row) {
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${row.date}</td>
+            <td>${row.time}</td>
+            <td>${row.distance}</td>
+            <td>${row.speed}</td>
+            <td>${row.watt_hr}</td>
+            <td>${row.batt_voltage}</td>
+            <td>${row.batt_amp}</td>
+            <td>${row.batt_power}</td>
+            <td>${row.batt_capacity}</td>
+        `;
+        tableBody.appendChild(newRow);
+    });
+}
 </script>
          
   </body>

@@ -1,3 +1,16 @@
+$(document).ready(function(){
+  $("#loginForm").submit(function(e){
+      e.preventDefault();
+      var password = $("#password").val();
+      if(password !== "123456"){
+          alert("Incorrect password! Please try again.");
+      } else {
+    window.location.href="MAP.html";
+          alert("Login successful!");
+      }
+  });
+});
+
 // pie chart start//
 document.addEventListener('DOMContentLoaded', function() {
   var ctx = document.getElementById('myPieChart').getContext('2d');
@@ -127,36 +140,29 @@ document.addEventListener('DOMContentLoaded', function() {
 //line chart end //
 
 // bar chart start //
-function updateBarChart(data) {
+function updateBarChartWithData(data) {
   var daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    for (var i = 0; i < 6; i++) {
+  for (var i = 0; i < 6; i++) {
       var day = daysOfWeek[i];
       var utilizationHours = data[day] || 0;
       var percent = (utilizationHours / MAX_HOURS) * 100;
 
       var row = document.querySelectorAll('.graph tbody tr')[i];
-      var bar = row.querySelector('td');
-      bar.style.height = percent + '%';
+      row.style.height = percent + '%';
       row.querySelector('th').textContent = day;
       row.querySelector('span').textContent = percent.toFixed(2) + '%';
-
-      if (percent >= 0 && percent <= 33.33) {
-        bar.style.backgroundColor = '#F37265';
-      } else if (percent > 33.33 && percent <= 66.66) {
-        bar.style.backgroundColor = '#5BADFF';
-      } else if (percent > 66.66 && percent <= 100) {
-        bar.style.backgroundColor = '#FF6E26';
-      }
-    }
+  }
 }
+
 function fetchDataAndUpdate() {
-    fetch('/utilization-hours/')
-        .then(response => response.json())
-        .then(data => updateBarChart(data))
-        .catch(error => console.error('Error fetching data:', error));
+  fetch('/utilization-hours/')
+      .then(response => response.json())
+      .then(data => updateBarChartWithData(data))
+      .catch(error => console.error('Error fetching data:', error));
 }
 
-const MAX_HOURS = 24 * 6;
+const MAX_HOURS = 24 * 6; 
+fetchDataAndUpdate();
 setInterval(fetchDataAndUpdate, 5000);
 // bar chart ens //

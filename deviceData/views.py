@@ -88,3 +88,13 @@ def get_utilization_hours(request):
         utilization_hours[current_date.strftime('%A')] = total_utilization_hours
 
     return JsonResponse(utilization_hours)
+
+def search_data(request):
+    from_date = request.GET.get('fromDate')
+    to_date = request.GET.get('toDate')
+
+    filtered_data = EXTData.objects.filter(
+        date__range=[from_date, to_date]
+    ).values('date', 'time', 'distance', 'speed', 'watt_hr', 'batt_voltage', 'batt_amp', 'batt_power', 'batt_capacity')
+
+    return JsonResponse(list(filtered_data), safe=False)

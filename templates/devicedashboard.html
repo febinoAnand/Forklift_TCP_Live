@@ -307,7 +307,7 @@
                   <th>Battery</th>
                   <td id="live_cap_widget">
                       <div class="battery-bar">
-                          <div id="battery_capacity" class="battery-fill-1" style="width: {{ extData.batt_capacity | div:'5' | mul:'100%' }}"></div>
+                          <div id="battery_capacity" class="battery-fill-1"></div>
                       </div>
                   </td>
               </tr>
@@ -619,11 +619,11 @@
       function initMap() {
         const map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 0, lng: 0 },
-          zoom: 15,
+          zoom: 2,
         });
-
+  
         const markers = [];
-
+  
         function addMarker(location) {
           const marker = new google.maps.Marker({
             position: location,
@@ -631,7 +631,7 @@
           });
           markers.push(marker);
         }
-
+  
         function fetchDataAndUpdateMap() {
           fetch("/api/get-gps-data/")
             .then((response) => response.json())
@@ -639,19 +639,26 @@
               markers.forEach((marker) => marker.setMap(null));
               markers.length = 0;
               const lastTwentyData = data.slice(-20);
-
+  
               lastTwentyData.forEach((item) => {
                 const location = { lat: item.latitude, lng: item.longitude };
                 addMarker(location);
               });
+  
+              const bounds = new google.maps.LatLngBounds();
+              markers.forEach((marker) => {
+                bounds.extend(marker.getPosition());
+              });
+
+              map.fitBounds(bounds);
             })
             .catch((error) => {
               console.error("Error fetching data:", error);
             });
         }
-
+  
         fetchDataAndUpdateMap();
-
+  
         setInterval(fetchDataAndUpdateMap, 5000);
       }
     </script>
@@ -805,6 +812,34 @@
       setInterval(function() {
         updateStatus();
       }, 3000);
-    </script>       
+    </script>  
+    <script>
+      $(document).ready(function () {
+          function updateExtData() {
+              $.ajax({
+                  url: "ext-data/",
+                  type: "GET",
+                  success: function (data) {
+                      let datacount = data.length;
+                      let lastEXTData = data[datacount - 1];
+                      if (lastEXTData["batt_capacity"]) {
+                          let batt_capacity = lastEXTData.batt_capacity;
+                          updateBatteryBar(batt_capacity);
+                      }
+                  },
+                  error: function (xhr, textStatus, errorThrown) {
+                      console.log("Error:", errorThrown);
+                  },
+              });
+          }
+
+          function updateBatteryBar(batt_capacity) {
+              let widthPercentage = (batt_capacity / 5) * 100;
+              $('#battery_capacity').css('width', widthPercentage + '%');
+          }
+          updateExtData();
+          setInterval(updateExtData, 5000);
+      });
+  </script>
   </body>
 </html>
