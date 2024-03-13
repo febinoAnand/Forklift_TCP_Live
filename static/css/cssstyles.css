@@ -797,8 +797,10 @@ ul.notika-menu-wrap li a{
 /*----------------------------------------*/
 /*  11.  Footer CSS
 /*----------------------------------------*/
-.footer-copyright-area {
-    margin-top:40px;
+.footer-copyright-area{
+    position:fixed;
+    bottom: 0;
+    width: 100%;
 }
 .footer-copyright-area p {
     margin: 0;
@@ -4849,7 +4851,7 @@ body, table, input, select, textarea {
         /* Define color gradient based on percentage */
         .graph tbody tr td {
             background: linear-gradient(to top, 
-                #ff5f5f 0%, #f2ff31bd 33.33%, #28f5ff 66.66%, #28f5ff 100%);
+                #f06472 0%, #edde4d 33.33%, #4daced 66.66%, #4daced 100%);
         }
     }
 }

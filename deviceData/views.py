@@ -95,13 +95,19 @@ def search_data(request):
         to_date = request.GET.get('toDate')
         gps_data = GPSData.objects.filter(date__range=[from_date, to_date])
         ext_data = EXTData.objects.filter(date__range=[from_date, to_date])
-        total_gps_distance = gps_data.aggregate(Sum('distance'))['distance__sum'] or 0
-        total_ext_distance = ext_data.aggregate(Sum('distance'))['distance__sum'] or 0
-        total_watt_hr = ext_data.aggregate(Sum('watt_hr'))['watt_hr__sum'] or 0
-        data = {
-            'gps_distance': total_gps_distance,
-            'ext_distance': total_ext_distance,
-            'watt_hr': total_watt_hr
-        }
+        
+        data = []
+        
+        for date in set(gps_data.values_list('date', flat=True)) | set(ext_data.values_list('date', flat=True)):
+            gps_distance = gps_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+            ext_distance = ext_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+            watt_hr = ext_data.filter(date=date).aggregate(Sum('watt_hr'))['watt_hr__sum'] or 0
+            
+            data.append({
+                'date': date,
+                'gps_distance': gps_distance,
+                'ext_distance': ext_distance,
+                'watt_hr': watt_hr,
+            })
 
-        return JsonResponse(data)
+        return JsonResponse(data, safe=False)

@@ -116,7 +116,7 @@
 
                       <label for="toDate">To :</label>
                       <input type="date" id="toDate">
-
+                      
                       <button onclick="search()">Search</button>
                       <button onclick="clearFields()">Clear</button>
                   </div>
@@ -134,43 +134,54 @@
                           <h2>Report</h2>
                       </div>
                       <div class="table-responsive">
-                          <table id="data-table-basic" class="table table-striped">
-                              <thead>
-                                  <tr>
-                                      <th>GPS DISTANCE</th>
-                                      <th>EXT DISTANCE</th>
-                                      <th>WATT HR</th>
-                                  </tr>
-                              </thead>
-                              <tbody id="table-body">
-                                  <!-- Table body content goes here -->
-                              </tbody>
-                          </table>
-                            <div>
+                        <table id="data-table-basic" class="table table-striped">
+                          <thead>
+                              <tr>
+                                  <th>Date</th>
+                                  <th>GPS Distance</th>
+                                  <th>EXT Distance</th>
+                                  <th>Watt HR</th>
+                                  <th colspan="3">Utilization Hours</th>
+                              </tr>
+                              <tr>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th>Active</th>
+                                  <th>Inactive</th>
+                                  <th>Idle</th>
+                              </tr>
+                          </thead>
+                          <tbody id="table-body">
+                              
+                          </tbody>
+                      </table>
+                          <div>
                               <button id="excelButton">Download Excel</button>
                               <button id="csvButton">Download CSV</button>
                               <button id="pdfButton">Download PDF</button>
                           </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
     <br />
     <!-- Table area End-->
     <!-- Start Footer area-->
     <div class="footer-copyright-area">
       <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div class="footer-copy-right">
-              <p>Copyright © 2024 . All rights reserved.</p>
-            </div>
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="footer-copy-right">
+                      <p>Copyright © 2024 . All rights reserved.</p>
+                  </div>
+              </div>
           </div>
-        </div>
       </div>
-    </div>
+  </div>
      <!-- jquery
 		============================================ -->
         <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
@@ -273,31 +284,42 @@
       
 
       <script>
-        function search() {
-            var fromDate = document.getElementById("fromDate").value;
-            var toDate = document.getElementById("toDate").value;
+function search() {
+    var fromDate = document.getElementById("fromDate").value;  
+    var toDate = document.getElementById("toDate").value;  
+   
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/search_data/?fromDate=" + fromDate + "&toDate=" + toDate, true);  
+    xhr.onreadystatechange = function() {  
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var responseData = JSON.parse(xhr.responseText);   
+            updateTable(responseData);
+        }     
+    };
+    xhr.send();
+}
 
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/search_data/?fromDate=" + fromDate + "&toDate=" + toDate, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var responseData = JSON.parse(xhr.responseText);
-                    updateTable(responseData);
-                }
-            };
-            xhr.send();
-        }
+function updateTable(data) {  
+    var tableBody = document.getElementById("table-body");
+    tableBody.innerHTML = "";
 
-        function updateTable(data) {
-            document.getElementById("table-body").innerHTML = `
-                <tr>
-                    <td>${data.gps_distance}</td>
-                    <td>${data.ext_distance}</td>
-                    <td>${data.watt_hr}</td>
-                </tr>
-            `;
-        }
-    </script>
+    for (var i = 0; i < data.length; i++) {  
+        var row = document.createElement("tr");
+        row.innerHTML = "<td>" + data[i].date + "</td>" +    
+                        "<td>" + data[i].gps_distance + "</td>" + 
+                        "<td>" + data[i].ext_distance + "</td>" +      
+                        "<td>" + data[i].watt_hr + "</td>";
+        tableBody.appendChild(row);   
+    }
+}
+
+function clearFields() {
+    document.getElementById("fromDate").value = "";
+    document.getElementById("toDate").value = "";
+    var tableBody = document.getElementById("table-body");
+    tableBody.innerHTML = "";
+}
+</script>
          
   </body>
 </html>
