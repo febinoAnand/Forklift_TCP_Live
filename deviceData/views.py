@@ -10,7 +10,10 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 import json
-
+from django.http import HttpResponse
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 def ext_data_list(request):
     if request.method == 'GET':
@@ -58,21 +61,17 @@ def get_today_gps_data(request):
 
     data = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())) \
         .values('state') \
-        .annotate(count=Count('state'))
+        .annotate(duration=Count('state'))
 
-    active = 0
-    inactive = 0
-    idle = 0
+    response_data = []
 
     for item in data:
-        if item['state'] == 1:
-            inactive = item['count']
-        elif item['state'] == 2:
-            idle = item['count']
-        elif item['state'] == 3:
-            active = item['count']
+        response_data.append({
+            'state': item['state'],
+            'duration': item['duration']
+        })
 
-    return JsonResponse({'active': active, 'idle': idle, 'inactive': inactive})
+    return JsonResponse(response_data, safe=False)
 
 def get_utilization_hours(request):
     end_date = datetime.now().date()
@@ -111,3 +110,38 @@ def search_data(request):
             })
 
         return JsonResponse(data, safe=False)
+    
+def generate_pdf(request):
+    ext_data = EXTData.objects.all()
+    gps_data = GPSData.objects.all()
+    table_data = [
+        ['Date', 'GPS Distance', 'EXT Distance', 'Watt HR']
+    ]
+
+    for gps_entry in gps_data:
+        ext_entry = ext_data.filter(date=gps_entry.date).first()
+        if ext_entry:
+            table_data.append([
+                gps_entry.date,
+                gps_entry.distance,
+                ext_entry.distance,
+                ext_entry.watt_hr
+            ])
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Forklift.pdf"'
+    pdf = SimpleDocTemplate(response, pagesize=letter)
+    table = Table(table_data)
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ])
+    table.setStyle(style)
+    pdf.build([table])
+
+    return response

@@ -131,7 +131,7 @@
               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="data-table-list">
                       <div class="basic-tb-hd">
-                          <h2>Report</h2>
+                          <h2>REPORT</h2>
                       </div>
                       <div class="table-responsive">
                         <table id="data-table-basic" class="table table-striped">
@@ -157,8 +157,8 @@
                               
                           </tbody>
                       </table>
+                      <br><br>
                           <div>
-                              <button id="excelButton">Download Excel</button>
                               <button id="csvButton">Download CSV</button>
                               <button id="pdfButton">Download PDF</button>
                           </div>
@@ -257,31 +257,11 @@
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
         <script>
           $(document).ready(function() {
-
-              var dataTable = $('#data-table-basic').DataTable();
-      
-              new $.fn.dataTable.Buttons(dataTable, {
-                  buttons: [
-                      'excel', 'csv', 'pdf'
-                  ]
-              });
-
-              dataTable.buttons().container().appendTo($('#buttons'));
-
-              $('#excelButton').on('click', function() {
-                  dataTable.buttons('.buttons-excel').trigger();
-              });
-      
-              $('#csvButton').on('click', function() {
-                  dataTable.buttons('.buttons-csv').trigger();
-              });
-      
               $('#pdfButton').on('click', function() {
-                  dataTable.buttons('.buttons-pdf').trigger();
+                  window.location.href = '/generate-pdf/';
               });
           });
       </script>
-      
 
       <script>
 function search() {
