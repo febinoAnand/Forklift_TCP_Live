@@ -11,9 +11,11 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 import json
 from django.http import HttpResponse
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle,  Paragraph, Spacer
 
 def ext_data_list(request):
     if request.method == 'GET':
@@ -112,25 +114,56 @@ def search_data(request):
         return JsonResponse(data, safe=False)
     
 def generate_pdf(request):
+    gps_dates = GPSData.objects.values_list('date', flat=True).distinct()
+    ext_dates = EXTData.objects.values_list('date', flat=True).distinct()
+    all_dates = set(gps_dates) | set(ext_dates)
     ext_data = EXTData.objects.all()
-    gps_data = GPSData.objects.all()
-    table_data = [
-        ['Date', 'GPS Distance', 'EXT Distance', 'Watt HR']
-    ]
 
-    for gps_entry in gps_data:
-        ext_entry = ext_data.filter(date=gps_entry.date).first()
+    table_data = [['Date', 'GPS Distance', 'EXT Distance', 'Watt HR']]
+
+    for date in all_dates:
+        gps_entries = GPSData.objects.filter(date=date)
+        ext_entry = ext_data.filter(date=date).first()
+
+        if gps_entries.exists():
+            gps_entry = gps_entries.first()
+            gps_distance = gps_entry.distance
+        else:
+            gps_distance = "N/A"
+
         if ext_entry:
-            table_data.append([
-                gps_entry.date,
-                gps_entry.distance,
-                ext_entry.distance,
-                ext_entry.watt_hr
-            ])
+            ext_distance = ext_entry.distance
+            watt_hr = ext_entry.watt_hr
+        else:
+            ext_distance = "N/A"
+            watt_hr = "N/A"
+
+        table_data.append([
+            date,
+            gps_distance,
+            ext_distance,
+            watt_hr
+        ])
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Forklift.pdf"'
+
     pdf = SimpleDocTemplate(response, pagesize=letter)
+
+    styles = getSampleStyleSheet()
+    center_style = ParagraphStyle(name='Center', parent=styles['Normal'], alignment=1)
+
+    content = []
+
+    title = Paragraph("<b>INNOSPACE</b><br/><br/>", center_style)
+    content.append(title)
+    content.append(Spacer(1, 0.2 * inch))
+    address = Paragraph("<b>Address:</b><br/>Innospace Automation Services Pvt Ltd,<br/>Old no. 38, New no. 20/1, Vaigai colony,<br/>12th Avenue, Ashok Nagar,<br/>Chennai-600083.", styles['Normal'])
+    content.append(address)
+    phone_email = Paragraph("<b>Phone:</b> +91-44-45550419<br/><b>Email:</b> info@innospace.co.in", styles['Normal'])
+    content.append(phone_email)
+    content.append(Spacer(1, 0.5 * inch))
+
     table = Table(table_data)
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
@@ -138,10 +171,12 @@ def generate_pdf(request):
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('GRID', (0, 0), (-1, -1), 1, colors.black)
     ])
     table.setStyle(style)
-    pdf.build([table])
+    content.append(table)
+
+    pdf.build(content)
 
     return response
