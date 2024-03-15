@@ -61,65 +61,65 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
     <!-- Login Register area Start-->
-    <form id="registrationForm" action="{% url 'register' %}" method="post">
+    <form id="registrationForm" action="{% url 'register_device' %}" method="post">
       {% csrf_token %}
       <div class="login-content">
           <div class="nk-block toggled" id="l-login">
               <div class="nk-form">
-                  <div class="input-group">
+                  <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-support"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="deviceId" class="form-control" placeholder="Device ID" required>
+                          <input type="text" id="deviceId" class="form-control" name="device_id" placeholder="Device ID" required>
                       </div>
                   </div>
                   <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-success"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="vehicleName" class="form-control" placeholder="Vehicle Name" required>
+                          <input type="text" id="vehicleName" class="form-control" name="vehicle_name" placeholder="Vehicle Name" required>
                       </div>
                   </div>
                   <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-app"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="deviceModel" class="form-control" placeholder="Device Model" required>
+                          <input type="text" id="deviceModel" class="form-control" name="device_model" placeholder="Device Model" required>
                       </div>
                   </div>
                   <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-form"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="vehicleId" class="form-control" placeholder="Vehicle ID" required>
+                          <input type="text" id="vehicleId" class="form-control" name="vehicle_id" placeholder="Vehicle ID" required>
                       </div>
                   </div>
                   <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-star"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="driver" class="form-control" placeholder="Driver" required>
+                          <input type="text" id="driver" class="form-control" name="driver" placeholder="Driver" required>
                       </div>
                   </div>
                   <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-refresh"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="manufacturer" class="form-control" placeholder="Manufacturer" required>
+                          <input type="text" id="manufacturer" class="form-control" name="manufacturer" placeholder="Manufacturer" required>
                       </div>
                   </div>
                   <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-menu"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="hardwareVersion" class="form-control" placeholder="Hardware Version" required>
+                          <input type="text" id="hardwareVersion" class="form-control" name="hardware_version" placeholder="Hardware Version" required>
                       </div>
                   </div>
                   <div class="input-group mg-t-15">
                       <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-menu"></i></span>
                       <div class="nk-int-st">
-                          <input type="text" id="softwareVersion" class="form-control" placeholder="Software Version" required>
+                          <input type="text" id="softwareVersion" class="form-control" name="software_version" placeholder="Software Version" required>
                       </div>
                   </div>
                   <br>
-                  <button type="submit">Register</button>
+                  <button type="submit" id="registerBtn">Register</button>
               </div>
           </div>
       </div>
-  </form>  
+  </form>
     <!-- jquery
 		============================================ -->
     <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
@@ -188,7 +188,35 @@
     <script src="../static/js/main.js"></script>
 	
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('registrationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            submitForm();
+        });
+    });
 
+    function submitForm() {
+        var formData = new FormData(document.getElementById('registrationForm'));
+        fetch("{% url 'register_device' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = "{% url 'list_page' %}";
+            } else {
+                console.error('Error:', response.statusText);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
 
 </body>
 

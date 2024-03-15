@@ -1,7 +1,13 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from forklift.models import tracker_device
 from django.http import HttpResponse
 from deviceData.models import GPSData,EXTData
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import TrackerDeviceSerializer
+from django.views.decorators.csrf import csrf_exempt
+from .forms import TrackerDeviceForm
 
 from django.core import serializers
 import random
@@ -48,29 +54,20 @@ def registration_view(request):
 def list_page_view(request):
     return render(request, 'listpage.html')
 
-def register(request):
+def register_device(request):
     if request.method == 'POST':
-
-        device_id = request.POST.get('deviceId')
-        vehicle_name = request.POST.get('vehicleName')
-        device_model = request.POST.get('deviceModel')
-        vehicle_id = request.POST.get('vehicleId')
-        driver = request.POST.get('driver')
-        manufacturer = request.POST.get('manufacturer')
-        hardware_version = request.POST.get('hardwareVersion')
-        software_version = request.POST.get('softwareVersion')
-
-        new_device = tracker_device.objects.create(
-            device_id=device_id,
-            vehicle_name=vehicle_name,
-            device_model=device_model,
-            vehicle_id=vehicle_id,
-            driver=driver,
-            manufacturer=manufacturer,
-            hardware_version=hardware_version,
-            software_version=software_version
-        )
-        new_device.save()
-        return redirect('login')
+        form = TrackerDeviceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listpage.html') 
     else:
-        return render(request, 'registration.html')
+        form = TrackerDeviceForm()
+    return render(request, 'registration.html', {'form': form})
+    
+def tracker_device_list(request):
+    devices = tracker_device.objects.all()
+    data = [{'device_id': device.device_id, 'vehicle_name': device.vehicle_name, 'device_model': device.device_model,
+             'vehicle_id': device.vehicle_id, 'driver': device.driver, 'add_date': device.add_date.strftime('%Y-%m-%d'),
+             'manufacturer': device.manufacturer, 'hardware_version': device.hardware_version,
+             'software_version': device.software_version} for device in devices]
+    return JsonResponse(data, safe=False)
