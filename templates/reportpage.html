@@ -82,16 +82,15 @@
         <div class="row">
           <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
             <div class="logo-area">
-              <a href="/"
-                ><p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a
-              >
+              <a href="/devicedashboard?device_id=${device.device_id}">
+                <p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a>
             </div>
           </div>
           <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
             <div class="header-top-menu">
               <ul class="nav navbar-nav notika-top-nav">
                 <li class="nav-item">
-                  <a href="/devicedashboard" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                  <a href="/devicedashboard?device_id=${device.device_id}" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
                     <span class="glyphicon glyphicon-arrow-left"></span>
                   </a>
                 </li>
@@ -141,16 +140,7 @@
                                   <th>GPS Distance</th>
                                   <th>EXT Distance</th>
                                   <th>Watt HR</th>
-                                  <th colspan="3">Utilization Hours</th>
-                              </tr>
-                              <tr>
-                                  <th></th>
-                                  <th></th>
-                                  <th></th>
-                                  <th></th>
-                                  <th>Active</th>
-                                  <th>Inactive</th>
-                                  <th>Idle</th>
+                                  <th>Utilization Hours</th>
                               </tr>
                           </thead>
                           <tbody id="table-body">

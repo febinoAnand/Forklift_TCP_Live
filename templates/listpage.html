@@ -194,35 +194,35 @@
                           if (data.length > 0) {
                               data.forEach(function(device) {
                                   var deviceHtml = `
-                                      <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                                          <a href="/devicedashboard">
-                                              <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
-                                                  <div class="website-traffic-ctn">
-                                                      <div class="widget-img-head">
-                                                          <div class="widget-status"></div>
-                                                          <div style="display: flex; flex-direction: column;margin-left: 20px; justify-content: center;">
-                                                              <h2 class="widget-head">${device.vehicle_name}</h2>
-                                                              <p style="margin-top: -10px;">ID: ${device.device_id}</p>
-                                                          </div>
-                                                      </div>
-                                                      <div class="widget-head-value">
-                                                          <div>
-                                                              <div class="widget-distance-head">Model</div>
-                                                              <div class="widget-distance-value">${device.device_model}</div>
-                                                          </div>
-                                                          <div>
-                                                              <div class="widget-distance-head">Vehicle ID</div>
-                                                              <div class="widget-distance-value">${device.vehicle_id}</div>
-                                                          </div>
-                                                          <div>
-                                                              <div class="widget-distance-head">Driver</div>
-                                                              <div class="widget-distance-value">${device.driver}</div>
-                                                          </div>
-                                                      </div>  
-                                                  </div> 
-                                              </div>
-                                          </a>
-                                      </div>
+                                  <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                                    <a href="/devicedashboard?device_id=${device.device_id}" methods=["GET"]>
+                                        <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                                            <div class="website-traffic-ctn">
+                                                <div class="widget-img-head">
+                                                    <div class="widget-status"></div>
+                                                    <div style="display: flex; flex-direction: column;margin-left: 20px; justify-content: center;">
+                                                        <h2 class="widget-head">${device.vehicle_name}</h2>
+                                                        <p style="margin-top: -10px;">ID: ${device.device_id}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="widget-head-value">
+                                                    <div>
+                                                        <div class="widget-distance-head">Model</div>
+                                                        <div class="widget-distance-value">${device.device_model}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="widget-distance-head">Vehicle ID</div>
+                                                        <div class="widget-distance-value">${device.vehicle_id}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="widget-distance-head">Driver</div>
+                                                        <div class="widget-distance-value">${device.driver}</div>
+                                                    </div>
+                                                </div>  
+                                            </div> 
+                                        </div>
+                                    </a>
+                                </div>
                                   `;
                                   $('#tracker-device-list').append(deviceHtml);
                               });

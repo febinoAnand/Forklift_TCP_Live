@@ -159,8 +159,7 @@ def generate_pdf(request):
     title = Paragraph("<b>INNOSPACE</b><br/><br/>", center_style)
     content.append(title)
     content.append(Spacer(1, 0.2 * inch))
-    address = Paragraph("<b>Address:</b><br/>Innospace Automation Services Pvt Ltd,<br/>Old no. 38, New no. 20/1, Vaigai colony,<br/>12th Avenue, Ashok Nagar,<br/>Chennai-600083.", styles['Normal'])
-    content.append(address)
+
     phone_email = Paragraph("<b>Phone:</b> +91-44-45550419<br/><b>Email:</b> info@innospace.co.in", styles['Normal'])
     content.append(phone_email)
     content.append(Spacer(1, 0.5 * inch))

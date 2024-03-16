@@ -187,36 +187,36 @@
 		============================================ -->
     <script src="../static/js/main.js"></script>
 	
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('registrationForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            submitForm();
-        });
-    });
-
-    function submitForm() {
-        var formData = new FormData(document.getElementById('registrationForm'));
-        fetch("{% url 'register_device' %}", {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.href = "{% url 'list_page' %}";
-            } else {
-                console.error('Error:', response.statusText);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-</script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById('registrationForm').addEventListener('submit', function (event) {
+              event.preventDefault();
+  
+              var formData = new FormData(this);
+              submitForm(formData);
+          });
+      });
+  
+      function submitForm(formData) {
+          fetch("{% url 'register_device' %}", {
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'X-CSRFToken': '{{ csrf_token }}'
+              }
+          })
+          .then(response => {
+              if (response.ok) {
+                  window.location.href = "{% url 'list_page' %}";
+              } else {
+                  console.error('Error:', response.statusText);
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+      }
+  </script>  
 
 </body>
 
