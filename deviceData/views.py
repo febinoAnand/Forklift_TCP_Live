@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 import json
+import csv
 from django.http import HttpResponse
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -178,5 +179,43 @@ def generate_pdf(request):
     content.append(table)
 
     pdf.build(content)
+
+    return response
+
+def generate_csv(request):
+    gps_dates = GPSData.objects.values_list('date', flat=True).distinct()
+    ext_dates = EXTData.objects.values_list('date', flat=True).distinct()
+    all_dates = set(gps_dates) | set(ext_dates)
+    ext_data = EXTData.objects.all()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="Forklift.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Date', 'GPS Distance', 'EXT Distance', 'Watt HR'])
+
+    for date in all_dates:
+        gps_entries = GPSData.objects.filter(date=date)
+        ext_entry = ext_data.filter(date=date).first()
+
+        if gps_entries.exists():
+            gps_entry = gps_entries.first()
+            gps_distance = gps_entry.distance
+        else:
+            gps_distance = "N/A"
+
+        if ext_entry:
+            ext_distance = ext_entry.distance
+            watt_hr = ext_entry.watt_hr
+        else:
+            ext_distance = "N/A"
+            watt_hr = "N/A"
+
+        writer.writerow([
+            date,
+            gps_distance,
+            ext_distance,
+            watt_hr
+        ])
 
     return response
