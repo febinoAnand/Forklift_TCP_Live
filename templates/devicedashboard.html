@@ -648,13 +648,22 @@
   
         const markers = [];
   
-        function addMarker(location) {
-          const marker = new google.maps.Marker({
-            position: location,
-            map: map,
-          });
-          markers.push(marker);
-        }
+      function addMarker(location) {
+        const dotIcon = {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 7,
+          fillColor: 'red', 
+          fillOpacity: 1,
+          strokeWeight: 0,
+        };
+
+        const marker = new google.maps.Marker({
+          position: location,
+          map: map,
+          icon: dotIcon
+        });
+        markers.push(marker);
+      }
   
         function fetchDataAndUpdateMap() {
           fetch("/api/get-gps-data/")
@@ -662,6 +671,7 @@
             .then((data) => {
               markers.forEach((marker) => marker.setMap(null));
               markers.length = 0;
+              
               const lastTwentyData = data.slice(-20);
   
               lastTwentyData.forEach((item) => {
