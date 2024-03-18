@@ -77,7 +77,7 @@ def get_today_gps_data(request):
     return JsonResponse(response_data, safe=False)
 
 def utilization_data(request):
-    utilization_data = []
+    utilization_data_list = []
     for day in range(1, 7):
         data_for_day = GPSData.objects.filter(date__week_day=day).values('state').annotate(total_distance=Sum('distance'))
         total_distance = sum(item['total_distance'] for item in data_for_day)
@@ -86,11 +86,11 @@ def utilization_data(request):
             state = item['state']
             distance = item['total_distance']
             utilization_percentages[state] = round((distance / total_distance) * 100, 2) if total_distance else 0
-        utilization_data.append({
+        utilization_data_list.append({
             'day': day,
             'percentages': utilization_percentages,
         })
-    return JsonResponse(utilization_data, safe=False)
+    return JsonResponse(utilization_data_list, safe=False)
 
 def search_data(request):
     if request.method == 'GET':
@@ -121,7 +121,23 @@ def generate_pdf(request):
     all_dates = set(gps_dates) | set(ext_dates)
     ext_data = EXTData.objects.all()
 
-    table_data = [['Date', 'GPS Distance', 'EXT Distance', 'Watt HR']]
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Forklift.pdf"'
+
+    pdf = SimpleDocTemplate(response, pagesize=letter)
+    styles = getSampleStyleSheet()
+    center_style = ParagraphStyle(name='Center', parent=styles['Normal'], alignment=1)
+    content = []
+
+    title = Paragraph("<b>INNOSPACE</b><br/><br/>", center_style)
+    content.append(title)
+    content.append(Spacer(1, 0.2 * inch))
+
+    phone_email = Paragraph("<b>Phone:</b> +91-44-45550419<br/><b>Email:</b> info@innospace.co.in", styles['Normal'])
+    content.append(phone_email)
+    content.append(Spacer(1, 0.5 * inch))
+
+    table_data = [['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Utilization Hours']]
 
     for date in all_dates:
         gps_entries = GPSData.objects.filter(date=date)
@@ -141,29 +157,11 @@ def generate_pdf(request):
             watt_hr = "N/A"
 
         table_data.append([
-            date,
+            date.strftime('%Y-%m-%d'),
             gps_distance,
             ext_distance,
             watt_hr
         ])
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="Forklift.pdf"'
-
-    pdf = SimpleDocTemplate(response, pagesize=letter)
-
-    styles = getSampleStyleSheet()
-    center_style = ParagraphStyle(name='Center', parent=styles['Normal'], alignment=1)
-
-    content = []
-
-    title = Paragraph("<b>INNOSPACE</b><br/><br/>", center_style)
-    content.append(title)
-    content.append(Spacer(1, 0.2 * inch))
-
-    phone_email = Paragraph("<b>Phone:</b> +91-44-45550419<br/><b>Email:</b> info@innospace.co.in", styles['Normal'])
-    content.append(phone_email)
-    content.append(Spacer(1, 0.5 * inch))
 
     table = Table(table_data)
     style = TableStyle([
@@ -182,7 +180,9 @@ def generate_pdf(request):
 
     return response
 
+
 def generate_csv(request):
+
     gps_dates = GPSData.objects.values_list('date', flat=True).distinct()
     ext_dates = EXTData.objects.values_list('date', flat=True).distinct()
     all_dates = set(gps_dates) | set(ext_dates)
@@ -192,7 +192,7 @@ def generate_csv(request):
     response['Content-Disposition'] = 'attachment; filename="Forklift.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Date', 'GPS Distance', 'EXT Distance', 'Watt HR'])
+    writer.writerow(['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Utilization Hours'])
 
     for date in all_dates:
         gps_entries = GPSData.objects.filter(date=date)

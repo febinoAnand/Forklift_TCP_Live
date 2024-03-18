@@ -259,12 +259,11 @@
             });
         });
     </script>
-
-      <script>
-function search() {
+<script>
+  function search() {
     var fromDate = document.getElementById("fromDate").value;  
     var toDate = document.getElementById("toDate").value;  
-   
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/search_data/?fromDate=" + fromDate + "&toDate=" + toDate, true);  
     xhr.onreadystatechange = function() {  
@@ -285,10 +284,45 @@ function updateTable(data) {
         row.innerHTML = "<td>" + data[i].date + "</td>" +    
                         "<td>" + data[i].gps_distance + "</td>" + 
                         "<td>" + data[i].ext_distance + "</td>" +      
-                        "<td>" + data[i].watt_hr + "</td>";
-        tableBody.appendChild(row);   
+                        "<td>" + data[i].watt_hr + "</td>" +
+                        "<td id='utilization-hours-" + i + "'></td>";
+        tableBody.appendChild(row);
+        calculateUtilizationHours(data[i].date, i);
     }
 }
+
+function calculateUtilizationHours(date, index) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/utilization-data/", true);  
+    xhr.onreadystatechange = function() {  
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                var utilizationData = JSON.parse(xhr.responseText);
+                var utilizationHours = 0;
+                var utilizationFound = false;
+                for (var j = 0; j < utilizationData.length; j++) {
+                    if (utilizationData[j].day == new Date(date).getDay() + 1) { 
+                        var percentages = utilizationData[j].percentages;
+                        for (var state in percentages) {
+                            utilizationHours += parseFloat(percentages[state]);
+                        }
+                        utilizationFound = true;
+                        break; 
+                    }
+                }
+                if (utilizationFound) {
+                    document.getElementById('utilization-hours-' + index).textContent = utilizationHours.toFixed(2);
+                } else {
+                    document.getElementById('utilization-hours-' + index).textContent = "0";
+                }
+            } else {
+                console.error("Error fetching utilization data. Status: " + xhr.status);
+            }
+        }
+    };
+    xhr.send();
+}
+
 
 function clearFields() {
     document.getElementById("fromDate").value = "";
@@ -296,7 +330,6 @@ function clearFields() {
     var tableBody = document.getElementById("table-body");
     tableBody.innerHTML = "";
 }
-</script>
-         
+</script>       
   </body>
 </html>
