@@ -76,20 +76,21 @@ def get_today_gps_data(request):
 
     return JsonResponse(response_data, safe=False)
 
-def get_utilization_hours(request):
-    end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=6)
-
-    gps_data = GPSData.objects.filter(date__range=[start_date, end_date])
-
-    utilization_hours = {}
-    for day in range(6):
-        current_date = start_date + timedelta(days=day)
-        day_data = gps_data.filter(date=current_date)
-        total_utilization_hours = sum([data.distance for data in day_data])
-        utilization_hours[current_date.strftime('%A')] = total_utilization_hours
-
-    return JsonResponse(utilization_hours)
+def utilization_data(request):
+    utilization_data = []
+    for day in range(1, 7):
+        data_for_day = GPSData.objects.filter(date__week_day=day).values('state').annotate(total_distance=Sum('distance'))
+        total_distance = sum(item['total_distance'] for item in data_for_day)
+        utilization_percentages = {}
+        for item in data_for_day:
+            state = item['state']
+            distance = item['total_distance']
+            utilization_percentages[state] = round((distance / total_distance) * 100, 2) if total_distance else 0
+        utilization_data.append({
+            'day': day,
+            'percentages': utilization_percentages,
+        })
+    return JsonResponse(utilization_data, safe=False)
 
 def search_data(request):
     if request.method == 'GET':

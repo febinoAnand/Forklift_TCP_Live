@@ -128,29 +128,38 @@ document.addEventListener('DOMContentLoaded', function() {
 //line chart end //
 
 // bar chart start //
-function updateBarChartWithData(data) {
-  var daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+function generateRandomPercentages() {
+  const apiUrl = '/utilization-data/';
 
-  for (var i = 0; i < 6; i++) {
-      var day = daysOfWeek[i];
-      var utilizationHours = data[day] || 0;
-      var percent = (utilizationHours / MAX_HOURS) * 100;
-
-      var row = document.querySelectorAll('.graph tbody tr')[i];
-      row.style.height = percent + '%';
-      row.querySelector('th').textContent = day;
-      row.querySelector('span').textContent = percent.toFixed(2) + '%';
-  }
-}
-
-function fetchDataAndUpdate() {
-  fetch('/utilization-hours/')
+  fetch(apiUrl)
       .then(response => response.json())
-      .then(data => updateBarChartWithData(data))
+      .then(data => {
+          const bars = document.querySelectorAll('.graph tbody tr');
+          bars.forEach((bar, index) => {
+              const percentSpans = bar.querySelectorAll('span[class^="percent"]');
+              const utilizationPercentages = data[index]?.percentages || [0, 0, 0]; 
+
+              percentSpans.forEach((span, index) => {
+                  if (utilizationPercentages[index] !== undefined) {
+                      span.textContent = utilizationPercentages[index] + '%';
+                  } else {
+                      span.textContent = '0%';
+                  }
+              });
+
+              let totalPercentage = 0;
+              if (utilizationPercentages.length === 1) {
+                  totalPercentage = utilizationPercentages[0];
+              } else {
+                  totalPercentage = utilizationPercentages.reduce((acc, curr) => acc + curr, 0);
+              }
+
+              bar.style.height = totalPercentage + '%';
+          });
+      })
       .catch(error => console.error('Error fetching data:', error));
 }
 
-const MAX_HOURS = 24 * 6; 
-fetchDataAndUpdate();
-setInterval(fetchDataAndUpdate, 5000);
+generateRandomPercentages();
+setInterval(generateRandomPercentages, 5000);
 // bar chart ens //
