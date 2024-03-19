@@ -4,13 +4,14 @@ from .models import EXTData, GPSData
 from .serializers import EXTDataSerializer, GPSDataSerializer
 from .import views
 from datetime import datetime, date ,time ,timedelta
-from django.db.models import Count ,Sum
+from django.db.models import Count ,Sum , F, DecimalField
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 import json
 import csv
+from decimal import Decimal
 from django.http import HttpResponse
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -63,8 +64,8 @@ def get_today_gps_data(request):
     end_time = datetime.now()
 
     data = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())) \
-        .values('state') \
-        .annotate(duration=Count('state'))
+                          .values('state') \
+                          .annotate(duration=Count('state'))
 
     response_data = []
 
@@ -76,21 +77,43 @@ def get_today_gps_data(request):
 
     return JsonResponse(response_data, safe=False)
 
-def utilization_data(request):
-    utilization_data_list = []
-    for day in range(1, 7):
-        data_for_day = GPSData.objects.filter(date__week_day=day).values('state').annotate(total_distance=Sum('distance'))
-        total_distance = sum(item['total_distance'] for item in data_for_day)
-        utilization_percentages = {}
-        for item in data_for_day:
-            state = item['state']
-            distance = item['total_distance']
-            utilization_percentages[state] = round((distance / total_distance) * 100, 2) if total_distance else 0
-        utilization_data_list.append({
-            'day': day,
-            'percentages': utilization_percentages,
-        })
-    return JsonResponse(utilization_data_list, safe=False)
+def get_utilization_hours(request):
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=6)
+
+    utilization_hours = {}
+    for day in range(7):
+        current_date = start_date + timedelta(days=day)
+        gps_data = GPSData.objects.filter(date=current_date)
+        
+        active_hours = gps_data.filter(state=3).aggregate(
+            total_hours=Sum(
+                (F('time__hour') + (F('time__minute') / 60)) - 0.5,
+                output_field=DecimalField()
+            )
+        )['total_hours'] or 0
+        
+        inactive_hours = gps_data.filter(state=1).aggregate(
+            total_hours=Sum(
+                (F('time__hour') + (F('time__minute') / 60)) - 0.5,
+                output_field=DecimalField()
+            )
+        )['total_hours'] or 0
+        
+        idle_hours = gps_data.filter(state=2).aggregate(
+            total_hours=Sum(
+                (F('time__hour') + (F('time__minute') / 60)) - 0.5,
+                output_field=DecimalField()
+            )
+        )['total_hours'] or 0
+
+        utilization_hours[current_date.strftime('%A')] = {
+            'Active': active_hours,
+            'Inactive': inactive_hours,
+            'Idle': idle_hours
+        }
+
+    return JsonResponse(utilization_hours)
 
 def search_data(request):
     if request.method == 'GET':
@@ -114,11 +137,10 @@ def search_data(request):
             })
 
         return JsonResponse(data, safe=False)
-    
+
 def generate_pdf(request):
-    gps_dates = GPSData.objects.values_list('date', flat=True).distinct()
-    ext_dates = EXTData.objects.values_list('date', flat=True).distinct()
-    all_dates = set(gps_dates) | set(ext_dates)
+    all_dates = set(GPSData.objects.values_list('date', flat=True).distinct()) | \
+                set(EXTData.objects.values_list('date', flat=True).distinct())
     ext_data = EXTData.objects.all()
 
     response = HttpResponse(content_type='application/pdf')
@@ -160,7 +182,7 @@ def generate_pdf(request):
             date.strftime('%Y-%m-%d'),
             gps_distance,
             ext_distance,
-            watt_hr
+            watt_hr,
         ])
 
     table = Table(table_data)
@@ -182,10 +204,8 @@ def generate_pdf(request):
 
 
 def generate_csv(request):
-
-    gps_dates = GPSData.objects.values_list('date', flat=True).distinct()
-    ext_dates = EXTData.objects.values_list('date', flat=True).distinct()
-    all_dates = set(gps_dates) | set(ext_dates)
+    all_dates = set(GPSData.objects.values_list('date', flat=True).distinct()) | \
+                set(EXTData.objects.values_list('date', flat=True).distinct())
     ext_data = EXTData.objects.all()
 
     response = HttpResponse(content_type='text/csv')
@@ -212,10 +232,11 @@ def generate_csv(request):
             watt_hr = "N/A"
 
         writer.writerow([
-            date,
+            date.strftime('%Y-%m-%d'),
             gps_distance,
             ext_distance,
-            watt_hr
+            watt_hr,
+
         ])
 
     return response
