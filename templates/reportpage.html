@@ -82,7 +82,7 @@
         <div class="row">
           <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
             <div class="logo-area">
-                <a href="/devicedashboard?device_id=${device.device_id}" methods=["GET"]>
+                <a href="/devicedashboard?device_id=${device.device_id}">
                 <p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a>
             </div>
           </div>
@@ -289,27 +289,26 @@
         }
         
         function calculateActiveHours(date, index) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/get_utilization_hours/", true);  
-            xhr.onreadystatechange = function() {  
-                if (xhr.readyState == 4) {
-                    if (xhr.status == 200) {
-                        var utilizationData = JSON.parse(xhr.responseText);
-                        var activeHours = 0;
-                        for (var j = 0; j < utilizationData.length; j++) {
-                            if (utilizationData[j].day == new Date(date).getDay() + 1) { 
-                                activeHours = parseFloat(utilizationData[j].percentages.Active);
-                                break; 
-                            }
-                        }
-                        document.getElementById('utilization-hours-' + index).textContent = activeHours.toFixed(2);
-                    } else {
-                        console.error("Error fetching utilization data. Status: " + xhr.status);
-                    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/get_utilization_hours/", true);  
+    xhr.onreadystatechange = function() {  
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                var utilizationData = JSON.parse(xhr.responseText);
+                var activeHours = 0;
+                var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                var dayName = dayNames[new Date(date).getDay()];
+                if (utilizationData.hasOwnProperty(dayName)) {
+                    activeHours = parseFloat(utilizationData[dayName]['Active']);
                 }
-            };
-            xhr.send();
+                document.getElementById('utilization-hours-' + index).textContent = activeHours.toFixed(2);
+            } else {
+                console.error("Error fetching utilization data. Status: " + xhr.status);
+            }
         }
+    };
+    xhr.send();
+}
         
         function clearFields() {
             document.getElementById("fromDate").value = "";

@@ -139,6 +139,9 @@ def search_data(request):
         return JsonResponse(data, safe=False)
 
 def generate_pdf(request):
+    response = get_utilization_hours(request)
+    utilization_hours = json.loads(response.content)
+
     all_dates = set(GPSData.objects.values_list('date', flat=True).distinct()) | \
                 set(EXTData.objects.values_list('date', flat=True).distinct())
     ext_data = EXTData.objects.all()
@@ -159,7 +162,7 @@ def generate_pdf(request):
     content.append(phone_email)
     content.append(Spacer(1, 0.5 * inch))
 
-    table_data = [['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Utilization Hours']]
+    table_data = [['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Active Hours']]
 
     for date in all_dates:
         gps_entries = GPSData.objects.filter(date=date)
@@ -178,11 +181,14 @@ def generate_pdf(request):
             ext_distance = "N/A"
             watt_hr = "N/A"
 
+        active_hours = utilization_hours.get(date.strftime('%A'), {}).get('Active', 0)
+        
         table_data.append([
             date.strftime('%Y-%m-%d'),
             gps_distance,
             ext_distance,
             watt_hr,
+            active_hours
         ])
 
     table = Table(table_data)
@@ -204,6 +210,9 @@ def generate_pdf(request):
 
 
 def generate_csv(request):
+    response = get_utilization_hours(request)
+    utilization_hours = json.loads(response.content)
+    
     all_dates = set(GPSData.objects.values_list('date', flat=True).distinct()) | \
                 set(EXTData.objects.values_list('date', flat=True).distinct())
     ext_data = EXTData.objects.all()
@@ -212,7 +221,7 @@ def generate_csv(request):
     response['Content-Disposition'] = 'attachment; filename="Forklift.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Utilization Hours'])
+    writer.writerow(['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Active Hours'])
 
     for date in all_dates:
         gps_entries = GPSData.objects.filter(date=date)
@@ -231,12 +240,14 @@ def generate_csv(request):
             ext_distance = "N/A"
             watt_hr = "N/A"
 
+        active_hours = utilization_hours.get(date.strftime('%A'), {}).get('Active', 0)
+        
         writer.writerow([
             date.strftime('%Y-%m-%d'),
             gps_distance,
             ext_distance,
             watt_hr,
-
+            active_hours
         ])
 
     return response

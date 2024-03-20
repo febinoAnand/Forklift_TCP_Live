@@ -4737,6 +4737,7 @@ body.box-layout {
 
   
 /* CSS styles for the bar chart */
+/* CSS styles for the bar chart */
 body, table, input, select, textarea {}
 
 .graph {
@@ -4873,7 +4874,6 @@ body, table, input, select, textarea {}
         }
     }
 }
-
 .circle {
     background: #229954;
     width: 90px;

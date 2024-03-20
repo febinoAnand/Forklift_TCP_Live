@@ -130,37 +130,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // bar chart start //
 function updateGraphWithData(data) {
-  const bars = document.querySelectorAll('.graph tbody tr');
+  Object.keys(data).forEach(day => {
+      if (day.toLowerCase() !== 'sunday') {
+          const row = document.querySelector(`.bar-${day.toLowerCase()}`);
+          if (row) {
+              const { Active, Inactive, Idle } = data[day];
+              const total = Active + Inactive + Idle;
 
-  bars.forEach((bar, barIndex) => {
-    const percentSpans = bar.querySelectorAll('span.percent');
-    const utilizationPercentages = data[barIndex]?.percentages || [0];
-    const totalPercentage = utilizationPercentages.reduce((acc, curr) => acc + curr, 0);
+              const activeHeight = total === 0 ? '0%' : (Active / total) * 100 + '%';
+              const inactiveHeight = total === 0 ? '0%' : (Inactive / total) * 100 + '%';
+              const idleHeight = total === 0 ? '0%' : (Idle / total) * 100 + '%';
 
-    percentSpans.forEach((span, spanIndex) => {
-      const percentage = utilizationPercentages[spanIndex] || 0;
-      span.textContent = percentage + '%';
-    });
+              const bar = row.querySelector('.bar');
+              const percentSpans = bar.querySelectorAll('.percent');
 
-    const barHeight = totalPercentage / 3;
-    bar.style.height = barHeight + '%';
+              percentSpans[0].style.height = activeHeight;
+              percentSpans[1].style.height = inactiveHeight;
+              percentSpans[2].style.height = idleHeight;
+
+              const percentValues = row.querySelector('.percent-values');
+              percentValues.querySelector('.active').textContent = `${Active === 0 ? '0' : (Active / total * 100).toFixed(2)}% `;
+              percentValues.querySelector('.inactive').textContent = `${Inactive === 0 ? '0' : (Inactive / total * 100).toFixed(2)}% `;
+              percentValues.querySelector('.idle').textContent = `${Idle === 0 ? '0' : (Idle / total * 100).toFixed(2)}% `;
+          } else {
+              console.error(`Row for ${day} not found.`);
+          }
+      }
   });
 }
-
 function fetchDataAndUpdateGraph() {
   const apiUrl = '/get_utilization_hours/';
 
   fetch(apiUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      updateGraphWithData(data);
-    })
-    .catch(error => console.error('Error fetching data:', error));
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+      })
+      .then(data => {
+          updateGraphWithData(data || {});
+      })
+      .catch(error => console.error('Error fetching data:', error));
 }
 
 fetchDataAndUpdateGraph();
