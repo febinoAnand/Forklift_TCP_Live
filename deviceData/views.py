@@ -106,11 +106,14 @@ def get_utilization_hours(request):
                 output_field=DecimalField()
             )
         )['total_hours'] or 0
+        
+        total_utilization = active_hours + inactive_hours + idle_hours
 
         utilization_hours[current_date.strftime('%A')] = {
             'Active': active_hours,
             'Inactive': inactive_hours,
-            'Idle': idle_hours
+            'Idle': idle_hours,
+            'Total': total_utilization
         }
 
     return JsonResponse(utilization_hours)

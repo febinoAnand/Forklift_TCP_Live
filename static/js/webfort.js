@@ -129,51 +129,56 @@ document.addEventListener('DOMContentLoaded', function() {
 //line chart end //
 
 // bar chart start //
-function updateGraphWithData(data) {
+function updateBarChart(data) {
   Object.keys(data).forEach(day => {
-      if (day.toLowerCase() !== 'sunday') {
-          const row = document.querySelector(`.bar-${day.toLowerCase()}`);
+      if (day.toLowerCase() !== 'sunday') { 
+          var utilizationData = data[day];
+          var row = document.querySelector(`.bar-${day.toLowerCase()}`);
           if (row) {
-              const { Active, Inactive, Idle } = data[day];
-              const total = Active + Inactive + Idle;
-
-              const activeHeight = total === 0 ? '0%' : (Active / total) * 100 + '%';
-              const inactiveHeight = total === 0 ? '0%' : (Inactive / total) * 100 + '%';
-              const idleHeight = total === 0 ? '0%' : (Idle / total) * 100 + '%';
-
-              const bar = row.querySelector('.bar');
-              const percentSpans = bar.querySelectorAll('.percent');
-
-              percentSpans[0].style.height = activeHeight;
-              percentSpans[1].style.height = inactiveHeight;
-              percentSpans[2].style.height = idleHeight;
-
-              const percentValues = row.querySelector('.percent-values');
-              percentValues.querySelector('.active').textContent = `${Active === 0 ? '0' : (Active / total * 100).toFixed(2)}% `;
-              percentValues.querySelector('.inactive').textContent = `${Inactive === 0 ? '0' : (Inactive / total * 100).toFixed(2)}% `;
-              percentValues.querySelector('.idle').textContent = `${Idle === 0 ? '0' : (Idle / total * 100).toFixed(2)}% `;
+              var bar = row.querySelector('.bar');
+              if (bar) {
+                  var maxHours = Math.max(...Object.values(utilizationData).filter(value => typeof value === 'number'));
+                  
+                  for (const state in utilizationData) {
+                      if (state !== 'Total') {
+                          var element = bar.querySelector(`.${state.toLowerCase()}`);
+                          if (element) {
+                              var hours = parseFloat(utilizationData[state]);
+                              if (!isNaN(hours)) {
+                                  if (hours > 0) {
+                                      var scaledHeight = (hours / maxHours) * 100;
+                                      element.textContent = hours.toFixed(2);
+                                      element.style.height = `${scaledHeight}%`;
+                                  } else {
+                                      element.textContent = '';
+                                      element.style.height = '0%';
+                                  }
+                              }
+                          }
+                      }
+                  }
+                  bar.style.height = '100%';
+              } else {
+                  console.error(`Bar not found for ${day}.`);
+              }
           } else {
               console.error(`Row for ${day} not found.`);
           }
       }
   });
 }
-function fetchDataAndUpdateGraph() {
-  const apiUrl = '/get_utilization_hours/';
-
-  fetch(apiUrl)
+function fetchDataAndUpdate() {
+  fetch('/get_utilization_hours/')
       .then(response => {
           if (!response.ok) {
               throw new Error('Network response was not ok');
           }
           return response.json();
       })
-      .then(data => {
-          updateGraphWithData(data || {});
-      })
+      .then(data => updateBarChart(data))
       .catch(error => console.error('Error fetching data:', error));
 }
 
-fetchDataAndUpdateGraph();
-setInterval(fetchDataAndUpdateGraph, 5000);
+fetchDataAndUpdate();
+setInterval(fetchDataAndUpdate, 5000);
 // bar chart ens //
