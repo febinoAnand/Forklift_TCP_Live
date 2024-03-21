@@ -4834,7 +4834,7 @@ body.box-layout {
         .graph td {
             width: 100%;
             height: 100%;
-            background: #F63;
+            background: #F08080;
             border-radius: 0.5em 0.5em 0 0;
             transition: background 0.5s;
         }
