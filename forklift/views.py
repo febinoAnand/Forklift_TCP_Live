@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import TrackerDeviceSerializer
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from .forms import TrackerDeviceForm
 
 from django.core import serializers
@@ -15,6 +16,7 @@ import random
 def loginView(request):
     return render(request,'login.html')
 
+@login_required
 def deviceDashborad(request):
     currentDevice = tracker_device.objects.get(device_id = '352592573198322')
     gpsData = GPSData.objects.all().order_by('-pk')[0]
@@ -23,7 +25,7 @@ def deviceDashborad(request):
     # print(gpsData)
     return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gpsData,"random":rand,"extData":extData})
 
-
+@login_required
 def updateGPSTableView(request):
     currentDeviceID = request.GET['deviceID']
     if currentDeviceID != None:
@@ -33,6 +35,7 @@ def updateGPSTableView(request):
         # print (gps_table_json)
     return HttpResponse(gps_table_json,content_type='application/json')
 
+@login_required
 def updateEXTTableView(request):
     currentDeviceID = request.GET['deviceID']
     if currentDeviceID != None:
@@ -42,18 +45,22 @@ def updateEXTTableView(request):
         # print (ext_table_json)
     return HttpResponse(ext_table_json,content_type='application/json')
 
+@login_required
 def report_page_view(request):
     return render(request, 'reportpage.html')
 
+@login_required
 def registration_view(request):
     if request.method == 'POST':
         return redirect('login')
     else:
         return render(request, 'registration.html')
 
+@login_required
 def list_page_view(request):
     return render(request, 'listpage.html')
 
+@login_required
 def register_device(request):
     if request.method == 'POST':
         form = TrackerDeviceForm(request.POST)
@@ -63,7 +70,8 @@ def register_device(request):
     else:
         form = TrackerDeviceForm()
     return render(request, 'registration.html', {'form': form})
-    
+
+@login_required    
 def tracker_device_list(request):
     devices = tracker_device.objects.all()
     data = [{'device_id': device.device_id, 'vehicle_name': device.vehicle_name, 'device_model': device.device_model,
