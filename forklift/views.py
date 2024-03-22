@@ -18,12 +18,28 @@ def loginView(request):
 
 @login_required
 def deviceDashborad(request):
-    currentDevice = tracker_device.objects.get(device_id = '352592573198322')
-    gpsData = GPSData.objects.all().order_by('-pk')[0]
-    extData = EXTData.objects.all().order_by('-pk')[0]
-    rand = random.randint(1,10)
-    # print(gpsData)
-    return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gpsData,"random":rand,"extData":extData})
+    try:
+        current_device_id = request.GET.get('device_id')
+        print (current_device_id)
+        currentDevice = tracker_device.objects.get(device_id = current_device_id)
+        gpsData = GPSData.objects.all()
+        if len(gpsData) > 0:
+            gpsData = gpsData.order_by('-pk')[0]
+        else:
+            gpsData = GPSData()
+        extData = EXTData.objects.all()
+        if len(extData) > 0:
+            extData = extData.order_by('-pk')[0]
+        else:
+            extData = EXTData()
+        
+        
+        rand = random.randint(1,10)
+        return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gpsData,"random":rand,"extData":extData})
+    except Exception as e:
+        print (e)
+        return HttpResponse('Device Not found')
+    
 
 @login_required
 def updateGPSTableView(request):
