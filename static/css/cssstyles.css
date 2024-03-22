@@ -4859,33 +4859,6 @@ body.box-layout {
         }
     }
 }
-
-/* Define colors for each bar */
-.bar-monday {
-    background: linear-gradient(to right, #F08080 0%, #F08080 20%, #5EC2F7 20%, #5EC2F7 40%, #F7DC6F 40%, #F7DC6F 100%);
-}
-
-.bar-tuesday {
-    background: linear-gradient(to right, #F08080 0%, #F08080 20%, #5EC2F7 20%, #5EC2F7 40%, #F7DC6F 40%, #F7DC6F 100%);
-}
-
-.bar-wednesday {
-    background: linear-gradient(to right, #F08080 0%, #F08080 20%, #5EC2F7 20%, #5EC2F7 40%, #F7DC6F 40%, #F7DC6F 100%);
-}
-
-.bar-thursday {
-    background: linear-gradient(to right, #F08080 0%, #F08080 20%, #5EC2F7 20%, #5EC2F7 40%, #F7DC6F 40%, #F7DC6F 100%);
-}
-
-.bar-friday {
-    background: linear-gradient(to right, #F08080 0%, #F08080 20%, #5EC2F7 20%, #5EC2F7 40%, #F7DC6F 40%, #F7DC6F 100%);
-}
-
-.bar-saturday {
-    background: linear-gradient(to right, #F08080 0%, #F08080 20%, #5EC2F7 20%, #5EC2F7 40%, #F7DC6F 40%, #F7DC6F 100%);
-}
-
-
 .circle {
     background: #229954;
     width: 90px;
