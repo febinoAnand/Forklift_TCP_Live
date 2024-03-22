@@ -159,8 +159,7 @@ $(document).ready(function(){
         var username = $("#username").val();
 		    var errorMessage = $("#errorMessage");
         if(password === "admin" && username === "admin"){
-          window.location.href="devicedashboard";
-          alert("Login successful!");
+          window.location.href="/listpage";
         } 
         else {
           alert("Incorrect password! Please try again.");

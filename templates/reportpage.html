@@ -1,0 +1,321 @@
+{% load static %}
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Report page</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	
+    <!-- favicon
+		============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <!-- Google Fonts
+		============================================ -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <!-- Bootstrap CSS
+		============================================ -->
+    <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
+    <!-- font awesome CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/font-awesome.min.css">
+    <!-- owl.carousel CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/owl.carousel.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.css">
+    <link rel="stylesheet" href="../static/css/owl.transitions.css">
+    <!-- animate CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/animate.css">
+    <!-- normalize CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/normalize.css">
+    <!-- mCustomScrollbar CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/scrollbar/jquery.mCustomScrollbar.min.css">
+    <!-- wave CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/wave/waves.min.css">
+    <!-- Notika icon CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/notika-custom-icon.css">
+    <!-- main CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/main.css">
+    <!-- style CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/cssstyles.css">
+    <!-- responsive CSS
+		============================================ -->
+    <link rel="stylesheet" href="../static/css/responsive.css">
+    <!-- modernizr JS
+		============================================ -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+     
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+
+    <style>
+        .data-table-area {
+            position: relative;
+        }
+        .search-container-1 {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Start Header Top Area -->
+    <div class="header-top-area">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <div class="logo-area">
+                <a href="/devicedashboard?device_id=${device.device_id}">
+                <p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a>
+            </div>
+          </div>
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+            <div class="header-top-menu">
+              <ul class="nav navbar-nav notika-top-nav">
+                <li class="nav-item">
+                  <a href="/devicedashboard?device_id=${device.device_id}" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                    <span class="glyphicon glyphicon-arrow-left"></span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="/" role="button"><span class="glyphicon glyphicon-log-out"></span></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br /><br />
+    <!-- table area start -->
+    <div class="mobile-menu-area">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="search-container">
+                      <label for="fromDate">From :</label>
+                      <input type="date" id="fromDate">
+
+                      <label for="toDate">To :</label>
+                      <input type="date" id="toDate">
+                      
+                      <button onclick="search()">Search</button>
+                      <button onclick="clearFields()">Clear</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <br/>
+  <div class="data-table-area">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="data-table-list">
+                      <div class="basic-tb-hd">
+                          <h2>REPORT</h2>
+                      </div>
+                      <div class="table-responsive">
+                        <table id="data-table-basic" class="table table-striped">
+                          <thead>
+                              <tr>
+                                  <th>Date</th>
+                                  <th>GPS Distance</th>
+                                  <th>EXT Distance</th>
+                                  <th>Watt HR</th>
+                                  <th>Utilization Hours</th>
+                              </tr>
+                          </thead>
+                          <tbody id="table-body">
+                              
+                          </tbody>
+                      </table>
+                      <br>
+                          <div>
+                              <button id="csvButton">Download CSV</button>
+                              <button id="pdfButton">Download PDF</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+    <br />
+    <!-- Table area End-->
+    <!-- Start Footer area-->
+    <div class="footer-copyright-area">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="footer-copy-right">
+                      <p>Copyright © 2024 . All rights reserved.</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+     <!-- jquery
+		============================================ -->
+        <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
+        <!-- bootstrap JS
+            ============================================ -->
+        <script src="../static/js/bootstrap.min.js"></script>
+        <!-- wow JS
+            ============================================ -->
+        <script src="../static/js/wow.min.js"></script>
+        <!-- price-slider JS
+            ============================================ -->
+        <script src="../static/js/jquery-price-slider.js"></script>
+        <!-- owl.carousel JS
+            ============================================ -->
+        <script src="../static/js/owl.carousel.min.js"></script>
+        <!-- scrollUp JS
+            ============================================ -->
+        <script src="../static/js/jquery.scrollUp.min.js"></script>
+        <!-- meanmenu JS
+            ============================================ -->
+        <script src="../static/js/meanmenu/jquery.meanmenu.js"></script>
+        <!-- counterup JS
+            ============================================ -->
+        <script src="../static/js/counterup/jquery.counterup.min.js"></script>
+        <script src="../static/js/counterup/waypoints.min.js"></script>
+        <script src="../static/js/counterup/counterup-active.js"></script>
+        <!-- mCustomScrollbar JS
+            ============================================ -->
+        <script src="../static/js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+        <!-- sparkline JS
+            ============================================ -->
+        <script src="../static/js/sparkline/jquery.sparkline.min.js"></script>
+        <script src="../static/js/sparkline/sparkline-active.js"></script>
+        <!-- flot JS
+            ============================================ -->
+        <script src="../static/js/flot/jquery.flot.js"></script>
+        <script src="../static/js/flot/jquery.flot.resize.js"></script>
+        <script src="../static/js/flot/flot-active.js"></script>
+        <!-- knob JS
+            ============================================ -->
+        <script src="../static/js/knob/jquery.knob.js"></script>
+        <script src="../static/js/knob/jquery.appear.js"></script>
+        <script src="../static/js/knob/knob-active.js"></script>
+        <!--  Chat JS
+            ============================================ -->
+        <script src="../static/js/chat/jquery.chat.js"></script>
+        <!--  wave JS
+            ============================================ -->
+        <script src="../static/js/wave/waves.min.js"></script>
+        <script src="../static/js/wave/wave-active.js"></script>
+        <!-- icheck JS
+            ============================================ -->
+        <script src="../static/js/icheck/icheck.min.js"></script>
+        <script src="../static/js/icheck/icheck-active.js"></script>
+        <!--  todo JS
+            ============================================ -->
+        <script src="../static/js/todo/jquery.todo.js"></script>
+        <!-- Login JS
+            ============================================ -->
+        <script src="../static/js/login/login-action.js"></script>
+        <!-- plugins JS
+            ============================================ -->
+        <script src="../static/js/plugins.js"></script>
+        <!-- main JS
+            ============================================ -->
+        <script src="../static/js/main.js"></script>
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                $('#pdfButton').on('click', function() {
+                    window.location.href = '/generate-pdf/';
+                });
+        
+                $('#csvButton').on('click', function() {
+                    window.location.href = '/generate-csv/';
+                });
+            });
+        
+            function search() {
+                var fromDate = document.getElementById("fromDate").value;
+                var toDate = document.getElementById("toDate").value;
+        
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/search_data/?fromDate=" + fromDate + "&toDate=" + toDate, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var responseData = JSON.parse(xhr.responseText);
+                        updateTable(responseData);
+                    }
+                };
+                xhr.send();
+            }
+        
+            function updateTable(data) {
+                var tableBody = document.getElementById("table-body");
+                tableBody.innerHTML = "";
+        
+                for (var i = 0; i < data.length; i++) {
+                    var row = document.createElement("tr");
+                    row.innerHTML = "<td>" + data[i].date + "</td>" +
+                        "<td>" + data[i].gps_distance + "</td>" +
+                        "<td>" + data[i].ext_distance + "</td>" +
+                        "<td>" + data[i].watt_hr + "</td>" +
+                        "<td id='utilization-hours-" + i + "'></td>";
+                    tableBody.appendChild(row);
+                    calculateActiveHours(data[i].date, i);
+                }
+            }
+        
+            function calculateActiveHours(date, index) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/get_utilization_hours/", true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            var utilizationData = JSON.parse(xhr.responseText);
+                            var activeHours = 0;
+                            var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                            var dayName = dayNames[new Date(date).getDay()];
+                            if (utilizationData.hasOwnProperty(dayName)) {
+                                activeHours = parseFloat(utilizationData[dayName]['Active']);
+                            }
+                            document.getElementById('utilization-hours-' + index).textContent = activeHours.toFixed(2);
+                        } else {
+                            console.error("Error fetching utilization data. Status: " + xhr.status);
+                        }
+                    }
+                };
+                xhr.send();
+            }
+        
+            function clearFields() {
+                document.getElementById("fromDate").value = "";
+                document.getElementById("toDate").value = "";
+                var tableBody = document.getElementById("table-body");
+                tableBody.innerHTML = "";
+            }
+        </script>
+  </body>
+</html>
