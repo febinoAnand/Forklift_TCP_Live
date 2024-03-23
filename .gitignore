@@ -142,3 +142,5 @@ GitHub.sublime-settings
 
 runforklift_django.sh
 runforklift_tcp.sh
+
+.DS_Store
