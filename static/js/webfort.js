@@ -138,9 +138,9 @@ function updateBarChart(data) {
                 if (bar) {
                     var totalHours = 0;
                     var stateHours = {};
-                    var currentTime = new Date(); // Get current time
+                    var currentTime = new Date();
                     var totalPercentage = 0;
-                    var maxHeight = 100; // Maximum height for the bar
+                    var maxHeight = 100;
                     for (const state in utilizationData) {
                         if (state !== 'Total') {
                             var hours = parseFloat(utilizationData[state]);

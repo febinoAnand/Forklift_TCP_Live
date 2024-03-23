@@ -709,7 +709,7 @@ function fetchDataAndUpdateMap() {
 
             const lastTwentyData = data.slice(-20).filter(item => item.latitude !== 0 || item.longitude !== 0);
 
-            let previousLocation = null; // Store the previous location
+            let previousLocation = null;
 
             lastTwentyData.forEach((item, index) => {
                 const location = { lat: item.latitude, lng: item.longitude };
