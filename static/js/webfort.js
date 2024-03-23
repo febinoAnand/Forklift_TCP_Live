@@ -138,6 +138,9 @@ function updateBarChart(data) {
                 if (bar) {
                     var totalHours = 0;
                     var stateHours = {};
+                    var currentTime = new Date(); // Get current time
+                    var totalPercentage = 0;
+                    var maxHeight = 100; // Maximum height for the bar
                     for (const state in utilizationData) {
                         if (state !== 'Total') {
                             var hours = parseFloat(utilizationData[state]);
@@ -148,14 +151,12 @@ function updateBarChart(data) {
                         }
                     }
                     if (totalHours > 0) {
-                        var totalPercentage = 0;
                         for (const state in stateHours) {
                             var percentage = (stateHours[state] / totalHours) * 100;
                             var element = bar.querySelector(`.${state.toLowerCase()}`);
                             if (element) {
                                 element.textContent = `${percentage.toFixed(1)}%`;
-                                element.style.height = `${percentage}%`;
-
+                                element.style.height = `${(percentage * maxHeight) / 100}%`; 
                                 if (state.toLowerCase() === 'active') {
                                     element.style.background = '#6ECBFA';
                                 } else if (state.toLowerCase() === 'idle') {
@@ -167,7 +168,7 @@ function updateBarChart(data) {
                             }
                         }
                         if (totalPercentage > 0 && totalPercentage <= 100) {
-                            bar.style.height = `${totalPercentage}%`;
+                            bar.style.height = `${(totalPercentage * maxHeight) / 100}%`; 
                         } else {
                             console.error(`Total percentage exceeds 100% for ${day}.`);
                         }
