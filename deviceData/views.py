@@ -59,20 +59,38 @@ def get_last_data(request):
     return JsonResponse({'gps_data': gps_serializer.data, 'ext_data': ext_serializer.data})
 
 def get_today_gps_data(request):
-    today = date.today()
+    today = date.today() 
     start_time = datetime.combine(today, time.min)
     end_time = datetime.now()
+    # end_time = datetime.strptime("2023-03-23 23:59:59", "%Y-%m-%d %H:%M:%S")
+
+    # print (start_time,"-", end_time)
 
     data = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())) \
                           .values('state') \
                           .annotate(duration=Count('state'))
-
+    
+    data2 = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+    
+    lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
+    states = ["Inactive", "Idle", "Active", "Alert"]
+    currentState = 1
+    stateHr = [0,0,0,0]
+    for gpsData in data2:
+        currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
+        differencesInSeconds = (currentTime - lastTime).total_seconds()
+        print(currentTime , " - ", lastTime , " = ", differencesInSeconds , " - ", states[currentState-1], " - ", currentState)
+        stateHr[currentState-1] = stateHr[currentState-1] + differencesInSeconds
+        
+        currentState = gpsData["state"]
+        lastTime = currentTime
+    res = [round(x/3600,2) for x in stateHr]
     response_data = []
 
-    for item in data:
+    for n,item in enumerate(states):
         response_data.append({
-            'state': item['state'],
-            'duration': item['duration']
+            'state': item,
+            'duration': res[n]
         })
 
     return JsonResponse(response_data, safe=False)

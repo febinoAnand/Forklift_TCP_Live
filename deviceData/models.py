@@ -30,6 +30,7 @@ class GPSData(models.Model):
     gsmAreaCode = models.IntegerField(default=0)
     odometer = models.IntegerField(default=0)
     satellite = models.IntegerField(default=0)
+    
 
     def __str__(self):
         return ( str(self.date) +"_"+ str(self.time) + " // " + self.device_id.device_id)

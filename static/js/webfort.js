@@ -13,26 +13,47 @@ document.addEventListener('DOMContentLoaded', async () =>  {
           if (!response.ok) {
               throw new Error('Network response was not ok');
           }
-
+        
           const data = await response.json();
           let activeHours = 0, inactiveHours = 0, idleHours = 0;
 
           if (data.length === 0) {
               inactiveHours = 24;
           } else {
+            //   data.forEach(entry => {
+            //       switch (entry.state) {
+            //           case 1:
+            //               activeHours += entry.duration / 3600;
+            //               break;
+            //           case 2:
+            //               inactiveHours += entry.duration / 3600;
+            //               break;
+            //           case 3:
+            //               idleHours += entry.duration / 3600;
+            //               break;
+            //       }
+            //   });
+            
               data.forEach(entry => {
                   switch (entry.state) {
-                      case 1:
-                          activeHours += entry.duration / 3600;
-                          break;
-                      case 2:
-                          inactiveHours += entry.duration / 3600;
-                          break;
-                      case 3:
-                          idleHours += entry.duration / 3600;
-                          break;
+                    case "Active":
+                        activeHours = entry.duration;
+                        break;
+                    case "Inactive":
+                        inactiveHours = entry.duration ;
+                        break;
+                    case "Idle":
+                        idleHours = entry.duration;
+                        break;
+                    case "Alert":
+                        inactiveHours += entry.duration;
+                        break;
                   }
               });
+
+
+
+
           }
 
           myPieChart.data.datasets[0].data = [activeHours, inactiveHours, idleHours];
