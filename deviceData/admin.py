@@ -10,7 +10,7 @@ class RAWDataAdmin(admin.ModelAdmin):
     list_display = ["received_time", "device_id", "data_length", "data"]
 
 class EXTDataAdmin(admin.ModelAdmin):
-    list_display = ["date","time", "device_id", "device_id", "speed", "distance","batt_voltage","batt_amp","batt_capacity","batt_power","watt_hr"]
+    list_display = ["date","time", "device_id", "speed", "distance","batt_voltage","batt_amp","batt_capacity","batt_power","watt_hr"]
 
 
 admin.site.register(EXTData, EXTDataAdmin)

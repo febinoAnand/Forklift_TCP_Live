@@ -799,15 +799,44 @@
             $('#movementState_view').text("Not Moving");
         }
 
-        if (lastGPSData["ignition"]) {
-          if (lastGPSData["movementState"]) {
-              $('#status_view').text("Active").removeClass("inactive").addClass("active");
-          } else {
-             $('#status_view').text("Idle").removeClass("inactive").addClass("idle");
-          }
-        } else {
-            $('#status_view').text("Inactive").removeClass("active idle").addClass("inactive");
+        // console.log("state",$('#status_view').text());
+        if( lastGPSData["ignition"] && lastGPSData["movementState"]){
+          
+          if($('#status_view').text() != "Active") {
+            $('#status_view').text("Active");
+            $('#status_view').removeClass();
+            $('#status_view').addClass("status active-1");
+          } 
+        }else if(lastGPSData["ignition"] && !lastGPSData["movementState"]){
+          if($('#status_view').text() != "Idle") {
+            $('#status_view').text("Idle");
+            $('#status_view').removeClass();
+            $('#status_view').addClass("status idle");
+          } 
+        }else if(!lastGPSData["ignition"] && !lastGPSData["movementState"]){
+          if($('#status_view').text() != "Inactive") {
+            $('#status_view').text("Inactive");
+            $('#status_view').removeClass();
+            $('#status_view').addClass("status inactive");
+            
+          } 
+        }else{
+          if($('#status_view').text() != "Alert") {
+            $('#status_view').text("Alert");
+            $('#status_view').removeClass();
+            $('#status_view').addClass("status alert");
+          } 
         }
+
+        // if (lastGPSData["ignition"]) {
+        //   if (lastGPSData["movementState"]) {
+        //       $('#status_view').text("Active").removeClass("inactive").addClass("active");
+        //   } else {
+        //      $('#status_view').text("Idle").removeClass("inactive").addClass("idle");
+        //   }
+        // } else {
+        //     $('#status_view').text("Inactive").removeClass("active idle").addClass("inactive");
+        // }
 
         if (lastGPSData["gsmOperatorCode"]) {
             $('#gsm_operator').text(lastGPSData.gsmOperatorCode);
@@ -856,35 +885,7 @@
         }, 5000);
       });
     </script>
-    <script>
-      function updateStatus() {
-        var ignitionState = document.getElementById('ignition_state').innerText;
-        var movementState = document.getElementById('movementState_view').innerText;
-        var statusView = document.getElementById('status_view');
-    
-        if (ignitionState === 'ON') {
-          if (movementState === 'Moving') {
-            statusView.innerText = 'Active';
-            statusView.className = 'status active-1';
-          } else {
-            statusView.innerText = 'Idle';
-            statusView.className = 'status idle';
-          }
-        } else {
-          if (movementState === 'Moving') {
-            statusView.innerText = 'Alert';
-            statusView.className = 'status alert';
-          } else {
-            statusView.innerText = 'Inactive';
-            statusView.className = 'status inactive';
-          }
-        }
-      }
-      updateStatus();
-      setInterval(function() {
-        updateStatus();
-      }, 3000);
-    </script>  
+     
     <script>
       $(document).ready(function () {
           function updateExtData() {
