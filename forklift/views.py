@@ -9,7 +9,6 @@ from .serializers import TrackerDeviceSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .forms import TrackerDeviceForm
-from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.core import serializers
 import random
@@ -18,17 +17,14 @@ def loginView(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
         user = authenticate(request, username=username, password=password)
-        
         if user is not None:
             login(request, user)
-            return redirect(reverse('list_page'))
+            return redirect('listpage/')
         else:
             return render(request, 'login.html', {'error_message': 'Invalid username or password'})
     else:
         return render(request, 'login.html')
-    
 
 @login_required
 def deviceDashborad(request):

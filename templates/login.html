@@ -61,7 +61,8 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
     <!-- Login Register area Start-->
-	<form id="loginForm">
+	<form id="loginForm" method="post">
+    {% csrf_token %}
     <div class="login-content">
         <!-- Login -->
         <div class="nk-block toggled" id="l-login">

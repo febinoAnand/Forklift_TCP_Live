@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["do.febinosolutions.com","localhost","165.232.181.228","andon.febinosolutions.com"]
 
-LOGIN_REDIRECT_URL = 'listpage/'
+LOGIN_REDIRECT_URL = 'listpage/' 
 
 # Application definition
 
