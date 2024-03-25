@@ -150,42 +150,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // bar chart start //
 function updateBarChart(data) {
-  Object.keys(data).forEach(day => {
-      if (day.toLowerCase() !== 'sunday') { 
-          var utilizationData = data[day];
-          var row = document.querySelector(`.bar-${day.toLowerCase()}`);
-          if (row) {
-              var bar = row.querySelector('.bar');
-              if (bar) {
-                  var maxHours = Math.max(...Object.values(utilizationData).filter(value => typeof value === 'number'));
-                  
-                  for (const state in utilizationData) {
-                      if (state !== 'Total') {
-                          var element = bar.querySelector(`.${state.toLowerCase()}`);
-                          if (element) {
-                              var hours = parseFloat(utilizationData[state]);
-                              if (!isNaN(hours)) {
-                                  if (hours > 0) {
-                                      var scaledHeight = (hours / maxHours) * 100;
-                                      element.textContent = hours.toFixed(2);
-                                      element.style.height = `${scaledHeight}%`;
-                                  } else {
-                                      element.textContent = '';
-                                      element.style.height = '0%';
-                                  }
-                              }
-                          }
-                      }
-                  }
-                  bar.style.height = '100%';
-              } else {
-                  console.error(`Bar not found for ${day}.`);
-              }
-          } else {
-              console.error(`Row for ${day} not found.`);
-          }
-      }
-  });
+    Object.keys(data).forEach(day => {
+        if (day.toLowerCase() !== 'sunday') {
+            var utilizationData = data[day];
+            var row = document.querySelector(`.bar-${day.toLowerCase()}`);
+            if (row) {
+                var bar = row.querySelector('.bar');
+                if (bar) {
+                    var totalHours = 0;
+                    var stateHours = {};
+                    var currentTime = new Date();
+                    var totalPercentage = 0;
+                    var maxHeight = 100;
+                    for (const state in utilizationData) {
+                        if (state !== 'Total') {
+                            var hours = parseFloat(utilizationData[state]);
+                            if (!isNaN(hours) && hours >= 0) {
+                                stateHours[state] = hours;
+                                totalHours += hours;
+                            }
+                        }
+                    }
+                    if (totalHours > 0) {
+                        for (const state in stateHours) {
+                            var percentage = (stateHours[state] / totalHours) * 100;
+                            var element = bar.querySelector(`.${state.toLowerCase()}`);
+                            if (element) {
+                                element.textContent = `${percentage.toFixed(1)}%`;
+                                element.style.height = `${(percentage * maxHeight) / 100}%`; 
+                                if (state.toLowerCase() === 'active') {
+                                    element.style.background = '#6ECBFA';
+                                } else if (state.toLowerCase() === 'idle') {
+                                    element.style.background = '#FCF46B';
+                                } else if (state.toLowerCase() === 'inactive') {
+                                    element.style.background = '#F78484';
+                                }
+                                totalPercentage += percentage;
+                            }
+                        }
+                        if (totalPercentage > 0 && totalPercentage <= 100) {
+                            bar.style.height = `${(totalPercentage * maxHeight) / 100}%`; 
+                        } else {
+                            console.error(`Total percentage exceeds 100% for ${day}.`);
+                        }
+                    }
+                } else {
+                    console.error(`Bar not found for ${day}.`);
+                }
+            }
+        }
+    });
 }
 function fetchDataAndUpdate() {
   fetch('/get_utilization_hours/')
