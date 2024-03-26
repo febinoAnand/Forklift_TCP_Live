@@ -12,6 +12,7 @@ from .forms import TrackerDeviceForm
 from django.contrib.auth import authenticate, login
 from django.core import serializers
 import random
+from datetime import datetime, date ,time ,timedelta
 
 
 def loginView(request):
@@ -31,11 +32,38 @@ def loginView(request):
 def deviceDashborad(request):
     try:
         current_device_id = request.GET.get('device_id')
-        print (current_device_id)
+        # print (current_device_id)
         currentDevice = tracker_device.objects.get(device_id = current_device_id)
         gpsData = GPSData.objects.all()
+
+        today = date.today() 
+        start_time = datetime.combine(today, time.min)
+        end_time = datetime.now()
         if len(gpsData) > 0:
             gpsData = gpsData.order_by('-pk')[0]
+
+            data2 = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+    
+            lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
+            states = ["Inactive", "Idle", "Active", "Alert"]
+            currentState = 1
+            stateHr = [0,0,0,0]
+            stateTiming = []
+            
+            for gpsData in data2:
+                onOffStateDic = {}
+                currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
+                differencesInSeconds = (currentTime - lastTime).total_seconds()
+                # print(currentTime , " - ", lastTime , " = ", differencesInSeconds , " - ", states[currentState-1], " - ", currentState)
+                # stateHr[currentState-1] = stateHr[currentState-1] + differencesInSeconds
+                
+                onOffStateDic['state'] = states[currentState-1]
+                onOffStateDic['timediff'] = differencesInSeconds
+                onOffStateDic['percent'] = round(((differencesInSeconds / (60 * 60 * 24)) * 100),3)
+                stateTiming.append(onOffStateDic)
+                
+                currentState = gpsData["state"]
+                lastTime = currentTime
         else:
             gpsData = GPSData()
         extData = EXTData.objects.all()
@@ -44,9 +72,9 @@ def deviceDashborad(request):
         else:
             extData = EXTData()
         
-        
+        # print (stateTiming)
         rand = random.randint(1,10)
-        return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gpsData,"random":rand,"extData":extData})
+        return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gpsData,"random":rand,"extData":extData,"stateTiming":stateTiming})
     except Exception as e:
         print (e)
         return HttpResponse('Device Not found')

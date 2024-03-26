@@ -66,9 +66,9 @@ def get_today_gps_data(request):
 
     # print (start_time,"-", end_time)
 
-    data = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())) \
-                          .values('state') \
-                          .annotate(duration=Count('state'))
+    # data = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())) \
+    #                       .values('state') \
+    #                       .annotate(duration=Count('state'))
     
     data2 = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
     
@@ -79,7 +79,7 @@ def get_today_gps_data(request):
     for gpsData in data2:
         currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
         differencesInSeconds = (currentTime - lastTime).total_seconds()
-        print(currentTime , " - ", lastTime , " = ", differencesInSeconds , " - ", states[currentState-1], " - ", currentState)
+        # print(currentTime , " - ", lastTime , " = ", differencesInSeconds , " - ", states[currentState-1], " - ", currentState)
         stateHr[currentState-1] = stateHr[currentState-1] + differencesInSeconds
         
         currentState = gpsData["state"]

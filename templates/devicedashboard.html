@@ -164,18 +164,28 @@
             <div class="google-map-single" style="height: 150px">
               <h3>State Timing</h3><br>
               <div class="progress">
-                <div class="segment red">
-                    33.33%
-                    <div class="tooltip">Inactive : 2 Hours</div>
-                </div>
-                <div class="segment blue">
-                    33.33%
-                    <div class="tooltip">Active : 3 Hours</div>
-                </div>
-                <div class="segment yellow">
-                    33.33%
+                {% for gpsState in stateTiming %}
+                  
+                  <div class="segment " style="background-color: {%if gpsState.state == 'Idle'%} lightyellow {%elif gpsState.state == 'Active'%} lightgreen {%elif gpsState.state == 'Inactive'%} lightgreen  {%endif%}; width: {{gpsState.percent}}%;">
+                      <div class="tooltip">Inactive : {{gpsState.timediff}} Seconds</div>
+                  </div>
+                {% endfor %}
+                  <!-- <div class="segment " style="background-color: red; width: 10%;">
+                      <div class="tooltip">Inactive : 2 Hours</div>
+                  </div>
+                  <div class="segment" style="background-color: lightblue; width: 10%;">
+                      <div class="tooltip">Active : 3 Hours</div>
+                  </div>
+                  <div class="segment" style="background-color: lightcoral; width: 10%;">
+                      
+                      <div class="tooltip">Idle : 4 Hours</div>
+                  </div>
+                  <div class="segment" style="background-color: lightgreen; width: 10%;">
                     <div class="tooltip">Idle : 4 Hours</div>
                 </div>
+                <div class="segment" style="background-color: lightgreen; width: 10%;">
+                  <div class="tooltip">Idle : 4 Hours</div>
+              </div> -->
             </div>
             <div class="ruler">
               <div class="ruler-cell">
