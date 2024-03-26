@@ -683,52 +683,60 @@
           }
   
           function addLine(location1, location2) {
-              const line = new google.maps.Polyline({
-                  path: [location1, location2],
-                  geodesic: true,
-                  strokeColor: 'Red',
-                  strokeOpacity: 1.0,
-                  strokeWeight: 2
-              });
-              lines.push(line);
-              line.setMap(map);
-          }
+    if (location1.lat === 0 && location1.lng === 0 || location2.lat === 0 && location2.lng === 0) {
+        return;
+    }
+
+    const line = new google.maps.Polyline({
+        path: [location1, location2],
+        geodesic: true,
+        strokeColor: 'Red',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+    lines.push(line);
+    line.setMap(map);
+}
   
-          function fetchDataAndUpdateMap() {
-              fetch("/api/get-gps-data/")
-                  .then((response) => response.json())
-                  .then((data) => {
-                      markers.forEach((marker) => marker.setMap(null));
-                      markers.length = 0;
-                      lines.forEach((line) => line.setMap(null));
-                      lines.length = 0;
-  
-                      const lastTwentyData = data.slice(-20);
-  
-                      lastTwentyData.forEach((item, index) => {
-                          const location = { lat: item.latitude, lng: item.longitude };
-                          if (index === lastTwentyData.length - 1) {
-                              addMarker(location);
-                          }
-                          if (index < lastTwentyData.length - 1) {
-                              const nextLocation = { lat: lastTwentyData[index + 1].latitude, lng: lastTwentyData[index + 1].longitude };
-                              addLine(location, nextLocation);
-                          }
-                      });
-  
-                      const bounds = new google.maps.LatLngBounds();
-                      lastTwentyData.forEach((item) => {
-                          const location = new google.maps.LatLng(item.latitude, item.longitude);
-                          bounds.extend(location);
-                      });
-  
-                      map.fitBounds(bounds);
-                  })
-                  .catch((error) => {
-                      console.error("Error fetching data:", error);
-                  });
-          }
-  
+function fetchDataAndUpdateMap() {
+    fetch("/api/get-gps-data/")
+        .then((response) => response.json())
+        .then((data) => {
+            markers.forEach((marker) => marker.setMap(null));
+            markers.length = 0;
+            lines.forEach((line) => line.setMap(null));
+            lines.length = 0;
+
+            const lastTwentyData = data.slice(-20).filter(item => item.latitude !== 0 || item.longitude !== 0);
+
+            let previousLocation = null;
+
+            lastTwentyData.forEach((item, index) => {
+                const location = { lat: item.latitude, lng: item.longitude };
+                if (index === lastTwentyData.length - 1) {
+                    addMarker(location);
+                }
+                if (index < lastTwentyData.length - 1) {
+                    const nextLocation = { lat: lastTwentyData[index + 1].latitude, lng: lastTwentyData[index + 1].longitude };
+                    addLine(location, nextLocation);
+                }
+            });
+
+            const bounds = new google.maps.LatLngBounds();
+            lastTwentyData.forEach((item) => {
+                const location = new google.maps.LatLng(item.latitude, item.longitude);
+                bounds.extend(location);
+            });
+
+            if (bounds.getCenter().lat() !== 0 || bounds.getCenter().lng() !== 0) {
+                map.fitBounds(bounds);
+            }
+        })
+        .catch((error) => {
+            console.error("Error fetching data:", error);
+        });
+}
+
           fetchDataAndUpdateMap();
   
           setInterval(fetchDataAndUpdateMap, 5000);
