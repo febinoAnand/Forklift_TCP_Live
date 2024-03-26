@@ -164,17 +164,17 @@
             <div class="google-map-single" style="height: 150px">
               <h3>State Timing</h3><br>
               <div class="progress">
-                <div class="segment red" title="Inactive Hours">
+                <div class="segment red">
                     33.33%
-                    <div class="tooltip">Inactive Hours</div>
+                    <div class="tooltip">Inactive : 2 Hours</div>
                 </div>
-                <div class="segment blue" title="Active Hours">
+                <div class="segment blue">
                     33.33%
-                    <div class="tooltip">Active Hours</div>
+                    <div class="tooltip">Active : 3 Hours</div>
                 </div>
-                <div class="segment yellow" title="Idle Hours">
+                <div class="segment yellow">
                     33.33%
-                    <div class="tooltip">Idle Hours</div>
+                    <div class="tooltip">Idle : 4 Hours</div>
                 </div>
             </div>
             <div class="ruler">
@@ -975,6 +975,25 @@ function fetchDataAndUpdateMap() {
           updateExtData();
           setInterval(updateExtData, 5000);
       });
+  </script>
+  <script>
+    $.ajax({
+    url: '/get_today_gps_data/',
+    method: 'GET',
+    success: function (data) {
+        $.each(data, function (index, item) {
+            var state = item.state.toLowerCase();
+            var duration = item.duration;
+            var percentage = (duration / 24) * 100;
+
+            $('.segment.' + state).css('width', percentage + '%');
+            $('.segment.' + state + ' .tooltip').text(state.charAt(0).toUpperCase() + state.slice(1) + ': ' + duration + ' Hours');
+        });
+    },
+    error: function (error) {
+        console.log('Error fetching data:', error);
+    }
+});
   </script>
   </body>
 </html>
