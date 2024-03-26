@@ -4911,43 +4911,33 @@ body.box-layout {
 
 .progress {
     position: relative;
+    z-index: 1;
     height: 35px;
     width: 1100px;
     text-align: center;
     color: #fff;
     font-size: 20px;
-    background: linear-gradient(to right, #ff8181 33.33%, #18b4ff 33.33%, #18b4ff 66.66%, #fbfb62 66.66%, #fbfb62 99.99%);
+    display: flex;
+    /* background: linear-gradient(to right, #ff8181 33.33%, #18b4ff 33.33%, #18b4ff 66.66%, #fbfb62 66.66%, #fbfb62 99.99%); */
+    background-color: #efefef;
     overflow: hidden;
   }
 
   .progress .segment {
-    position: absolute;
     top: 0;
     height: 100%;
     text-align: center;
     line-height: 25px;
     font-size: 14px;
-    color: #000;
     cursor: pointer;
   }
 
-  .progress .segment.red {
-    left: 0;
-    width: 33.33%;
-    background-color: #ff8181;
-  }
+  /* .segment::after{
+    position: absolute;
+    z-index: 1;
+    background-color: lemonchiffon;
+  } */
 
-  .progress .segment.blue {
-    left: 33.33%;
-    width: 33.33%;
-    background-color: #18b4ff;
-  }
-
-  .progress .segment.yellow {
-    left: 66.66%;
-    width: 33.33%;
-    background-color: #fbfb62;
-  }
 
   .ruler{
     margin:20px 0px;
@@ -5009,8 +4999,10 @@ body.box-layout {
     border-radius: 20px;
     opacity: 0;
     transition: opacity 0.3s;
-    top: 5px;
+    top: -10px;
 }
+
+
 
 .segment:hover .tooltip {
     opacity: 10;
