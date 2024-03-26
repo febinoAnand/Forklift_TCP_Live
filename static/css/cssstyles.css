@@ -4908,3 +4908,110 @@ body.box-layout {
 #map {
   height: 100%;
 }
+
+.progress {
+    position: relative;
+    height: 35px;
+    width: 1100px;
+    text-align: center;
+    color: #fff;
+    font-size: 20px;
+    background: linear-gradient(to right, #ff8181 33.33%, #18b4ff 33.33%, #18b4ff 66.66%, #fbfb62 66.66%, #fbfb62 99.99%);
+    overflow: hidden;
+  }
+
+  .progress .segment {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    text-align: center;
+    line-height: 25px;
+    font-size: 14px;
+    color: #000;
+    cursor: pointer;
+  }
+
+  .progress .segment.red {
+    left: 0;
+    width: 33.33%;
+    background-color: #ff8181;
+  }
+
+  .progress .segment.blue {
+    left: 33.33%;
+    width: 33.33%;
+    background-color: #18b4ff;
+  }
+
+  .progress .segment.yellow {
+    left: 66.66%;
+    width: 33.33%;
+    background-color: #fbfb62;
+  }
+
+  .ruler{
+    margin:20px 0px;
+    height:10px;
+    width:100%;
+    display:flex;
+    justify-content:center
+  }
+  .ruler-cell{
+    position:relative;
+    height:50%;
+    width:calc(100% - 20px);
+    border-left:1px solid black;
+    border-right:1px solid black;
+    background-repeat:no-repeat;
+    background-size:
+      100% 1px,
+      1px 5px,
+      1px 5px,
+      1px 5px,
+      1px 5px;
+    background-position:
+      0% center,
+      20% center,
+      40% center,
+      60% center,
+      80% center;
+    background-image:
+      linear-gradient(gray, gray),
+      linear-gradient(gray, gray),
+      linear-gradient(gray, gray),
+      linear-gradient(gray, gray),
+      linear-gradient(gray, gray);
+  }
+  .ruler-cell span{
+    position:absolute;
+    top:-15px;
+    font-size:12px;
+    text-align:center;
+  }
+  .zero{
+    left:0;
+    transform:translateX(-50%);
+    display:none;
+  }
+  .number{
+    right:0px;
+    transform:translateX(50%);
+  }
+  .ruler-cell:first-child .zero{
+    display:block;
+  }
+  .tooltip {
+    position: absolute;
+    z-index: 2;
+    background-color: #000;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    top: 5px;
+}
+
+.segment:hover .tooltip {
+    opacity: 10;
+}
