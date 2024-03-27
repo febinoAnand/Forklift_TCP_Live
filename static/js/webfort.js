@@ -157,10 +157,11 @@ setInterval(() => updatePieChart("device_id"), 5000);
                           if (state !== 'Total') {
                               var element = bar.querySelector(`.${state.toLowerCase()}`);
                               if (element) {
-                                  var hours = parseFloat(utilizationData[state])/24*320;
+                                  var hours = parseFloat(utilizationData[state]);
+                                  var pixel = hours/24*320;
                                   if (!isNaN(hours) && hours > 0) { 
                                       element.textContent = hours.toFixed(1);
-                                      element.style.height = `${hours}px`;
+                                      element.style.height = `${pixel}px`;
                                       if (state === 'Active') {
                                           element.style.backgroundColor = '#6EC7FA';
                                       } else if (state === 'Inactive') {
