@@ -813,6 +813,9 @@ function fetchDataAndUpdateMap() {
     ></script>
     <script>
       $(document).ready(function () {
+        let lastEXTData = { 
+        movementState: true 
+        };
         function updateExtData() {
           $.ajax({
             url: "ext-data/",
@@ -843,6 +846,9 @@ function fetchDataAndUpdateMap() {
         if (lastEXTData["batt_capacity"]) {
             $('#battery_capacity').text(lastEXTData.batt_capacity);
         }
+        let extSpeed = lastEXTData["speed"];
+            let movementState = (extSpeed > 0) ? "Moving" : "Not Moving";
+            $('#movementState_view').text(movementState);
   
     },
     error: function (xhr, textStatus, errorThrown) {
@@ -850,55 +856,45 @@ function fetchDataAndUpdateMap() {
             },
           });
         }
-        function updateGpsData() {
-          $.ajax({
-    url: "gps-data/",
-    type: "GET",
-    success: function (data) {
-        console.log("Received GPS Data -> ", data);
-        let datacount = data.length;
-        let lastGPSData = data[datacount - 1];
+function updateGpsData() {
+    $.ajax({
+        url: "gps-data/",
+        type: "GET",
+        success: function(data) {
+            let datacount = data.length;
+            let lastGPSData = data[datacount - 1];
 
-        if (lastGPSData["ignition"]) {
-            $('#ignition_state').text("ON");
-        } else {
-            $('#ignition_state').text("OFF");
-        }
+            if (lastGPSData["ignition"]) {
+                $('#ignition_state').text("ON");
+            } else {
+                $('#ignition_state').text("OFF");
+            }
 
-        if (lastGPSData["movementState"]) {
-            $('#movementState_view').text("Moving");
-        } else {
-            $('#movementState_view').text("Not Moving");
-        }
-
-        // console.log("state",$('#status_view').text());
-        if( lastGPSData["ignition"] && lastGPSData["movementState"]){
-          
-          if($('#status_view').text() != "Active") {
-            $('#status_view').text("Active");
-            $('#status_view').removeClass();
-            $('#status_view').addClass("status active-1");
-          } 
-        }else if(lastGPSData["ignition"] && !lastGPSData["movementState"]){
-          if($('#status_view').text() != "Idle") {
-            $('#status_view').text("Idle");
-            $('#status_view').removeClass();
-            $('#status_view').addClass("status idle");
-          } 
-        }else if(!lastGPSData["ignition"] && !lastGPSData["movementState"]){
-          if($('#status_view').text() != "Inactive") {
-            $('#status_view').text("Inactive");
-            $('#status_view').removeClass();
-            $('#status_view').addClass("status inactive");
-            
-          } 
-        }else{
-          if($('#status_view').text() != "Alert") {
-            $('#status_view').text("Alert");
-            $('#status_view').removeClass();
-            $('#status_view').addClass("status alert");
-          } 
-        }
+            if (lastGPSData["ignition"] && lastEXTData["movementState"]) {
+                if ($('#status_view').text() != "Active") {
+                    $('#status_view').text("Active");
+                    $('#status_view').removeClass();
+                    $('#status_view').addClass("status active-1");
+                }
+            } else if (lastGPSData["ignition"] && !lastEXTData["movementState"]) {
+                if ($('#status_view').text() != "Idle") {
+                    $('#status_view').text("Idle");
+                    $('#status_view').removeClass();
+                    $('#status_view').addClass("status idle");
+                }
+            } else if (!lastGPSData["ignition"] && !lastEXTData["movementState"]) {
+                if ($('#status_view').text() != "Inactive") {
+                    $('#status_view').text("Inactive");
+                    $('#status_view').removeClass();
+                    $('#status_view').addClass("status inactive");
+                }
+            } else {
+                if ($('#status_view').text() != "Alert") {
+                    $('#status_view').text("Alert");
+                    $('#status_view').removeClass();
+                    $('#status_view').addClass("status alert");
+                }
+            }
 
         // if (lastGPSData["ignition"]) {
         //   if (lastGPSData["movementState"]) {
