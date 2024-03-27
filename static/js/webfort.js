@@ -150,53 +150,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // bar chart start //
 function updateBarChart(data) {
-  Object.keys(data).forEach(day => {
-      if (day.toLowerCase() !== 'sunday') { 
-          var utilizationData = data[day];
-          var row = document.querySelector(`.bar-${day.toLowerCase()}`);
-          if (row) {
-              var bar = row.querySelector('.bar');
-              if (bar) {
-                  var maxHours = Math.max(...Object.values(utilizationData).filter(value => typeof value === 'number'));
-                  
-                  for (const state in utilizationData) {
-                      if (state !== 'Total') {
-                          var element = bar.querySelector(`.${state.toLowerCase()}`);
-                          if (element) {
-                              var hours = parseFloat(utilizationData[state]);
-                              if (!isNaN(hours)) {
-                                  if (hours > 0) {
-                                      var scaledHeight = (hours / maxHours) * 100;
-                                      element.textContent = hours.toFixed(2);
-                                      element.style.height = `${scaledHeight}%`;
-                                  } else {
-                                      element.textContent = '';
-                                      element.style.height = '0%';
-                                  }
-                              }
-                          }
-                      }
-                  }
-                  bar.style.height = '100%';
-              } else {
-                  console.error(`Bar not found for ${day}.`);
-              }
-          } else {
-              console.error(`Row for ${day} not found.`);
-          }
-      }
-  });
+    Object.keys(data).forEach(day => {
+        if (day.toLowerCase() !== 'sunday') { 
+            var utilizationData = data[day];
+            var row = document.querySelector(`.bar-${day.toLowerCase()}`);
+            if (row) {
+                var bar = row.querySelector('.bar');
+                if (bar) {
+                    for (const state in utilizationData) {
+                        if (state !== 'Total') {
+                            var element = bar.querySelector(`.${state.toLowerCase()}`);
+                            if (element) {
+                                var hours = parseFloat(utilizationData[state]);
+                                if (!isNaN(hours) && hours > 0) { 
+                                    element.textContent = hours.toFixed(2);
+                                    element.style.height = `${hours}px`;
+                                    if (state === 'Active') {
+                                        element.style.backgroundColor = '#6EC7FA';
+                                    } else if (state === 'Inactive') {
+                                        element.style.backgroundColor = '#FA766E';
+                                    } else if (state === 'Idle') {
+                                        element.style.backgroundColor = '#FAFA6E';
+                                    }
+                                } else {
+                                    element.textContent = '';
+                                    element.style.height = '0px';
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    console.error(`Bar not found for ${day}.`);
+                }
+            } else {
+                console.error(`Row for ${day} not found.`);
+            }
+        }
+    });
 }
 function fetchDataAndUpdate() {
-  fetch('/get_utilization_hours/')
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-          return response.json();
-      })
-      .then(data => updateBarChart(data))
-      .catch(error => console.error('Error fetching data:', error));
+    fetch('/get_utilization_hours/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => updateBarChart(data))
+        .catch(error => console.error('Error fetching data:', error));
 }
 
 fetchDataAndUpdate();
