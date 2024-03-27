@@ -100,37 +100,31 @@ def get_utilization_hours(request):
     start_date = end_date - timedelta(days=6)
 
     utilization_hours = {}
+    states = ["Inactive", "Idle", "Active"]
+
     for day in range(7):
         current_date = start_date + timedelta(days=day)
         gps_data = GPSData.objects.filter(date=current_date)
         
-        active_hours = gps_data.filter(state=3).aggregate(
-            total_hours=Sum(
-                (F('time__hour') + (F('time__minute') / 60)) - 0.5,
-                output_field=DecimalField()
-            )
-        )['total_hours'] or 0
-        
-        inactive_hours = gps_data.filter(state=1).aggregate(
-            total_hours=Sum(
-                (F('time__hour') + (F('time__minute') / 60)) - 0.5,
-                output_field=DecimalField()
-            )
-        )['total_hours'] or 0
-        
-        idle_hours = gps_data.filter(state=2).aggregate(
-            total_hours=Sum(
-                (F('time__hour') + (F('time__minute') / 60)) - 0.5,
-                output_field=DecimalField()
-            )
-        )['total_hours'] or 0
-        
-        total_utilization = active_hours + inactive_hours + idle_hours
+        state_hours = [0, 0, 0]
+
+        last_time = datetime.combine(current_date, datetime.min.time())
+        for state in range(1, 4):
+            state_data = gps_data.filter(state=state).order_by("time")
+            for data_point in state_data:
+                current_time = datetime.combine(current_date, data_point.time)
+                difference_seconds = (current_time - last_time).total_seconds()
+                state_hours[state - 1] += difference_seconds
+                last_time = current_time
+
+        state_hours = [round(hours / 3600, 2) for hours in state_hours]
+
+        total_utilization = sum(state_hours)
 
         utilization_hours[current_date.strftime('%A')] = {
-            'Active': active_hours,
-            'Inactive': inactive_hours,
-            'Idle': idle_hours,
+            "Inactive": state_hours[0],
+            "Idle": state_hours[1],
+            "Active": state_hours[2],
             'Total': total_utilization
         }
 
