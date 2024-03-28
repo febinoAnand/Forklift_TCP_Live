@@ -377,14 +377,26 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 		try:
 			GPSDataObject.ignition = io_dict[239] 	#ignition
 			GPSDataObject.movementState = io_dict[240]	#movement
-			if(GPSDataObject.ignition == True and GPSDataObject.movementState == True):
+			lastExtDatafromDB = EXTData.objects.all().order_by('-pk')[0]
+        	# print("Last data from DB -->",lastExtDatafromDB.speed)
+
+			if(GPSDataObject.ignition == True and lastExtDatafromDB.speed > 0):
 				GPSDataObject.state = 3
-			elif(GPSDataObject.ignition == True and GPSDataObject.movementState == False):
+			elif(GPSDataObject.ignition == True and lastExtDatafromDB.speed <= 0):
 				GPSDataObject.state = 2
-			elif(GPSDataObject.ignition == False and GPSDataObject.movementState == False):
+			elif(GPSDataObject.ignition == False and lastExtDatafromDB.speed <= 0):
 				GPSDataObject.state = 1
 			else:
 				GPSDataObject.state = 4
+
+			# if(GPSDataObject.ignition == True and GPSDataObject.movementState == True):
+			# 	GPSDataObject.state = 3
+			# elif(GPSDataObject.ignition == True and GPSDataObject.movementState == False):
+			# 	GPSDataObject.state = 2
+			# elif(GPSDataObject.ignition == False and GPSDataObject.movementState == False):
+			# 	GPSDataObject.state = 1
+			# else:
+			# 	GPSDataObject.state = 4
 				
 			GPSDataObject.gsmSignal = io_dict[21]
 			GPSDataObject.gsmOperatorCode = io_dict[241]
