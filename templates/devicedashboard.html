@@ -165,9 +165,10 @@
               <h3>State Timing</h3><br>
               <div class="progress">
                 {% for gpsState in stateTiming %}
+               
                   
-                  <div class="segment " style="background-color: {%if gpsState.state == 'Idle'%} lightyellow {%elif gpsState.state == 'Active'%} lightgreen {%elif gpsState.state == 'Inactive'%} lightgreen  {%endif%}; width: {{gpsState.percent}}%;">
-                      <div class="tooltip">Inactive : {{gpsState.timediff}} Seconds</div>
+                  <div class="segment " style="background-color: {%if gpsState.state == 'Idle'%} rgba(255, 206, 86, 1) {%elif gpsState.state == 'Active'%} rgba(54, 162, 235, 1) {%elif gpsState.state == 'Inactive'%} rgba(255, 99, 132, 1)  {%endif%}; width: {{gpsState.percent}}%;">
+                      <div class="tooltip">{{gpsState.state}} : {{gpsState.timediff}} Seconds</div>
                   </div>
                 {% endfor %}
                   <!-- <div class="segment " style="background-color: red; width: 10%;">
