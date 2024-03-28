@@ -378,7 +378,7 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 			GPSDataObject.ignition = io_dict[239] 	#ignition
 			GPSDataObject.movementState = io_dict[240]	#movement
 			lastExtDatafromDB = EXTData.objects.all().order_by('-pk')[0]
-        	# print("Last data from DB -->",lastExtDatafromDB.speed)
+			print ("Last data from DB -->",lastExtDatafromDB.speed)
 
 			if(GPSDataObject.ignition == True and lastExtDatafromDB.speed > 0):
 				GPSDataObject.state = 3
