@@ -32,23 +32,23 @@ def loginView(request):
 def deviceDashborad(request):
     try:
         current_device_id = request.GET.get('device_id')
-        # print (current_device_id)
+        print (current_device_id)
         currentDevice = tracker_device.objects.get(device_id = current_device_id)
-        gpsData = GPSData.objects.all()
-
+        gps_data = GPSData.objects.filter(device_id=currentDevice)
+        stateTiming = []
         today = date.today() 
         start_time = datetime.combine(today, time.min)
         end_time = datetime.now()
-        if len(gpsData) > 0:
-            gpsData = gpsData.order_by('-pk')[0]
+        if len(gps_data) > 0:
+            gps_data = gps_data.order_by('-pk')[0]
 
-            data2 = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+            data2 = GPSData.objects.filter(device_id = currentDevice, date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
     
             lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
             states = ["Inactive", "Idle", "Active", "Alert"]
             currentState = 1
             stateHr = [0,0,0,0]
-            stateTiming = []
+            
             
             for gpsData in data2:
                 onOffStateDic = {}
@@ -65,16 +65,16 @@ def deviceDashborad(request):
                 currentState = gpsData["state"]
                 lastTime = currentTime
         else:
-            gpsData = GPSData()
-        extData = EXTData.objects.all()
-        if len(extData) > 0:
-            extData = extData.order_by('-pk')[0]
+            gps_data = GPSData()
+        ext_data = EXTData.objects.filter(device_id=currentDevice)
+        if len(ext_data) > 0:
+            ext_data = ext_data.order_by('-pk')[0]
         else:
-            extData = EXTData()
+            ext_data = EXTData()
         
         # print (stateTiming)
         rand = random.randint(1,10)
-        return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gpsData,"random":rand,"extData":extData,"stateTiming":stateTiming})
+        return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gps_data,"random":rand,"extData":ext_data,"stateTiming":stateTiming})
     except Exception as e:
         print (e)
         return HttpResponse('Device Not found')
@@ -107,6 +107,7 @@ def report_page_view(request):
 
 @login_required
 def registration_view(request):
+    currentDeviceID = request.GET.get('deviceID')
     if request.method == 'POST':
         return redirect('login')
     else:
