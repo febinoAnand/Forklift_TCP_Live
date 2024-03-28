@@ -18,14 +18,23 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle,  Paragraph, Spacer
+from forklift.models import tracker_device
 
 def ext_data_list(request):
-    currentDeviceID = request.GET.get('deviceID')
-    # print ("ext--->", currentDeviceID)
+   
     if request.method == 'GET':
-        ext_data = [EXTData.objects.latest('id')]
+        currentDeviceID = request.GET.get('deviceID')
+        # currentDevice = currentDeviceID.objects.get(deviceID=currentDeviceID)
+        # print ("ext--->", currentDeviceID)
+        # if currentDeviceID:
+        deviceObject = tracker_device.objects.get(device_id = currentDeviceID)
+        ext_data = EXTData.objects.filter(device_id=deviceObject).order_by('-id')[:1]
+        # else:
+            # ext_data = [EXTData.objects.latest('deviceID')]
+            
         serializer = EXTDataSerializer(ext_data, many=True)
         return JsonResponse(serializer.data, safe=False)
+    
     elif request.method == 'POST':
         data = json.loads(request.body)
         serializer = EXTDataSerializer(data=data)
@@ -35,12 +44,16 @@ def ext_data_list(request):
         return JsonResponse(serializer.errors, status=400)
 
 def gps_data_list(request):
-    currentDeviceID = request.GET.get('deviceID')
-    # print ("gps--->", currentDeviceID)
+
     if request.method == 'GET':
-        gps_data = [GPSData.objects.latest('id')]
+        currentDeviceID = request.GET.get('deviceID')
+        # print ("gps--->", currentDeviceID)
+        deviceObject = tracker_device.objects.get(device_id = currentDeviceID)
+        gps_data = GPSData.objects.filter(device_id=deviceObject).order_by('-id')[:1]
+
         serializer = GPSDataSerializer(gps_data, many=True)
         return JsonResponse(serializer.data, safe=False)
+
     elif request.method == 'POST':
         data = JSONParser().parse(request)
         serializer = GPSDataSerializer(data=data)
@@ -50,28 +63,35 @@ def gps_data_list(request):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 def get_gps_data(request):
-    currentDeviceID = request.GET.get('deviceID')
-    # print ("gps--->", currentDeviceID)
-    gps_data = GPSData.objects.all().values('latitude', 'longitude') 
-    return JsonResponse(list(gps_data), safe=False)
+    if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+        # print ("gps--->", currentDeviceID)
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+        gps_data = GPSData.objects.filter(device_id=deviceObject).values('latitude', 'longitude')
+        return JsonResponse(list(gps_data), safe=False)
     
 def get_last_data(request):
-    currentDeviceID = request.GET.get('deviceID')
-    # print ("gps--->", currentDeviceID)
-    last_gps_data = GPSData.objects.order_by('-date', '-time')[:5]
-    last_ext_data = EXTData.objects.order_by('-date', '-time')[:5]
+    if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+        # print ("gps--->", currentDeviceID)
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+        
+        last_gps_data = GPSData.objects.filter(device_id=deviceObject).order_by('-date', '-time')[:5]
+        last_ext_data = EXTData.objects.filter(device_id=deviceObject).order_by('-date', '-time')[:5]
 
-    gps_serializer = GPSDataSerializer(last_gps_data, many=True)
-    ext_serializer = EXTDataSerializer(last_ext_data, many=True)
+        gps_serializer = GPSDataSerializer(last_gps_data, many=True)
+        ext_serializer = EXTDataSerializer(last_ext_data, many=True)
 
-    return JsonResponse({'gps_data': gps_serializer.data, 'ext_data': ext_serializer.data})
+        return JsonResponse({'gps_data': gps_serializer.data, 'ext_data': ext_serializer.data})
 
 def get_today_gps_data(request):
-    currentDeviceID = request.GET.get('deviceID')
-    # print ("gps--->", currentDeviceID)
-    today = date.today() 
-    start_time = datetime.combine(today, time.min)
-    end_time = datetime.now()
+    if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+        # print ("gps--->", currentDeviceID)
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+        today = date.today() 
+        start_time = datetime.combine(today, time.min)
+        end_time = datetime.now()
     # end_time = datetime.strptime("2023-03-23 23:59:59", "%Y-%m-%d %H:%M:%S")
 
     # print (start_time,"-", end_time)
@@ -80,7 +100,9 @@ def get_today_gps_data(request):
     #                       .values('state') \
     #                       .annotate(duration=Count('state'))
     
-    data2 = GPSData.objects.filter(date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+    data2 = GPSData.objects.filter(device_id=deviceObject, date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+        
+    last_gps_data = GPSData.objects.filter(device_id=deviceObject).order_by('-date', '-time')[:5]
     
     lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
     states = ["Inactive", "Idle", "Active", "Alert"]
@@ -107,16 +129,16 @@ def get_today_gps_data(request):
 
 def get_utilization_hours(request):
     currentDeviceID = request.GET.get('deviceID')
-   # print ("gps--->", currentDeviceID)
+    # print ("gps--->", currentDeviceID)
+    deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=6)
-
     utilization_hours = {}
     states = ["Inactive", "Idle", "Active"]
 
     for day in range(7):
         current_date = start_date + timedelta(days=day)
-        gps_data = GPSData.objects.filter(date=current_date)
+        gps_data = GPSData.objects.filter(device_id=deviceObject, date=current_date)
         
         state_hours = [0, 0, 0]
 
@@ -144,7 +166,6 @@ def get_utilization_hours(request):
 
 def search_data(request):
     currentDeviceID = request.GET.get('deviceID')
-    print ("gps--->", currentDeviceID)
     if request.method == 'GET':
         from_date = request.GET.get('fromDate')
         to_date = request.GET.get('toDate')
