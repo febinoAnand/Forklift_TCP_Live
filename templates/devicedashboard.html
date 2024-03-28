@@ -816,6 +816,7 @@ function fetchDataAndUpdateMap() {
         let lastEXTData = { 
           movementState: true 
         };
+        let isVehicleMovingOrNot = false;
         function updateExtData() {
           $.ajax({
             url: "ext-data/",
@@ -847,8 +848,9 @@ function fetchDataAndUpdateMap() {
             $('#battery_capacity').text(lastEXTData.batt_capacity);
         }
         let extSpeed = lastEXTData["speed"];
-            let movementState = (extSpeed > 0) ? "Moving" : "Not Moving";
-            $('#movementState_view').text(movementState);
+        let movementState = (extSpeed > 0) ? "Moving" : "Not Moving";
+        isVehicleMovingOrNot = (extSpeed > 0) ? true : false;
+        $('#movementState_view').text(movementState);
   
     },
     error: function (xhr, textStatus, errorThrown) {
@@ -870,19 +872,19 @@ function updateGpsData() {
                 $('#ignition_state').text("OFF");
             }
 
-            if (lastGPSData["ignition"] && lastEXTData["movementState"]) {
+            if (lastGPSData["ignition"] && isVehicleMovingOrNot) {
                 if ($('#status_view').text() != "Active") {
                     $('#status_view').text("Active");
                     $('#status_view').removeClass();
                     $('#status_view').addClass("status active-1");
                 }
-            } else if (lastGPSData["ignition"] && !lastEXTData["movementState"]) {
+            } else if (lastGPSData["ignition"] && !isVehicleMovingOrNot) {
                 if ($('#status_view').text() != "Idle") {
                     $('#status_view').text("Idle");
                     $('#status_view').removeClass();
                     $('#status_view').addClass("status idle");
                 }
-            } else if (!lastGPSData["ignition"] && !lastEXTData["movementState"]) {
+            } else if (!lastGPSData["ignition"] && !isVehicleMovingOrNot) {
                 if ($('#status_view').text() != "Inactive") {
                     $('#status_view').text("Inactive");
                     $('#status_view').removeClass();
