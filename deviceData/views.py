@@ -20,6 +20,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle,  Paragraph, Spacer
 
 def ext_data_list(request):
+    currentDeviceID = request.GET.get('deviceID')
+    # print ("ext--->", currentDeviceID)
     if request.method == 'GET':
         ext_data = [EXTData.objects.latest('id')]
         serializer = EXTDataSerializer(ext_data, many=True)
@@ -33,6 +35,8 @@ def ext_data_list(request):
         return JsonResponse(serializer.errors, status=400)
 
 def gps_data_list(request):
+    currentDeviceID = request.GET.get('deviceID')
+    # print ("gps--->", currentDeviceID)
     if request.method == 'GET':
         gps_data = [GPSData.objects.latest('id')]
         serializer = GPSDataSerializer(gps_data, many=True)
@@ -46,10 +50,14 @@ def gps_data_list(request):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 def get_gps_data(request):
+    currentDeviceID = request.GET.get('deviceID')
+    # print ("gps--->", currentDeviceID)
     gps_data = GPSData.objects.all().values('latitude', 'longitude') 
     return JsonResponse(list(gps_data), safe=False)
     
 def get_last_data(request):
+    currentDeviceID = request.GET.get('deviceID')
+    # print ("gps--->", currentDeviceID)
     last_gps_data = GPSData.objects.order_by('-date', '-time')[:5]
     last_ext_data = EXTData.objects.order_by('-date', '-time')[:5]
 
@@ -59,6 +67,8 @@ def get_last_data(request):
     return JsonResponse({'gps_data': gps_serializer.data, 'ext_data': ext_serializer.data})
 
 def get_today_gps_data(request):
+    currentDeviceID = request.GET.get('deviceID')
+    # print ("gps--->", currentDeviceID)
     today = date.today() 
     start_time = datetime.combine(today, time.min)
     end_time = datetime.now()
@@ -96,6 +106,8 @@ def get_today_gps_data(request):
     return JsonResponse(response_data, safe=False)
 
 def get_utilization_hours(request):
+    currentDeviceID = request.GET.get('deviceID')
+   # print ("gps--->", currentDeviceID)
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=6)
 
@@ -131,6 +143,8 @@ def get_utilization_hours(request):
     return JsonResponse(utilization_hours)
 
 def search_data(request):
+    currentDeviceID = request.GET.get('deviceID')
+    print ("gps--->", currentDeviceID)
     if request.method == 'GET':
         from_date = request.GET.get('fromDate')
         to_date = request.GET.get('toDate')
@@ -154,6 +168,7 @@ def search_data(request):
         return JsonResponse(data, safe=False)
 
 def generate_pdf(request):
+    currentDeviceID = request.GET.get('deviceID')
     response = get_utilization_hours(request)
     utilization_hours = json.loads(response.content)
 
@@ -225,6 +240,7 @@ def generate_pdf(request):
 
 
 def generate_csv(request):
+    currentDeviceID = request.GET.get('deviceID')
     response = get_utilization_hours(request)
     utilization_hours = json.loads(response.content)
     

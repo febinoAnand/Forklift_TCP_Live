@@ -2,14 +2,15 @@
 document.addEventListener('DOMContentLoaded', async () =>  {
     const ctx = document.getElementById('myPieChart').getContext('2d');
     let myPieChart;
+    var deviceID = document.getElementById("currentdeviceID").innerText;
 
-    const updatePieChart = async (deviceID) => {
+    const updatePieChart = async () => {
         try {
             const todayMorningTimestamp = new Date();
             todayMorningTimestamp.setHours(0, 0, 0, 0);
             const currentTimestamp = Math.floor(Date.now() / 1000);
 
-            const response = await fetch(`/get_today_gps_data/?start=${todayMorningTimestamp.getTime() / 1000}&end=${currentTimestamp}&deviceID=${deviceID}`);
+            const response = await fetch(`/get_today_gps_data/?deviceID=`+deviceID);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -86,8 +87,8 @@ myPieChart = new Chart(ctx, {
     }
 });
 
-updatePieChart("device_id");
-setInterval(() => updatePieChart("device_id"), 5000);
+updatePieChart();
+setInterval(updatePieChart, 5000);
 });
   // pie chart end//
   
@@ -95,10 +96,10 @@ setInterval(() => updatePieChart("device_id"), 5000);
   document.addEventListener('DOMContentLoaded', function() {
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart;
-
-    function updateChart(deviceID) {
+    var deviceID = document.getElementById("currentdeviceID").innerText;
+    function updateChart() {
         $.ajax({
-            url: '/api/get_last_data/?deviceID=' + deviceID,
+            url: '/api/get_last_data/?deviceID='+deviceID,
             success: function(data) {
                 var gpsData = data.gps_data.map(item => item.speed);
                 var extData = data.ext_data.map(item => item.speed);
@@ -145,6 +146,7 @@ setInterval(() => updatePieChart("device_id"), 5000);
   //line chart end //
   
   // bar chart start //
+  var deviceID = document.getElementById("currentdeviceID").innerText;
   function updateBarChart(data) {
       Object.keys(data).forEach(day => {
           if (day.toLowerCase() !== 'sunday') { 
@@ -186,7 +188,7 @@ setInterval(() => updatePieChart("device_id"), 5000);
       });
   }
   function fetchDataAndUpdate() {
-      fetch('/get_utilization_hours/')
+      fetch('/get_utilization_hours/?deviceID='+deviceID)
           .then(response => {
               if (!response.ok) {
                   throw new Error('Network response was not ok');
