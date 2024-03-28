@@ -82,7 +82,7 @@
         <div class="row">
           <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
             <div class="logo-area">
-                <a href="/devicedashboard?device_id=${device.device_id}">
+                <a href="/devicedashboard?device_id="${device.device_id}>
                 <p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a>
             </div>
           </div>
@@ -90,7 +90,7 @@
             <div class="header-top-menu">
               <ul class="nav navbar-nav notika-top-nav">
                 <li class="nav-item">
-                  <a href="/devicedashboard?device_id=${device.device_id}" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                    <a href="/devicedashboard?device_id=${device.device_id}" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
                     <span class="glyphicon glyphicon-arrow-left"></span>
                   </a>
                 </li>
@@ -247,6 +247,7 @@
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
         <script>
+            var deviceID = document.getElementById("currentdeviceID").innerText;
             $(document).ready(function() {
                 $('#pdfButton').on('click', function() {
                     window.location.href = '/generate-pdf/';
@@ -262,7 +263,7 @@
                 var toDate = document.getElementById("toDate").value;
         
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", "/search_data/?fromDate=" + fromDate + "&toDate=" + toDate, true);
+                xhr.open("GET", "/search_data/?deviceID="+deviceID+"&fromDate=" + fromDate + "&toDate=" + toDate, true);
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState == 4 && xhr.status == 200) {
                         var responseData = JSON.parse(xhr.responseText);

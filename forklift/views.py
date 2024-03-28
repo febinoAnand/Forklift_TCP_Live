@@ -102,6 +102,7 @@ def updateEXTTableView(request):
 
 @login_required
 def report_page_view(request):
+    currentDeviceID = request.GET.get('deviceID')
     return render(request, 'reportpage.html')
 
 @login_required
