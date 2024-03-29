@@ -129,7 +129,7 @@ def get_today_gps_data(request):
 
 def get_utilization_hours(request):
     currentDeviceID = request.GET.get('deviceID')
-    # print ("gps--->", currentDeviceID)
+    print("deviceId---->"+currentDeviceID)
     deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=6)
@@ -153,6 +153,8 @@ def get_utilization_hours(request):
 
         state_hours = [round(max(hours / 3600, 0), 2) for hours in state_hours]
 
+        # state_hours = [round(hours / 3600, 2) for hours in state_hours]
+        # print("state hours--->",state_hours)
         total_utilization = sum(state_hours)
 
         utilization_hours[current_date.strftime('%A')] = {

@@ -149,8 +149,10 @@ setInterval(updatePieChart, 5000);
   var deviceID = document.getElementById("currentdeviceID").innerText;
   function updateBarChart(data) {
       Object.keys(data).forEach(day => {
+        console.log(day)
           if (day.toLowerCase() !== 'sunday') { 
               var utilizationData = data[day];
+              console.log(utilizationData)
               var row = document.querySelector(`.bar-${day.toLowerCase()}`);
               if (row) {
                   var bar = row.querySelector('.bar');
@@ -160,7 +162,9 @@ setInterval(updatePieChart, 5000);
                               var element = bar.querySelector(`.${state.toLowerCase()}`);
                               if (element) {
                                   var hours = parseFloat(utilizationData[state]);
-                                  var pixel = hours/24*320;
+                                  console.log("hours---->",hours)
+                                  var pixel = hours/24*332;
+                                  console.log("pixel---->",pixel)
                                   if (!isNaN(hours) && hours > 0) { 
                                       element.textContent = hours.toFixed(1);
                                       element.style.height = `${pixel}px`;
