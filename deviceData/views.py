@@ -165,12 +165,15 @@ def get_utilization_hours(request):
     return JsonResponse(utilization_hours)
 
 def search_data(request):
-    currentDeviceID = request.GET.get('deviceID')
     if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+        print ("gps--->", currentDeviceID)
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
         from_date = request.GET.get('fromDate')
         to_date = request.GET.get('toDate')
-        gps_data = GPSData.objects.filter(date__range=[from_date, to_date])
-        ext_data = EXTData.objects.filter(date__range=[from_date, to_date])
+
+        gps_data = GPSData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
+        ext_data = EXTData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
         
         data = []
         
@@ -190,12 +193,15 @@ def search_data(request):
 
 def generate_pdf(request):
     currentDeviceID = request.GET.get('deviceID')
+    print ("gps--->", currentDeviceID)
+    deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+
     response = get_utilization_hours(request)
     utilization_hours = json.loads(response.content)
 
-    all_dates = set(GPSData.objects.values_list('date', flat=True).distinct()) | \
-                set(EXTData.objects.values_list('date', flat=True).distinct())
-    ext_data = EXTData.objects.all()
+    all_dates = set(GPSData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct()) | \
+                set(EXTData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct())
+    ext_data = EXTData.objects.filter(device_id=deviceObject)
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Forklift.pdf"'
@@ -216,8 +222,8 @@ def generate_pdf(request):
     table_data = [['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Active Hours']]
 
     for date in all_dates:
-        gps_entries = GPSData.objects.filter(date=date)
-        ext_entry = ext_data.filter(date=date).first()
+        gps_entries = GPSData.objects.filter(device_id=deviceObject, date=date)
+        ext_entry = ext_data.filter(device_id=deviceObject, date=date).first()
 
         if gps_entries.exists():
             gps_entry = gps_entries.first()
@@ -262,12 +268,15 @@ def generate_pdf(request):
 
 def generate_csv(request):
     currentDeviceID = request.GET.get('deviceID')
+    print ("gps--->", currentDeviceID)
+    deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+
     response = get_utilization_hours(request)
     utilization_hours = json.loads(response.content)
     
-    all_dates = set(GPSData.objects.values_list('date', flat=True).distinct()) | \
-                set(EXTData.objects.values_list('date', flat=True).distinct())
-    ext_data = EXTData.objects.all()
+    all_dates = set(GPSData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct()) | \
+                set(EXTData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct())
+    ext_data = EXTData.objects.filter(device_id=deviceObject)
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="Forklift.csv"'

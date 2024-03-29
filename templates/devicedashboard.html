@@ -142,7 +142,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="/reportpage/" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                  <a href="/reportpage/?deviceID={{device.device_id}}" method="GET" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
                     <span class="glyphicon glyphicon-save-file"></span>
                   </a>
                 </li>
@@ -162,7 +162,7 @@
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="google-map-single" style="height: 150px">
-              <h3>State Timing</h3><br>
+              <h3>Today Status</h3><br>
               <div class="progress">
                 {% for gpsState in stateTiming %}
                
@@ -609,7 +609,7 @@
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="data-table-list">
               <div class="basic-tb-hd">
-                <h2>External Table</h2>
+                <h2>Vehicle Parameter</h2>
               </div>
               <div class="table-responsive">
                 <table id="data-table-basic" class="table table-striped">
@@ -618,7 +618,7 @@
                       <th>S/NO</th>
                       <th>DATE</th>
                       <th>TIME</th>
-                      <th>DISTANCE</th>
+                      <th>ODOMETER DISTANCE</th>
                       <th>SPEED</th>
                       <th>WATT HR</th>
                       <th>BATT VOLTAGE</th>

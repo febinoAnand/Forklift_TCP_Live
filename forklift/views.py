@@ -17,18 +17,17 @@ from datetime import datetime, date ,time ,timedelta
 
 def loginView(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST['admin']
+        password = request.POST['admin']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect('listpage/')
         else:
-            return render(request, 'login.html', {'error_message': 'Invalid username or password'})
+            return render(request, 'login.html', {'error': True})
     else:
-        return render(request, 'login.html')
+        return render(request, 'login.html', {'error': False})
 
-@login_required
 def deviceDashborad(request):
     try:
         current_device_id = request.GET.get('device_id')
@@ -80,7 +79,6 @@ def deviceDashborad(request):
         return HttpResponse('Device Not found')
     
 
-@login_required
 def updateGPSTableView(request):
     currentDeviceID = request.GET['deviceID']
     if currentDeviceID != None:
@@ -90,7 +88,7 @@ def updateGPSTableView(request):
         # print (gps_table_json)
     return HttpResponse(gps_table_json,content_type='application/json')
 
-@login_required
+
 def updateEXTTableView(request):
     currentDeviceID = request.GET['deviceID']
     if currentDeviceID != None:
@@ -100,24 +98,26 @@ def updateEXTTableView(request):
         # print (ext_table_json)
     return HttpResponse(ext_table_json,content_type='application/json')
 
-@login_required
-def report_page_view(request):
-    currentDeviceID = request.GET.get('deviceID')
-    return render(request, 'reportpage.html')
 
-@login_required
+def report_page_view(request):
+    currentDeviceID = request.GET['deviceID']
+    return render(request, 'reportpage.html',{'deviceID': currentDeviceID})
+
+
 def registration_view(request):
-    currentDeviceID = request.GET.get('deviceID')
     if request.method == 'POST':
         return redirect('login')
     else:
         return render(request, 'registration.html')
 
-@login_required
-def list_page_view(request):
-    return render(request, 'listpage.html')
 
-@login_required
+def list_page_view(request):
+    if request.user.is_authenticated:
+        return render(request, 'listpage.html')
+    else:
+        return redirect('/')
+
+
 def register_device(request):
     if request.method == 'POST':
         form = TrackerDeviceForm(request.POST)
@@ -127,8 +127,7 @@ def register_device(request):
     else:
         form = TrackerDeviceForm()
     return render(request, 'registration.html', {'form': form})
-
-@login_required    
+    
 def tracker_device_list(request):
     devices = tracker_device.objects.all()
     data = [{'device_id': device.device_id, 'vehicle_name': device.vehicle_name, 'device_model': device.device_model,
