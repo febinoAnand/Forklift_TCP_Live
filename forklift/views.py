@@ -19,14 +19,9 @@ from datetime import datetime, date ,time ,timedelta
 def loginView(request):
     print("login....")
     if request.method == 'POST':
-<<<<<<< HEAD
-        username = request.POST['admin']
-        password = request.POST['admin']
-=======
         username = request.POST.get('username')
         password = request.POST.get('password')
         print(username)
->>>>>>> UserLogin
         user = authenticate(request, username=username, password=password)
         print(user)
         if user is not None:
@@ -39,10 +34,6 @@ def loginView(request):
         else:
             return render(request, 'login.html', {'error': True})
     else:
-<<<<<<< HEAD
-        return render(request, 'login.html', {'error': False})
-
-=======
         print("get")
         return render(request, 'login.html')
 
@@ -52,7 +43,6 @@ def logoutView(request):
 
 
 @login_required
->>>>>>> UserLogin
 def deviceDashborad(request):
     try:
         
