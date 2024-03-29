@@ -4,6 +4,7 @@ from .views import loginView, deviceDashborad, updateGPSTableView,updateEXTTable
 
 urlpatterns = [
     path('',loginView, name='login'),
+    path('/login',loginView, name='login'),
     path('devicedashboard',deviceDashborad),
     path('updategpstable',updateGPSTableView),
     path('updateexttable',updateEXTTableView),

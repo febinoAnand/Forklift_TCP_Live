@@ -16,17 +16,26 @@ from datetime import datetime, date ,time ,timedelta
 
 
 def loginView(request):
+    print("login....")
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        print(username)
         user = authenticate(request, username=username, password=password)
+        print(user)
         if user is not None:
-            login(request, user)
-            return redirect('listpage/')
+            if user.is_staff:
+                login(request, user)
+                return redirect('listpage/')  
+            else:
+                login(request, user)
+                return redirect('listpage/') 
         else:
             return render(request, 'login.html', {'error_message': 'Invalid username or password'})
     else:
+        print("get")
         return render(request, 'login.html')
+
 
 @login_required
 def deviceDashborad(request):
