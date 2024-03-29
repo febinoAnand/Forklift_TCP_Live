@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .forms import TrackerDeviceForm
 from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout
 from django.core import serializers
 import random
 from datetime import datetime, date ,time ,timedelta
@@ -36,10 +37,15 @@ def loginView(request):
         print("get")
         return render(request, 'login.html')
 
+def logoutView(request):
+    logout(request)
+    return redirect('/login')
+
 
 @login_required
 def deviceDashborad(request):
     try:
+        
         current_device_id = request.GET.get('device_id')
         print (current_device_id)
         currentDevice = tracker_device.objects.get(device_id = current_device_id)

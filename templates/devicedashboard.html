@@ -77,6 +77,7 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+      <link rel="stylesheet" href="../static/css/dashboardBars.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -147,7 +148,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="/" role="button"><span class="glyphicon glyphicon-log-out"></span></a>
+                  <a href="/logout" role="button"><span class="glyphicon glyphicon-log-out"></span></a>
                 </li>
               </ul>
             </div>
@@ -469,7 +470,7 @@
               </div>
               <table class="graph" id="barChart">
                 <thead>
-                    <tr>
+                    <tr >
                         <th scope="col">Day</th>
                         <th scope="col">Active</th>
                         <th scope="col">Inactive</th>
@@ -477,10 +478,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="bar-monday">
+                    <tr class= "bar-monday">
                         <th scope="row">Monday</th>
                         <td>
-                            <div class="bar">
+                            <div class="bar" style="height: 332px;">
                                 <div class="active"></div>
                                 <div class="inactive"></div>
                                 <div class="idle"></div>
@@ -490,28 +491,27 @@
                     <tr class="bar-tuesday">
                         <th scope="row">Tuesday</th>
                         <td>
-                            <div class="bar">
+                            <div class="bar" style="height: 332px;background-color:#FA766E;">
                                 <div class="active"></div>
-                                <div class="inactive"></div>
                                 <div class="idle"></div>
                             </div>
                         </td>
                     </tr>
-                    <tr class="bar-wednesday">
+                    <tr class="bar-wednesday" >
                       <th scope="row">Wednesday</th>
                       <td>
-                          <div class="bar">
-                              <div class="active"></div>
+                          <div class="bar" style="height: 332px;">
                               <div class="inactive"></div>
                               <div class="idle"></div>
+                              <div class="active"></div>
                           </div>
                       </td>
                   </tr>
                   
-                  <tr class="bar-thursday">
+                  <tr class="bar-thursday" >
                       <th scope="row">Thursday</th>
                       <td>
-                          <div class="bar">
+                          <div class="bar" style="height: 332px;">
                               <div class="active"></div>
                               <div class="inactive"></div>
                               <div class="idle"></div>
@@ -522,7 +522,7 @@
                   <tr class="bar-friday">
                       <th scope="row">Friday</th>
                       <td>
-                          <div class="bar">
+                          <div class="bar" style="height: 332px;">
                               <div class="active"></div>
                               <div class="inactive"></div>
                               <div class="idle"></div>
@@ -533,7 +533,7 @@
                   <tr class="bar-saturday">
                       <th scope="row">Saturday</th>
                       <td>
-                          <div class="bar">
+                          <div class="bar" style="height: 332px;">
                               <div class="active"></div>
                               <div class="inactive"></div>
                               <div class="idle"></div>
