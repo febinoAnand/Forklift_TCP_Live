@@ -151,7 +151,7 @@ def get_utilization_hours(request):
                 state_hours[state - 1] += difference_seconds
                 last_time = current_time
 
-        state_hours = [round(hours / 3600, 2) for hours in state_hours]
+        state_hours = [round(max(hours / 3600, 0), 2) for hours in state_hours]
 
         total_utilization = sum(state_hours)
 
@@ -167,7 +167,7 @@ def get_utilization_hours(request):
 def search_data(request):
     if request.method == 'GET':
         currentDeviceID = request.GET.get('deviceID')
-        print ("gps--->", currentDeviceID)
+        # print ("gps--->", currentDeviceID)
         deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
         from_date = request.GET.get('fromDate')
         to_date = request.GET.get('toDate')
@@ -193,14 +193,13 @@ def search_data(request):
 
 def generate_pdf(request):
     currentDeviceID = request.GET.get('deviceID')
-    print ("gps--->", currentDeviceID)
     deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
 
     response = get_utilization_hours(request)
     utilization_hours = json.loads(response.content)
 
-    all_dates = set(GPSData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct()) | \
-                set(EXTData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct())
+    all_dates = set(GPSData.objects.filter(device_id=deviceObject).values_list('date', flat=True)) | \
+                set(EXTData.objects.filter(device_id=deviceObject).values_list('date', flat=True))
     ext_data = EXTData.objects.filter(device_id=deviceObject)
 
     response = HttpResponse(content_type='application/pdf')
@@ -219,24 +218,15 @@ def generate_pdf(request):
     content.append(phone_email)
     content.append(Spacer(1, 0.5 * inch))
 
-    table_data = [['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Active Hours']]
+    table_data = [['Date', 'GPS Distance', 'ODOMETER Distance', 'Watt HR', 'Utilization Hours']]
 
     for date in all_dates:
-        gps_entries = GPSData.objects.filter(device_id=deviceObject, date=date)
-        ext_entry = ext_data.filter(device_id=deviceObject, date=date).first()
+        gps_entry = GPSData.objects.filter(device_id=deviceObject, date=date).first()
+        ext_entry = ext_data.filter(date=date).first()
 
-        if gps_entries.exists():
-            gps_entry = gps_entries.first()
-            gps_distance = gps_entry.distance
-        else:
-            gps_distance = "N/A"
-
-        if ext_entry:
-            ext_distance = ext_entry.distance
-            watt_hr = ext_entry.watt_hr
-        else:
-            ext_distance = "N/A"
-            watt_hr = "N/A"
+        gps_distance = gps_entry.distance if gps_entry else "N/A"
+        ext_distance = ext_entry.distance if ext_entry else "N/A"
+        watt_hr = ext_entry.watt_hr if ext_entry else "N/A"
 
         active_hours = utilization_hours.get(date.strftime('%A'), {}).get('Active', 0)
         
@@ -268,38 +258,27 @@ def generate_pdf(request):
 
 def generate_csv(request):
     currentDeviceID = request.GET.get('deviceID')
-    print ("gps--->", currentDeviceID)
     deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
-
     response = get_utilization_hours(request)
     utilization_hours = json.loads(response.content)
     
-    all_dates = set(GPSData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct()) | \
-                set(EXTData.objects.filter(device_id=currentDeviceID).values_list('date', flat=True).distinct())
+    all_dates = set(GPSData.objects.filter(device_id=deviceObject).values_list('date', flat=True)) | \
+                set(EXTData.objects.filter(device_id=deviceObject).values_list('date', flat=True))
     ext_data = EXTData.objects.filter(device_id=deviceObject)
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="Forklift.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Date', 'GPS Distance', 'EXT Distance', 'Watt HR', 'Active Hours'])
+    writer.writerow(['Date', 'GPS Distance', 'ODOMETER Distance', 'Watt HR', 'Utilization Hours'])
 
     for date in all_dates:
-        gps_entries = GPSData.objects.filter(date=date)
+        gps_entry = GPSData.objects.filter(device_id=deviceObject, date=date).first()
         ext_entry = ext_data.filter(date=date).first()
 
-        if gps_entries.exists():
-            gps_entry = gps_entries.first()
-            gps_distance = gps_entry.distance
-        else:
-            gps_distance = "N/A"
-
-        if ext_entry:
-            ext_distance = ext_entry.distance
-            watt_hr = ext_entry.watt_hr
-        else:
-            ext_distance = "N/A"
-            watt_hr = "N/A"
+        gps_distance = gps_entry.distance if gps_entry else "N/A"
+        ext_distance = ext_entry.distance if ext_entry else "N/A"
+        watt_hr = ext_entry.watt_hr if ext_entry else "N/A"
 
         active_hours = utilization_hours.get(date.strftime('%A'), {}).get('Active', 0)
         

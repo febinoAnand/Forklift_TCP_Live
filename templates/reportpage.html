@@ -82,7 +82,7 @@
         <div class="row">
           <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
             <div class="logo-area">
-                <a href="/devicedashboard?deviceID={{deviceID}}" method="GET">
+                <a href="/devicedashboard?device_id={{deviceID}}" method="GET">
                 <p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a>
             </div>
           </div>
@@ -90,7 +90,7 @@
             <div class="header-top-menu">
               <ul class="nav navbar-nav notika-top-nav">
                 <li class="nav-item">
-                    <a href="/devicedashboard?deviceID={{deviceID}}" method="GET" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                    <a href="/devicedashboard?device_id={{deviceID}}" method="GET" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
                     <span class="glyphicon glyphicon-arrow-left"></span>
                   </a>
                 </li>
@@ -138,7 +138,7 @@
                               <tr>
                                   <th>Date</th>
                                   <th>GPS Distance</th>
-                                  <th>EXT Distance</th>
+                                  <th>ODOMETER Distance</th>
                                   <th>Watt HR</th>
                                   <th>Utilization Hours</th>
                               </tr>
@@ -250,11 +250,11 @@
             var deviceID = document.getElementById("currentdeviceID");
             $(document).ready(function() {
                 $('#pdfButton').on('click', function() {
-                    window.location.href = '/generate-pdf/?deviceID='+ deviceID;
+                    window.location.href = '/generate-pdf/?deviceID={{deviceID}}';
                 });
         
                 $('#csvButton').on('click', function() {
-                    window.location.href = '/generate-csv/?deviceID='+ deviceID;
+                    window.location.href = '/generate-csv/?deviceID={{deviceID}}';
                 });
             });
         
