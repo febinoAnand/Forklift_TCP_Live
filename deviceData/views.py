@@ -154,8 +154,10 @@ def get_utilization_hours(request):
 
         state_hours = [round(max(hours / 3600, 0), 2) for hours in state_hours]
 
+
         # state_hours = [round(hours / 3600, 2) for hours in state_hours]
         # print("state hours--->",state_hours)
+
         total_utilization = sum(state_hours)
 
         utilization_hours[current_date.strftime('%A')] = {
