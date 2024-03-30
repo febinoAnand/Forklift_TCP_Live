@@ -147,50 +147,52 @@ setInterval(updatePieChart, 5000);
   
   // bar chart start //
   var deviceID = document.getElementById("currentdeviceID").innerText;
-  function updateBarChart(data) {
-      Object.keys(data).forEach(day => {
-        console.log(day)
-          if (day.toLowerCase() !== 'sunday') { 
-              var utilizationData = data[day];
-              console.log(utilizationData)
-              var row = document.querySelector(`.bar-${day.toLowerCase()}`);
-              if (row) {
-                  var bar = row.querySelector('.bar');
-                  if (bar) {
-                      for (const state in utilizationData) {
-                          if (state !== 'Total') {
-                              var element = bar.querySelector(`.${state.toLowerCase()}`);
-                              if (element) {
-                                  var hours = parseFloat(utilizationData[state]);
-                                  console.log("hours---->",hours)
-                                  var pixel = hours/24*332;
-                                  console.log("pixel---->",pixel)
-                                  if (!isNaN(hours) && hours > 0) { 
-                                      element.textContent = hours.toFixed(1);
-                                      element.style.height = `${pixel}px`;
-                                      if (state === 'Active') {
-                                          element.style.backgroundColor = '#6EC7FA';
-                                      } else if (state === 'Inactive') {
-                                          element.style.backgroundColor = '#FA766E';
-                                      } else if (state === 'Idle') {
-                                          element.style.backgroundColor = '#FAFA6E';
-                                      }
-                                  } else {
-                                      element.textContent = '';
-                                      element.style.height = '0px';
-                                  }
-                              }
-                          }
-                      }
-                  } else {
-                      console.error(`Bar not found for ${day}.`);
-                  }
-              } else {
-                  console.error(`Row for ${day} not found.`);
-              }
-          }
-      });
-  }
+ function updateBarChart(data) {
+    Object.keys(data).forEach(day => {
+        var utilizationData = data[day];
+        var row = document.querySelector(`.bar-${day.toLowerCase()}`);
+        if (row) {
+            var bar = row.querySelector('.bar');
+            if (bar) {
+                var totalActive = parseFloat(utilizationData['Active']);
+                var totalIdle = parseFloat(utilizationData['Idle']);
+                var totalInactive = 24 - (totalActive + totalIdle);
+                
+                var activeElement = bar.querySelector('.active');
+                var activeHours = totalActive > 0 ? totalActive : 0; // If totalActive is 0, set activeHours to 0
+                
+                var activePixel = (activeHours / 24) * 332; // Assuming 332 is the maximum height of the bar
+                activeElement.style.height = `${activePixel}px`;
+                activeElement.textContent = activeHours.toFixed(1);
+                activeElement.style.backgroundColor = '#6EC7FA';
+                activeElement.style.display = activePixel > 0 ? 'block' : 'none'; // Show or hide text content based on the height
+                
+                var idleElement = bar.querySelector('.idle');
+                var idleHours = parseFloat(utilizationData['Idle']);
+                var idlePixel = (idleHours / 24) * 332; // Assuming 332 is the maximum height of the bar
+                idleElement.style.height = `${idlePixel}px`;
+                idleElement.textContent = idleHours.toFixed(1);
+                idleElement.style.backgroundColor = '#FAFA6E';
+                idleElement.style.display = idlePixel > 0 ? 'block' : 'none'; // Show or hide text content based on the height
+                
+                var inactiveElement = bar.querySelector('.inactive');
+                var inactivePixel = (totalInactive / 24) * 332; // Assuming 332 is the maximum height of the bar
+                inactiveElement.style.height = `${inactivePixel}px`;
+                inactiveElement.textContent = totalInactive.toFixed(1);
+                inactiveElement.style.backgroundColor = '#FA766E';
+                inactiveElement.style.display = inactivePixel > 0 ? 'block' : 'none'; // Show or hide text content based on the height
+            } else {
+                console.error(`Bar not found for ${day}.`);
+            }
+        } else {
+            console.error(`Row for ${day} not found.`);
+        }
+    });
+}
+
+
+
+
   function fetchDataAndUpdate() {
       fetch('/get_utilization_hours/?deviceID='+deviceID)
           .then(response => {
