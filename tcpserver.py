@@ -113,7 +113,7 @@ def start_server_tigger():
 				device_imei = "default_IMEI"
 				while True:
 					try:
-						data = conn.recv(1280)
+						data = conn.recv(2560)
 						print(f"// {time_stamper()} // data received = {data.hex()}")
 						if not data:
 							break
