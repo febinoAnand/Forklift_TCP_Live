@@ -1,3 +1,4 @@
+from re import S
 from django.http import JsonResponse
 from rest_framework import serializers
 from .models import EXTData, GPSData
@@ -129,43 +130,47 @@ def get_today_gps_data(request):
 
 def get_utilization_hours(request):
     currentDeviceID = request.GET.get('deviceID')
-    print("deviceId---->"+currentDeviceID)
-    deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+    try:
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+    except tracker_device.DoesNotExist:
+        return JsonResponse({"error": "Device not found"}, status=404)
+
     end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=6)
+    start_date = end_date - timedelta(days=7)
     utilization_hours = {}
-    states = ["Inactive", "Idle", "Active"]
 
     for day in range(7):
         current_date = start_date + timedelta(days=day)
-        gps_data = GPSData.objects.filter(device_id=deviceObject, date=current_date)
-        
+        print(current_date)
+        gps_data = GPSData.objects.filter(device_id=deviceObject, date=current_date).order_by('time')
+
         state_hours = [0, 0, 0]
 
         last_time = datetime.combine(current_date, datetime.min.time())
         for state in range(1, 4):
-            state_data = gps_data.filter(state=state).order_by("time")
+            state_data = gps_data.filter(state=state)
             for data_point in state_data:
                 current_time = datetime.combine(current_date, data_point.time)
                 difference_seconds = (current_time - last_time).total_seconds()
-                state_hours[state - 1] += difference_seconds
+                if difference_seconds > 0:  
+                    state_hours[state - 1] += difference_seconds
                 last_time = current_time
 
-        state_hours = [round(max(hours / 3600, 0), 2) for hours in state_hours]
-
-        # state_hours = [round(hours / 3600, 2) for hours in state_hours]
-        # print("state hours--->",state_hours)
-        total_utilization = sum(state_hours)
-
+        total_state_hours = sum(state_hours)
+        if total_state_hours > 86400:  
+            state_hours = [hour * 86400 / total_state_hours for hour in state_hours]
+        total_utilization = sum(state_hours) / 3600
         utilization_hours[current_date.strftime('%A')] = {
-            "Inactive": state_hours[0],
-            "Idle": state_hours[1],
-            "Active": state_hours[2],
-            'Total': total_utilization
+            "Inactive": state_hours[0] / 3600,  
+            "Idle": state_hours[1] / 3600,
+            "Active": state_hours[2] / 3600,
+            'Total':total_utilization 
         }
-
+    print(utilization_hours)
     return JsonResponse(utilization_hours)
 
+
+        
 def search_data(request):
     if request.method == 'GET':
         currentDeviceID = request.GET.get('deviceID')

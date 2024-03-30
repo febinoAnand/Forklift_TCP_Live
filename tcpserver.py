@@ -100,54 +100,56 @@ def ascii_imei_converter(hex_imei):
 
 def start_server_tigger():
 	print("Starting server!")
+	try:
+		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+			s.bind((HOST, PORT))
+			while True:
+				s.listen()
+				print(f"// {time_stamper()} // listening port: {PORT} // IP: {HOST}")
+				conn, addr = s.accept()
+				conn.settimeout(20) #connection timeout, change this value to close the socket if no DATA is received for X amount of seconds
+				with conn:
+					print(f"// {time_stamper()} // Connected by {addr}")
+					device_imei = "default_IMEI"
+					while True:
+						try:
+							data = conn.recv(1280)
+							print(f"// {time_stamper()} // data received = {data.hex()}")
+							if not data:
+								break
+							elif imei_checker(data.hex()) != False:
+								device_imei = ascii_imei_converter(data.hex())
+								imei_reply = (1).to_bytes(1, byteorder="big")
+								conn.sendall(imei_reply)
+								print(f"-- {time_stamper()} sending reply = {imei_reply}")
+							elif codec_8e_checker(data.hex().replace(" ","")) != False:
+								record_number = codec_parser_trigger(data.hex(), device_imei, "SERVER")
+								print(f"received records {record_number}")
+								print(f"from device IMEI = {device_imei}")
+								print()
+								record_response = (record_number).to_bytes(4, byteorder="big")
+								conn.sendall(record_response)
+								print(f"// {time_stamper()} // response sent = {record_response.hex()}")
 
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-		s.bind((HOST, PORT))
-		while True:
-			s.listen()
-			print(f"// {time_stamper()} // listening port: {PORT} // IP: {HOST}")
-			conn, addr = s.accept()
-			conn.settimeout(20) #connection timeout, change this value to close the socket if no DATA is received for X amount of seconds
-			with conn:
-				print(f"// {time_stamper()} // Connected by {addr}")
-				device_imei = "default_IMEI"
-				while True:
-					try:
-						data = conn.recv(1280)
-						print(f"// {time_stamper()} // data received = {data.hex()}")
-						if not data:
+							elif codec_12_checker(data.hex().replace(" ","")) != False:
+								returnData = codec12_parser_trigger(data.hex(), device_imei, "SERVER")
+								print(f"received records --> {returnData}")
+								print(f"from device IMEI = {device_imei}")
+								print()
+								# record_response = (returnData).to_bytes(4, byteorder="big")
+								returnData = "OK"
+								record_response = str.encode(returnData)
+								conn.sendall(record_response)
+								print(f"// {time_stamper()} // response sent = {record_response.hex()}")
+							else:
+								print(f"// {time_stamper()} // no expected DATA received - dropping connection")
+								break
+						except socket.timeout:
+							print(f"// {time_stamper()} // Socket timed out. Closing connection with {addr}")
 							break
-						elif imei_checker(data.hex()) != False:
-							device_imei = ascii_imei_converter(data.hex())
-							imei_reply = (1).to_bytes(1, byteorder="big")
-							conn.sendall(imei_reply)
-							print(f"-- {time_stamper()} sending reply = {imei_reply}")
-						elif codec_8e_checker(data.hex().replace(" ","")) != False:
-							record_number = codec_parser_trigger(data.hex(), device_imei, "SERVER")
-							print(f"received records {record_number}")
-							print(f"from device IMEI = {device_imei}")
-							print()
-							record_response = (record_number).to_bytes(4, byteorder="big")
-							conn.sendall(record_response)
-							print(f"// {time_stamper()} // response sent = {record_response.hex()}")
-
-						elif codec_12_checker(data.hex().replace(" ","")) != False:
-							returnData = codec12_parser_trigger(data.hex(), device_imei, "SERVER")
-							print(f"received records --> {returnData}")
-							print(f"from device IMEI = {device_imei}")
-							print()
-							# record_response = (returnData).to_bytes(4, byteorder="big")
-							returnData = "OK"
-							record_response = str.encode(returnData)
-							conn.sendall(record_response)
-							print(f"// {time_stamper()} // response sent = {record_response.hex()}")
-						else:
-							print(f"// {time_stamper()} // no expected DATA received - dropping connection")
-							break
-					except socket.timeout:
-						print(f"// {time_stamper()} // Socket timed out. Closing connection with {addr}")
-						break
 							
+	except Exception as e:
+		print ("Connection Terminated! Restarting...")
 ####################################################
 ###############_Codec8E_parser_code_################
 ####################################################
