@@ -116,7 +116,7 @@
                       <label for="toDate">To :</label>
                       <input type="date" id="toDate">
                       
-                      <button onclick="search()">Search</button>
+                      <button onclick="search_nav()">Search</button>
                       <button onclick="clearFields()">Clear</button>
                   </div>
               </div>
@@ -149,8 +149,8 @@
                       </table>
                       <br>
                           <div>
-                              <button id="csvButton">Download CSV</button>
-                              <button id="pdfButton">Download PDF</button>
+                              <button id="csvButton" onclick="generateCsv('{{ deviceID }}')"  >Download CSV</button>
+                              <button id="pdfButton" onclick="generatePdf('{{ deviceID }}')">Download PDF</button>
                           </div>
                       </div>
                   </div>
@@ -247,71 +247,84 @@
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
         <script>
-            var deviceID = document.getElementById("currentdeviceID");
-            $(document).ready(function() {
-                $('#pdfButton').on('click', function() {
-                    window.location.href = '/generate-pdf/?deviceID={{deviceID}}';
-                });
+           
+          
         
-                $('#csvButton').on('click', function() {
-                    window.location.href = '/generate-csv/?deviceID={{deviceID}}';
-                });
+    function search_nav() {
+    var fromDate = document.getElementById("fromDate").value;
+    var toDate = document.getElementById("toDate").value;
+    console.log("hiii");
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/search_data/?deviceID={{deviceID}}&fromDate=" + fromDate + "&toDate=" + toDate, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var responseData = JSON.parse(xhr.responseText);
+            console.log(responseData);
+            
+            document.getElementById("table-body").innerHTML = "";
+
+            responseData.forEach(function(entry) {
+                var row = document.createElement("tr");
+                var active = parseFloat(entry.utilization_hours.Active).toFixed(2);
+                var inactive = parseFloat(entry.utilization_hours.Inactive).toFixed(2);
+                var idle = parseFloat(entry.utilization_hours.Idle).toFixed(2);
+                row.innerHTML = "<td>" + entry.date + "</td><td>" + entry.gps_distance + "</td><td>" + entry.ext_distance + "</td><td>" + entry.watt_hr + "</td><td><strong>Active:</strong> " + active + "<br><strong>Inactive:</strong> " + inactive + "<br><strong>Idle:</strong> " + idle + "</td>";
+                document.getElementById("table-body").appendChild(row);
             });
-        
-            function search() {
-                var fromDate = document.getElementById("fromDate").value;
-                var toDate = document.getElementById("toDate").value;
-        
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "/search_data/?deviceID={{deviceID}}&fromDate=" + fromDate + "&toDate=" + toDate, true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        var responseData = JSON.parse(xhr.responseText);
-                        updateTable(responseData);
-                    }
-                };
-                xhr.send();
-            }
-        
-            function updateTable(data) {
-                var tableBody = document.getElementById("table-body");
-                tableBody.innerHTML = "";
-        
-                for (var i = 0; i < data.length; i++) {
-                    var row = document.createElement("tr");
-                    row.innerHTML = "<td>" + data[i].date + "</td>" +
-                        "<td>" + data[i].gps_distance + "</td>" +
-                        "<td>" + data[i].ext_distance + "</td>" +
-                        "<td>" + data[i].watt_hr + "</td>" +
-                        "<td id='utilization-hours-" + i + "'></td>";
-                    tableBody.appendChild(row);
-                    calculateActiveHours(data[i].date, i);
+        }
+    };
+    xhr.send();
+}
+function generatePdf(deviceID) {
+    console.log(deviceID);
+    var fromDate = document.getElementById("fromDate").value;
+    var toDate = document.getElementById("toDate").value;
+ew
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/generate-pdf/?deviceID=" + deviceID + "&fromDate=" + fromDate + "&toDate=" + toDate, true);
+    xhr.responseType = 'blob'; 
+    xhr.onload = function(event) {
+        if (this.status === 200) {
+           
+            var blob = new Blob([xhr.response], { type: 'application/pdf' });
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'report.pdf'; 
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url); 
+        }
+    };
+    xhr.send();
+}
+
+
+function generateCsv(deviceID) {
+            var fromDate = document.getElementById("fromDate").value;
+            var toDate = document.getElementById("toDate").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/generate-csv/?deviceID=" + deviceID + "&fromDate=" + fromDate + "&toDate=" + toDate, true);
+            xhr.responseType = 'blob';
+            xhr.onload = function(event) {
+                if (this.status === 200) {
+                    var blob = new Blob([xhr.response], { type: 'text/csv' });
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'report.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
                 }
-            }
+            };
+            xhr.send();
+        }
         
-            function calculateActiveHours(date, index) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "/get_utilization_hours/?deviceID={{deviceID}}", true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4) {
-                        if (xhr.status == 200) {
-                            var utilizationData = JSON.parse(xhr.responseText);
-                            var activeHours = 0;
-                            var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                            var dayName = dayNames[new Date(date).getDay()];
-                            if (utilizationData.hasOwnProperty(dayName)) {
-                                activeHours = parseFloat(utilizationData[dayName]['Active']);
-                            }
-                            document.getElementById('utilization-hours-' + index).textContent = activeHours.toFixed(2);
-                        } else {
-                            console.error("Error fetching utilization data. Status: " + xhr.status);
-                        }
-                    }
-                };
-                xhr.send();
-            }
+            
         
-            function clearFields() {
+function clearFields() {
                 document.getElementById("fromDate").value = "";
                 document.getElementById("toDate").value = "";
                 var tableBody = document.getElementById("table-body");
