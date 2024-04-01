@@ -422,8 +422,8 @@
                   </div>
                 </div>
                 <div class="circle" style="color: white; font-size: 12px">
-                  <div class="text">Top Speed: 12 Km/Hr</div>
-                </div>
+                  <div class="text">Top Speed: <span id="top-speed"></span></div>
+              </div>
                 <div class="circle" style="color: white; font-size: 12px">
                   <div id="gps_time" class="text">Duration: {{gpsData.time}}</div>
                 </div>
@@ -1039,6 +1039,42 @@ function updateGauge() {
 
   updateGauge();
   setInterval(updateGauge, 5000);
+</script>
+<script>
+  $(document).ready(function() {
+      let topSpeed = 0;
+
+      function updateTopSpeed() {
+          $.ajax({
+              url: "gps-data/?deviceID=" + deviceID,
+              type: 'GET',
+              success: function(data) {
+                  let newTopSpeed = calculateTopSpeed(data);
+                  if (newTopSpeed > topSpeed) {
+                      topSpeed = newTopSpeed;
+                      $('#top-speed').text(topSpeed + " Km/Hr");
+                  }
+              },
+              error: function(xhr, textStatus, errorThrown) {
+                  console.log('Error:', errorThrown);
+              }
+          });
+      }
+
+      function calculateTopSpeed(data) {
+          let maxSpeed = 0;
+          for (let i = 0; i < data.length; i++) {
+              let speed = data[i].speed;
+              if (speed > maxSpeed) {
+                  maxSpeed = speed;
+              }
+          }
+          return maxSpeed;
+      }
+
+      updateTopSpeed();
+      setInterval(updateTopSpeed, 5000);
+  });
 </script>
 </body>
 </html>
