@@ -253,7 +253,7 @@
     function search_nav() {
     var fromDate = document.getElementById("fromDate").value;
     var toDate = document.getElementById("toDate").value;
-    console.log("hiii");
+    // console.log("hiii");
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/search_data/?deviceID={{deviceID}}&fromDate=" + fromDate + "&toDate=" + toDate, true);
     xhr.onreadystatechange = function() {
@@ -279,7 +279,7 @@ function generatePdf(deviceID) {
     console.log(deviceID);
     var fromDate = document.getElementById("fromDate").value;
     var toDate = document.getElementById("toDate").value;
-ew
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/generate-pdf/?deviceID=" + deviceID + "&fromDate=" + fromDate + "&toDate=" + toDate, true);
     xhr.responseType = 'blob'; 

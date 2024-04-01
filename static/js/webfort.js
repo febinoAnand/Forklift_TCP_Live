@@ -149,6 +149,7 @@ setInterval(updatePieChart, 5000);
   var deviceID = document.getElementById("currentdeviceID").innerText;
  function updateBarChart(data) {
     Object.keys(data).forEach(day => {
+        if (day.toLowerCase() !== 'sunday') { // Except Sunday
         var utilizationData = data[day];
         var row = document.querySelector(`.bar-${day.toLowerCase()}`);
         if (row) {
@@ -187,6 +188,7 @@ setInterval(updatePieChart, 5000);
         } else {
             console.error(`Row for ${day} not found.`);
         }
+    }
     });
 }
 

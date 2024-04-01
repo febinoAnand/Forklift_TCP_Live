@@ -275,7 +275,7 @@
                 <h2>GPS Speed</h2>
               </div>
               <div
-                id="gps-data-container"
+                id="gps-data-conta"
                 class="gauge"
                 style="width: 300px; --rotation: {{gpsData.speed | div:'25' | mul:'180'}}deg; --color:#566573; --background:#e9ecef;"
               >
@@ -289,7 +289,7 @@
                 <h2>EXT Speed</h2>
               </div>
               <div
-                id="ext-data-container" class="gauge" style="width: 300px; --rotation: {{extData.speed | div:'25' | mul:'180' }}deg; --color:#643873; --background:#e9ecef;"
+                id="ext-data-conta" class="gauge" style="width: 300px; --rotation: {{extData.speed | div:'25' | mul:'180' }}deg; --color:#643873; --background:#e9ecef;"
               >
                 <div class="percentage"></div>
                 <div class="mask"></div>
@@ -377,6 +377,7 @@
                 <h2>Battery Capacity</h2>
               </div>
               <div
+                id="ext_batt"
                 class="gauge"
                 style="width: 300px; --rotation: {{ extData.batt_power | div:'10000' | mul:'180'}}deg; --color:#76C9E2; --background:#e9ecef;"
               >
@@ -468,7 +469,7 @@
                 <h2>Utilization Hour</h2>
                 <p>The total Utilization Hour for a week</p>
               </div>
-              <table class="graph" id="barChart"">
+              <table class="graph" id="barChart">
                 <thead>
                     <tr >
                         <th scope="col">Day</th>
@@ -988,6 +989,56 @@ function updateGpsData() {
           updateExtData();
           setInterval(updateExtData, 5000);
       });
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+    function updateGauge() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', "gps-data/?deviceID=" + deviceID, true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            var datacount = data.length;
+            var lastGPSData = data[datacount - 1];
+            //console.log(lastGPSData.speed);
+            document.getElementById('gps-data-conta').style.setProperty('--rotation', (lastGPSData.speed / 25 * 180) + 'deg');
+          } else {
+            console.log('Error:', xhr.statusText);
+          }
+        }
+      };
+      xhr.send();
+    }
+
+    updateGauge();
+    setInterval(updateGauge, 5000);
+  });
   </script>
-  </body>
+<script>
+function updateGauge() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "ext-data/?deviceID=" + deviceID, true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          var data = JSON.parse(xhr.responseText);
+          var datacount = data.length;
+          var lastEXTData = data[datacount - 1];
+          //console.log(lastEXTData.speed);
+          //console.log(lastEXTData.batt_power);
+          document.getElementById('ext-data-conta').style.setProperty('--rotation', (lastEXTData.speed / 25 * 180) + 'deg');
+          document.getElementById('ext_batt').style.setProperty('--rotation', (lastEXTData.batt_power / 10000 * 180) + 'deg');
+        } else {
+          console.log('Error:', xhr.statusText);
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  updateGauge();
+  setInterval(updateGauge, 5000);
+</script>
+</body>
 </html>
