@@ -17,13 +17,13 @@ from datetime import datetime, date ,time ,timedelta
 
 
 def loginView(request):
-    print("login....")
+    # print("login....")
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(username)
+        # print(username)
         user = authenticate(request, username=username, password=password)
-        print(user)
+        # print(user)
         if user is not None:
             if user.is_staff:
                 login(request, user)
@@ -34,7 +34,7 @@ def loginView(request):
         else:
             return render(request, 'login.html', {'error': True})
     else:
-        print("get")
+        # print("get")
         return render(request, 'login.html')
 
 def logoutView(request):
@@ -47,7 +47,7 @@ def deviceDashborad(request):
     try:
         
         current_device_id = request.GET.get('device_id')
-        print (current_device_id)
+        # print (current_device_id)
         currentDevice = tracker_device.objects.get(device_id = current_device_id)
         gps_data = GPSData.objects.filter(device_id=currentDevice)
         stateTiming = []

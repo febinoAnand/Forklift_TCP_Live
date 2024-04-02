@@ -141,7 +141,7 @@ def get_utilization_hours(request):
 
     for day in range(7):
         current_date = start_date + timedelta(days=day)
-        print(current_date)
+        # print(current_date)
         gps_data = GPSData.objects.filter(device_id=deviceObject, date=current_date).order_by('time')
 
         state_hours = [0, 0, 0]
@@ -166,7 +166,7 @@ def get_utilization_hours(request):
             "Active": state_hours[2] / 3600,
             'Total':total_utilization 
         }
-    print(utilization_hours)
+    # print(utilization_hours)
     return JsonResponse(utilization_hours)
 
 def get_utilization_hours_for_report(deviceId, fromdate, todate):
