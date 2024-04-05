@@ -41,8 +41,6 @@ def logoutView(request):
     logout(request)
     return redirect('/login')
 
-
-@login_required
 def deviceDashborad(request):
     try:
         

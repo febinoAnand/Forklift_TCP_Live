@@ -5,9 +5,9 @@ from .views import loginView, deviceDashborad, updateGPSTableView,updateEXTTable
 urlpatterns = [
     path('',loginView, name='login'),
     path('login',loginView, name='login'),
-    path('devicedashboard',deviceDashborad),
-    path('updategpstable',updateGPSTableView),
-    path('updateexttable',updateEXTTableView),
+    path('devicedashboard',deviceDashborad, name='device_dashboard'),
+    path('updategpstable',updateGPSTableView, name='update_gpstable'),
+    path('updateexttable',updateEXTTableView, name='update_exttable'),
     path('reportpage/', report_page_view, name='report_page'),
     path('register/', register_device, name='register_device'),
     path('listpage/', list_page_view, name='list_page'),
