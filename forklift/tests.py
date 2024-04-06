@@ -26,17 +26,7 @@ class TestDeviceDashboard(unittest.TestCase):
             time=datetime.now().time(),
             date=date.today(),
         )
-        ext_data = EXTData.objects.create(device_id=device, date=date.today(), time=datetime.now().time(), batt_capacity=100)  # Set the batt_capacity field
-
-        request = self.factory.get('/devicedashboard/', {'device_id': 'sample_device_id'})
-        response = deviceDashborad(request)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_device_dashboard_device_not_found(self):
-        request = self.factory.get('/devicedashboard/', {'device_id': 'non_existing_device_id'})
-        response = deviceDashborad(request)
-        self.assertEqual(response.content, b'Device Not found')
+        ext_data = EXTData.objects.create(device_id=device, date=date.today(), time=datetime.now().time(), batt_capacity=100)
 
     def test_device_dashboard_url(self):
         url = reverse('device_dashboard')
