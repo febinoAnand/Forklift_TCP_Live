@@ -14,6 +14,8 @@ from django.contrib.auth import logout
 from django.core import serializers
 import random
 from datetime import datetime, date ,time ,timedelta
+from django.core.exceptions import ObjectDoesNotExist
+
 
 
 def loginView(request):
@@ -149,3 +151,69 @@ def tracker_device_list(request):
              'manufacturer': device.manufacturer, 'hardware_version': device.hardware_version,
              'software_version': device.software_version} for device in devices]
     return JsonResponse(data, safe=False)
+
+def historypage(request):
+    currentDeviceID = request.GET['deviceID']
+    return render(request, 'historypage.html',{'deviceID': currentDeviceID})
+
+def get_gps_data_for_date(request):
+    if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+        selected_date_str = request.GET.get('date')
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+        
+        start_time = datetime.combine(selected_date, time.min)
+        end_time = datetime.combine(selected_date, time.max)
+        
+        data2 = GPSData.objects.filter(device_id=deviceObject, date=selected_date, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+        
+        last_gps_data = GPSData.objects.filter(device_id=deviceObject).order_by('-date', '-time')[:5]
+        
+        lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
+        states = ["Inactive", "Idle", "Active", "Alert"]
+        currentState = 1
+        stateHr = [0, 0, 0, 0]
+        for gpsData in data2:
+            currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
+            differencesInSeconds = (currentTime - lastTime).total_seconds()
+            stateHr[currentState-1] += differencesInSeconds
+            currentState = gpsData["state"]
+            lastTime = currentTime
+        
+        res = [round(x / 3600, 2) for x in stateHr]
+        response_data = []
+
+        for n, item in enumerate(states):
+            response_data.append({
+                'state': item,
+                'duration': res[n]
+            })
+
+        return JsonResponse(response_data, safe=False)
+    
+def updateEXTTabledateView(request):
+    currentDeviceID = request.GET.get('deviceID')
+    selected_date = request.GET.get('date')
+
+    if currentDeviceID is not None and selected_date is not None:
+        current_tracker_device = tracker_device.objects.get(device_id = currentDeviceID)
+        ext_table_list = EXTData.objects.filter(device_id=current_tracker_device, date=selected_date).order_by('-pk')[:10]
+        ext_table_json = serializers.serialize('json', ext_table_list)
+    else:
+        ext_table_json = '{"error": "Please provide both deviceID and date parameters."}'
+
+    return HttpResponse(ext_table_json, content_type='application/json')
+
+def updateGPSTabledateView(request):
+    currentDeviceID = request.GET['deviceID']
+    selected_date = request.GET.get('date')
+
+    if currentDeviceID is not None and selected_date is not None:
+        current_tracker_device = tracker_device.objects.get(device_id = currentDeviceID)
+        gps_table_list = GPSData.objects.filter(device_id=current_tracker_device, date=selected_date).order_by('-pk')[:10]
+        gps_table_json = serializers.serialize('json', gps_table_list)
+    else:
+        gps_table_json = '{"error": "Please provide both deviceID and date parameters."}'
+
+    return HttpResponse(gps_table_json, content_type='application/json')

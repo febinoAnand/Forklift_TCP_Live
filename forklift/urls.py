@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import loginView, deviceDashborad, updateGPSTableView,updateEXTTableView, report_page_view, register_device ,list_page_view, tracker_device_list,logoutView
+from .views import loginView, deviceDashborad, historypage,get_gps_data_for_date,updateGPSTabledateView,updateEXTTabledateView , updateGPSTableView,updateEXTTableView, report_page_view, register_device ,list_page_view, tracker_device_list,logoutView
 
 
 urlpatterns = [
@@ -13,4 +13,8 @@ urlpatterns = [
     path('listpage/', list_page_view, name='list_page'),
     path('listpage/api/tracker-devices/', tracker_device_list, name='tracker-device-list'),
     path('logout',logoutView,name='logoutView'),
+    path('historypage',historypage, name='history_page'),
+    path('get_gps_data_for_date/', get_gps_data_for_date, name='get_gps_data_for_date'),
+    path('updateextdatetable',updateEXTTabledateView, name='update_exttabledate'),
+    path('updategpsdatetable',updateGPSTabledateView, name='update_gpsdatetable'),
 ]

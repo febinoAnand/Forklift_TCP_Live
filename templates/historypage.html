@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <title>Device Dashboard</title>
+    <title>History Page</title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- favicon
@@ -113,7 +113,7 @@
 
   </head>
 
-  <body onload="startUpdateTable('{{device.device_id}}')">
+  <body>
     {% load mathfilters %}
 
     <!--[if lt IE 8]>
@@ -129,7 +129,7 @@
         <div class="row">
           <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
             <div class="logo-area">
-              <a href="#"
+              <a href="/devicedashboard?device_id={{deviceID}}" method="GET"
                 ><p style="color: white; font-size: 25px; font-weight: bold;">INNOSPACE</p></a
               >
             </div>
@@ -138,18 +138,8 @@
             <div class="header-top-menu">
               <ul class="nav navbar-nav notika-top-nav">
                 <li class="nav-item">
-                  <a href="/listpage" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                  <a href="/devicedashboard?device_id={{deviceID}}" method="GET" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
                     <span class="glyphicon glyphicon-arrow-left"></span>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/reportpage/?deviceID={{device.device_id}}" method="GET" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
-                    <span class="glyphicon glyphicon-save-file"></span>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/historypage?deviceID={{device.device_id}}" method="GET" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
-                    <span class="glyphicon glyphicon-repeat"></span>
                   </a>
                 </li>
                 <li class="nav-item">
@@ -162,6 +152,20 @@
       </div>
     </div>
     <br /><br />
+    <div class="notika-status-area">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                  <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                      <label for="datepicker">Select a date:</label>
+                      <input type="date" id="datepicker" name="datepicker">
+                      <button id="showButton">Show</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <br /><br />
     <!-- End Header Top Area -->
     <div class="google-map-area">
       <div class="container">
@@ -724,290 +728,457 @@
     <!-- main JS
 		============================================ -->
     <script src="static/js/main.js"></script>
-
-    <script src="static/js/custom.js"></script>
-
-    <script src="static/js/webfort.js"></script>
     <script>
-      var deviceID = document.getElementById("currentdeviceID").innerText;
-      function initMap() {
-          const map = new google.maps.Map(document.getElementById("map"), {
-              center: { lat: 0, lng: 0 },
-              zoom: 2,
+      document.addEventListener('DOMContentLoaded', async () => {
+          const ctx = document.getElementById('myPieChart').getContext('2d');
+          let myPieChart;
+          var deviceID = document.getElementById("currentdeviceID").innerText;
+  
+          const updatePieChart = async (selectedDate) => {
+    try {
+        const response = await fetch(`/get_gps_data_for_date/?deviceID={{deviceID}}&date=${selectedDate}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        let activeHours = 0, inactiveHours = 0, idleHours = 0;
+
+        if (data.length === 0) {
+            inactiveHours = 24;
+        } else {
+            data.forEach(entry => {
+                switch (entry.state) {
+                    case "Active":
+                        activeHours += entry.duration;
+                        break;
+                    case "Inactive":
+                        inactiveHours += entry.duration ;
+                        break;
+                    case "Idle":
+                        idleHours += entry.duration;
+                        break;
+                    case "Alert":
+                        inactiveHours += entry.duration;
+                        break;
+                }
+            });
+        }
+
+        myPieChart.data.datasets[0].data = [activeHours, inactiveHours, idleHours];
+        myPieChart.update();
+    } catch (error) {
+        console.error('Error fetching or parsing data:', error);
+        myPieChart.data.datasets[0].data = [0, 24, 0];
+        myPieChart.update();
+    }
+};
+  
+          myPieChart = new Chart(ctx, {
+              type: 'pie',
+              data: {
+                  labels: ['Active Hours', 'Inactive Hours', 'Idle Hours'],
+                  datasets: [{
+                      label: 'Today',
+                      data: [0, 0, 0],
+                      backgroundColor: [
+                          'rgba(54, 162, 235, 0.8)',
+                          'rgba(255, 99, 132, 0.8)',
+                          'rgba(255, 206, 86, 0.8)'
+                      ],
+                      borderColor: [
+                          'rgba(54, 162, 235, 1)',
+                          'rgba(255, 99, 132, 1)',
+                          'rgba(255, 206, 86, 1)'
+                      ],
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true
+              }
           });
   
-          const markers = [];
-          const lines = [];
-  
-          function addMarker(location) {
-              const icon = {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 7,
-                  fillColor: 'blue',
-                  fillOpacity: 1,
-                  strokeWeight: 0,
-              };
-  
-              const marker = new google.maps.Marker({
-                  position: location,
-                  map: map,
-              });
-              markers.push(marker);
+          document.getElementById('showButton').addEventListener('click', async () => {
+              const selectedDate = document.getElementById('datepicker').value;
+              updatePieChart(selectedDate);
+          });
+      });
+  </script>  
+<script>
+  var deviceID = document.getElementById("currentdeviceID").innerText;
+
+  document.getElementById('showButton').addEventListener('click', async () => {
+      const selectedDate = document.getElementById('datepicker').value;
+      resetPreviousResults();
+      fetchDataAndUpdate(selectedDate);
+  });
+
+  function resetPreviousResults() {
+      var barElements = document.querySelectorAll('.bar');
+      barElements.forEach(bar => {
+          var activeElement = bar.querySelector('.active');
+          activeElement.style.height = '0';
+          activeElement.textContent = '';
+          activeElement.style.display = 'none';
+
+          var idleElement = bar.querySelector('.idle');
+          idleElement.style.height = '0';
+          idleElement.textContent = '';
+          idleElement.style.display = 'none';
+
+          var inactiveElement = bar.querySelector('.inactive');
+          inactiveElement.style.height = '0';
+          inactiveElement.textContent = '';
+          inactiveElement.style.display = 'none';
+      });
+  }
+
+  function updateBarChart(data) {
+      const selectedDate = document.getElementById('datepicker').value;
+      const selectedDay = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
+      const selectedData = data[selectedDay];
+
+      if (!selectedData) {
+          console.error(`Data not available for ${selectedDay}.`);
+          return;
+      }
+
+      var utilizationData = selectedData;
+      var row = document.querySelector(`.bar-${selectedDay.toLowerCase()}`);
+      if (row) {
+          var bar = row.querySelector('.bar');
+          if (bar) {
+              var totalActive = parseFloat(utilizationData['Active']);
+              var totalIdle = parseFloat(utilizationData['Idle']);
+              var totalInactive = 24 - (totalActive + totalIdle);
+
+              var activeElement = bar.querySelector('.active');
+              var activeHours = totalActive > 0 ? totalActive : 0;
+              var activePixel = (activeHours / 24) * 332;
+              activeElement.style.height = `${activePixel}px`;
+              activeElement.textContent = activeHours.toFixed(1);
+              activeElement.style.backgroundColor = '#6EC7FA';
+              activeElement.style.display = activePixel > 0 ? 'block' : 'none';
+
+              var idleElement = bar.querySelector('.idle');
+              var idleHours = parseFloat(utilizationData['Idle']);
+              var idlePixel = (idleHours / 24) * 332;
+              idleElement.style.height = `${idlePixel}px`;
+              idleElement.textContent = idleHours.toFixed(1);
+              idleElement.style.backgroundColor = '#FAFA6E';
+              idleElement.style.display = idlePixel > 0 ? 'block' : 'none';
+
+              var inactiveElement = bar.querySelector('.inactive');
+              var inactivePixel = (totalInactive / 24) * 332;
+              inactiveElement.style.height = `${inactivePixel}px`;
+              inactiveElement.textContent = totalInactive.toFixed(1);
+              inactiveElement.style.backgroundColor = '#FA766E';
+              inactiveElement.style.display = inactivePixel > 0 ? 'block' : 'none';
+          } else {
+              console.error(`Bar not found for ${selectedDay}.`);
           }
-  
-          function addLine(location1, location2) {
-    if (location1.lat === 0 && location1.lng === 0 || location2.lat === 0 && location2.lng === 0) {
-        return;
+      } else {
+          console.error(`Row for ${selectedDay} not found.`);
+      }
+  }
+
+  function fetchDataAndUpdate(selectedDate) {
+      fetch(`/get_utilization_date_hours/?deviceID={{deviceID}}&date=${selectedDate}`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => updateBarChart(data))
+          .catch(error => console.error('Error fetching data:', error));
+  }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart;
+    var deviceID = document.getElementById("currentdeviceID").innerText;
+
+    function updateChart(selectedDate) {
+        $.ajax({
+            url: `/get_last_date_data/?deviceID={{deviceID}}&date=${selectedDate}`,
+            success: function(data) {
+                var gpsData = data.gps_data.map(item => item.speed);
+                var extData = data.ext_data.map(item => item.speed);
+                var labels = data.gps_data.map(item => item.time);
+
+                myChart.data.labels = labels;
+                myChart.data.datasets[0].data = gpsData;
+                myChart.data.datasets[1].data = extData;
+
+                myChart.update();
+            }
+        });
     }
 
-    const line = new google.maps.Polyline({
-        path: [location1, location2],
-        geodesic: true,
-        strokeColor: 'Red',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-    });
-    lines.push(line);
-    line.setMap(map);
-}
-  
-function fetchDataAndUpdateMap() {
-    fetch("/api/get-gps-data/?deviceID="+deviceID)
-        .then((response) => response.json())
-        .then((data) => {
-            markers.forEach((marker) => marker.setMap(null));
-            markers.length = 0;
-            lines.forEach((line) => line.setMap(null));
-            lines.length = 0;
-
-            const lastTwentyData = data.slice(-20).filter(item => item.latitude !== 0 || item.longitude !== 0);
-
-            let previousLocation = null;
-
-            lastTwentyData.forEach((item, index) => {
-                const location = { lat: item.latitude, lng: item.longitude };
-                if (index === lastTwentyData.length - 1) {
-                    addMarker(location);
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                    label: 'GPS-Speed',
+                    data: [],
+                    borderColor: 'red',
+                    borderWidth: 1
+                },
+                {
+                    label: 'EXT-Speed',
+                    data: [],
+                    borderColor: 'blue',
+                    borderWidth: 1
                 }
-                if (index < lastTwentyData.length - 1) {
-                    const nextLocation = { lat: lastTwentyData[index + 1].latitude, lng: lastTwentyData[index + 1].longitude };
-                    addLine(location, nextLocation);
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
-            });
-
-            const bounds = new google.maps.LatLngBounds();
-            lastTwentyData.forEach((item) => {
-                const location = new google.maps.LatLng(item.latitude, item.longitude);
-                bounds.extend(location);
-            });
-
-            if (bounds.getCenter().lat() !== 0 || bounds.getCenter().lng() !== 0) {
-                map.fitBounds(bounds);
             }
-        })
-        .catch((error) => {
-            console.error("Error fetching data:", error);
-        });
-}
+        }
+    });
 
-          fetchDataAndUpdateMap();
-  
-          setInterval(fetchDataAndUpdateMap, 5000);
+    document.getElementById('showButton').addEventListener('click', function() {
+        var selectedDate = document.getElementById('datepicker').value;
+        updateChart(selectedDate);
+    });
+});
+</script>
+<script>
+  document.getElementById('showButton').addEventListener('click', async () => {
+      const selectedDate = document.getElementById('datepicker').value;
+      fetchDataAndUpdateMap(selectedDate);
+  });
+
+  function fetchDataAndUpdateMap(selectedDate) {
+      const deviceID = document.getElementById("currentdeviceID").innerText;
+      
+      fetch(`/get-gps-date-data/?deviceID={{deviceID}}&date=${selectedDate}`)
+      .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => updateMap(data))
+          .catch(error => console.error('Error fetching data:', error));
+  }
+
+  function updateMap(data) {
+      const map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 0, lng: 0 },
+          zoom: 2,
+      });
+
+      const markers = [];
+      const lines = [];
+
+      function addMarker(location) {
+          const icon = {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 7,
+              fillColor: 'blue',
+              fillOpacity: 1,
+              strokeWeight: 0,
+          };
+
+          const marker = new google.maps.Marker({
+              position: location,
+              map: map,
+          });
+          markers.push(marker);
       }
-  </script>
-    <script
+
+      function addLine(location1, location2) {
+          if (location1.lat === 0 && location1.lng === 0 || location2.lat === 0 && location2.lng === 0) {
+              return;
+          }
+
+          const line = new google.maps.Polyline({
+              path: [location1, location2],
+              geodesic: true,
+              strokeColor: 'Red',
+              strokeOpacity: 1.0,
+              strokeWeight: 2
+          });
+          lines.push(line);
+          line.setMap(map);
+      }
+
+      markers.forEach((marker) => marker.setMap(null));
+      markers.length = 0;
+      lines.forEach((line) => line.setMap(null));
+      lines.length = 0;
+
+      data.forEach((item, index) => {
+          const location = { lat: item.latitude, lng: item.longitude };
+          addMarker(location);
+          if (index < data.length - 1) {
+              const nextLocation = { lat: data[index + 1].latitude, lng: data[index + 1].longitude };
+              addLine(location, nextLocation);
+          }
+      });
+
+      const bounds = new google.maps.LatLngBounds();
+      data.forEach((item) => {
+          const location = new google.maps.LatLng(item.latitude, item.longitude);
+          bounds.extend(location);
+      });
+
+      if (bounds.getCenter().lat() !== 0 || bounds.getCenter().lng() !== 0) {
+          map.fitBounds(bounds);
+      }
+  }
+</script>
+<script
       async
       defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcErlQMQKVQmqlnSmo9lIgEHp5e9MIjTE&callback=initMap"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcErlQMQKVQmqlnSmo9lIgEHp5e9MIjTE"
     ></script>
-    <script>
-      var deviceID = document.getElementById("currentdeviceID").innerText;
-      $(document).ready(function () {
-        let lastEXTData = { 
-          movementState: true 
-        };
-        let isVehicleMovingOrNot = false;
-        function updateExtData() {
-          $.ajax({
-            url: "ext-data/?deviceID="+deviceID,
-            type: "GET",
-            success: function (data) {
-              // $('#ext-data-table').html(JSON.stringify(data));
-             // console.log("Received DAta -> ", data);
-             let datacount = data.length;
-        console.log(data[datacount - 1]);
-        
-        let lastEXTData = data[datacount - 1];
+<script>
+var deviceID = document.getElementById("currentdeviceID").innerText;
+let isVehicleMovingOrNot = false;
 
-        if (lastEXTData["batt_voltage"]) {
-            $('#battery_voltage').text(lastEXTData.batt_voltage);
+$(document).ready(function () {
+    $('#showButton').click(function () {
+        const selectedDate = $('#datepicker').val();
+        if (selectedDate) {
+            updateExtData(selectedDate);
+            updateGpsData(selectedDate);
+        } else {
+            console.log("Please select a date.");
         }
-        if (lastEXTData["batt_amp"]) {
-            $('#battery_amps').text(lastEXTData.batt_amp);
-        }
-        if (lastEXTData["watt_hr"]) {
-            $('#watt_hour').text(lastEXTData.watt_hr);
-        }
-        if (lastEXTData["speed"]) {
-            $('#ext_speed').text(lastEXTData.speed +"Km/Hr" );
-        }
-        if (lastEXTData["batt_power"]) {
-            $('#battery_power').text(lastEXTData.batt_power + "Watt");
-        }
-        if (lastEXTData["batt_capacity"]) {
-            $('#battery_capacity').text(lastEXTData.batt_capacity);
-        }
-        let extSpeed = lastEXTData["speed"];
-        let movementState = (extSpeed > 0) ? "Moving" : "Not Moving";
-        isVehicleMovingOrNot = (extSpeed > 0) ? true : false;
-        $('#movementState_view').text(movementState);
-  
-    },
-    error: function (xhr, textStatus, errorThrown) {
-        console.log("Error:", errorThrown);
-            },
-          });
-        }
-function updateGpsData() {
-    $.ajax({
-        url: "gps-data/?deviceID="+deviceID,
-        type: "GET",
-        success: function(data) {
-            let datacount = data.length;
-            let lastGPSData = data[datacount - 1];
-
-            if (lastGPSData["ignition"]) {
-                $('#ignition_state').text("ON");
-            } else {
-                $('#ignition_state').text("OFF");
-            }
-
-            if (lastGPSData["ignition"] && isVehicleMovingOrNot) {
-                if ($('#status_view').text() != "Active") {
-                    $('#status_view').text("Active");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status active-1");
-                }
-            } else if (lastGPSData["ignition"] && !isVehicleMovingOrNot) {
-                if ($('#status_view').text() != "Idle") {
-                    $('#status_view').text("Idle");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status idle");
-                }
-            } else if (!lastGPSData["ignition"] && !isVehicleMovingOrNot) {
-                if ($('#status_view').text() != "Inactive") {
-                    $('#status_view').text("Inactive");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status inactive");
-                }
-            } else {
-                if ($('#status_view').text() != "Alert") {
-                    $('#status_view').text("Alert");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status alert");
-                }
-            }
-
-        // if (lastGPSData["ignition"]) {
-        //   if (lastGPSData["movementState"]) {
-        //       $('#status_view').text("Active").removeClass("inactive").addClass("active");
-        //   } else {
-        //      $('#status_view').text("Idle").removeClass("inactive").addClass("idle");
-        //   }
-        // } else {
-        //     $('#status_view').text("Inactive").removeClass("active idle").addClass("inactive");
-        // }
-
-        if (lastGPSData["gsmOperatorCode"]) {
-            $('#gsm_operator').text(lastGPSData.gsmOperatorCode);
-        }
-
-        if (lastGPSData["gsmSignal"]) {
-            $('#gsm_signal').text(lastGPSData.gsmSignal);
-        }
-
-        if (lastGPSData["gsmAreaCode"]) {
-            $('#gsm_area').text(lastGPSData.gsmAreaCode);
-        }
-
-        if (lastGPSData["speed"]) {
-            $('#gps_speed').text( lastGPSData.speed + ' Km/Hr');
-        }
-
-        if (lastGPSData["time"]) {
-            $('#gps_time').text('Current Time: ' + lastGPSData.time);
-        }
-
-        if (lastGPSData["satellite"]) {
-            $('#satellite_connect').text(lastGPSData.satellite);
-        }
-
-        if (lastGPSData["latitude"]) {
-            $('#latitude_view').text(lastGPSData.latitude);
-        }
-
-        if (lastGPSData["longitude"]) {
-            $('#longitude_view').text(lastGPSData.longitude);
-        }
-
-    },
-    error: function (xhr, textStatus, errorThrown) {
-        console.log("Error:", errorThrown);
-    }
+    });
 });
-        }
-        updateGpsData();
-        updateExtData();
 
-        setInterval(function () {
-          updateGpsData();
-          updateExtData();
-        }, 5000);
+function updateExtData(selectedDate) {
+    $.ajax({
+        url: `/ext-date-data/?deviceID={{deviceID}}&date=${selectedDate}`,
+        type: "GET",
+        success: function (data) {
+            if (data && data.length > 0) {
+                let lastEXTData = data[data.length - 1];
+                $('#battery_voltage').text(lastEXTData["batt_voltage"]);
+                $('#battery_amps').text(lastEXTData["batt_amp"]);
+                $('#watt_hour').text(lastEXTData["watt_hr"]);
+                $('#ext_speed').text(lastEXTData["speed"] + " Km/Hr");
+                $('#battery_power').text(lastEXTData["batt_power"] + " Watt");
+                $('#battery_capacity').text(lastEXTData["batt_capacity"]);
+                let extSpeed = lastEXTData["speed"];
+                let movementState = (extSpeed > 0) ? "Moving" : "Not Moving";
+                $('#movementState_view').text(movementState);
+            } else {
+                console.log("No data available for the selected date.");
+                $('#battery_voltage, #battery_amps, #watt_hour, #ext_speed, #battery_power, #battery_capacity, #movementState_view').text('');
+            }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.error("Error:", errorThrown);
+        }
+    });
+}
+
+function updateGpsData(selectedDate) {
+    $.ajax({
+        url: `/gps-date-data/?deviceID={{deviceID}}&date=${selectedDate}`,
+        type: "GET",
+        success: function (data) {
+            if (data && data.length > 0) {
+                let lastGPSData = data[data.length - 1];
+                $('#ignition_state').text(lastGPSData["ignition"] ? "ON" : "OFF");
+                let statusText;
+                if (lastGPSData["ignition"]) {
+                    if (isVehicleMovingOrNot) {
+                        statusText = "Active";
+                        $('#status_view').removeClass().addClass("status active-1");
+                    } else {
+                        statusText = "Idle";
+                        $('#status_view').removeClass().addClass("status idle");
+                    }
+                } else {
+                    statusText = isVehicleMovingOrNot ? "Alert" : "Inactive";
+                    $('#status_view').removeClass().addClass("status " + (isVehicleMovingOrNot ? "alert" : "inactive"));
+                }
+                $('#status_view').text(statusText);
+                $('#gsm_operator').text(lastGPSData["gsmOperatorCode"]);
+                $('#gsm_signal').text(lastGPSData["gsmSignal"]);
+                $('#gsm_area').text(lastGPSData["gsmAreaCode"]);
+                $('#gps_speed').text(lastGPSData["speed"] + " Km/Hr");
+                $('#gps_time').text('Current Time: ' + lastGPSData["time"]);
+                $('#satellite_connect').text(lastGPSData["satellite"]);
+                $('#latitude_view').text(lastGPSData["latitude"]);
+                $('#longitude_view').text(lastGPSData["longitude"]);
+            } else {
+                console.log("No GPS data available for the selected date.");
+                $('#ignition_state, #status_view, #gsm_operator, #gsm_signal, #gsm_area, #gps_speed, #gps_time, #satellite_connect, #latitude_view, #longitude_view').text('');
+            }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.error("Error:", errorThrown);
+        }
+    });
+}
+</script>
+<script>
+  $(document).ready(function () {
+      $('#showButton').click(function () {
+          const selectedDate = $('#datepicker').val();
+          if (selectedDate) {
+              fetchAndUpdateData(selectedDate);
+          } else {
+              console.log("Please select a date.");
+          }
       });
-    </script>
-     
-    <script>
-      
-      $(document).ready(function () {
-          function updateExtData() {
-              $.ajax({
-                  url: "ext-data/?deviceID="+deviceID,
-                  type: "GET",
-                  success: function (data) {
-                      let datacount = data.length;
-                      let lastEXTData = data[datacount - 1];
+
+      function fetchAndUpdateData(selectedDate) {
+          $.ajax({
+              url: "ext-date-data/?deviceID={{deviceID}}"+"&date="+selectedDate,
+              type: "GET",
+              success: function (data) {
+                  if (data.length > 0) {
+                      let lastEXTData = data[data.length - 1];
                       if (lastEXTData["batt_capacity"]) {
                           let batt_capacity = lastEXTData.batt_capacity;
                           updateBatteryBar(batt_capacity);
                       }
-                  },
-                  error: function (xhr, textStatus, errorThrown) {
-                      console.log("Error:", errorThrown);
-                  },
-              });
-          }
+                  } else {
+                      console.log("No data available for the selected date.");
+                  }
+              },
+              error: function (xhr, textStatus, errorThrown) {
+                  console.log("Error:", errorThrown);
+              },
+          });
+      }
 
-          function updateBatteryBar(batt_capacity) {
-              let widthPercentage = (batt_capacity / 5) * 100;
-              $('#battery_capacity').css('width', widthPercentage + '%');
-          }
-          updateExtData();
-          setInterval(updateExtData, 5000);
-      });
+      function updateBatteryBar(batt_capacity) {
+          let widthPercentage = (batt_capacity / 5) * 100;
+          $('#battery_capacity').css('width', widthPercentage + '%');
+      }
+  });
 </script>
 <script>
-   document.addEventListener("DOMContentLoaded", function() {
-    function updateGauge() {
+  document.addEventListener("DOMContentLoaded", function () {
+    var deviceID = document.getElementById("currentdeviceID").innerText;
+
+    function updateGauge(date) {
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', "gps-data/?deviceID=" + deviceID, true);
-      xhr.onreadystatechange = function() {
+      xhr.open('GET', "gps-date-data/?deviceID={{deviceID}}" + "&date=" + date, true);
+      xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
             var data = JSON.parse(xhr.responseText);
             var datacount = data.length;
             var lastGPSData = data[datacount - 1];
-            //console.log(lastGPSData.speed);
             document.getElementById('gps-data-conta').style.setProperty('--rotation', (lastGPSData.speed / 25 * 180) + 'deg');
+            document.getElementById('gps_speed').textContent = lastGPSData.speed + ' Km/Hr';
           } else {
             console.log('Error:', xhr.statusText);
           }
@@ -1016,60 +1187,83 @@ function updateGpsData() {
       xhr.send();
     }
 
-    updateGauge();
-    setInterval(updateGauge, 5000);
-  });
-  </script>
-<script>
-function updateGauge() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', "ext-data/?deviceID=" + deviceID, true);
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          var data = JSON.parse(xhr.responseText);
-          var datacount = data.length;
-          var lastEXTData = data[datacount - 1];
-          //console.log(lastEXTData.speed);
-          //console.log(lastEXTData.batt_power);
-          document.getElementById('ext-data-conta').style.setProperty('--rotation', (lastEXTData.speed / 25 * 180) + 'deg');
-          document.getElementById('ext_batt').style.setProperty('--rotation', (lastEXTData.batt_power / 10000 * 180) + 'deg');
-        } else {
-          console.log('Error:', xhr.statusText);
-        }
+    document.getElementById('showButton').addEventListener('click', function () {
+      var selectedDate = document.getElementById('datepicker').value;
+      if (selectedDate) {
+        updateGauge(selectedDate);
+      } else {
+        console.log('Please select a date.');
       }
-    };
-    xhr.send();
-  }
-
-  updateGauge();
-  setInterval(updateGauge, 5000);
+    });
+  });
 </script>
 <script>
-  $(document).ready(function() {
-      let topSpeed = 0;
+  document.addEventListener("DOMContentLoaded", function () {
+    var deviceID = document.getElementById("currentdeviceID").innerText;
 
-      function updateTopSpeed() {
-          $.ajax({
-              url: "gps-data/?deviceID=" + deviceID,
-              type: 'GET',
-              success: function(data) {
-                  let newTopSpeed = calculateTopSpeed(data);
-                  if (newTopSpeed > topSpeed) {
-                      topSpeed = newTopSpeed;
-                      $('#top-speed').text(topSpeed + " Km/Hr");
+    function updateGauge(date) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', "ext-date-data/?deviceID={{deviceID}}" + "&date=" + date, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            if (data.length > 0) {
+              var lastEXTData = data[data.length - 1];
+              document.getElementById('ext-data-conta').style.setProperty('--rotation', (lastEXTData.speed / 25 * 180) + 'deg');
+              document.getElementById('ext_batt').style.setProperty('--rotation', (lastEXTData.batt_power / 10000 * 180) + 'deg');
+            } else {
+              console.log('No data available for the selected date.');
+            }
+          } else {
+            console.log('Error:', xhr.statusText);
+          }
+        }
+      };
+      xhr.send();
+    }
+
+    document.getElementById('showButton').addEventListener('click', function () {
+      var selectedDate = document.getElementById('datepicker').value;
+      if (selectedDate) {
+        updateGauge(selectedDate);
+      } else {
+        console.log('Please select a date.');
+      }
+    });
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      var deviceID = document.getElementById("currentdeviceID").innerText;
+
+      function updateTopSpeed(date) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', "gps-date-data/?deviceID={{deviceID}}" + "&date=" + date, true);
+          xhr.onreadystatechange = function () {
+              if (xhr.readyState === 4) {
+                  if (xhr.status === 200) {
+                      var data = JSON.parse(xhr.responseText);
+                      if (data.length > 0) {
+                          var maxSpeed = calculateTopSpeed(data);
+                          var rotation = (maxSpeed / 25 * 180) + 'deg';
+                          document.getElementById('gps-data-conta').style.setProperty('--rotation', rotation);
+                          document.getElementById('top-speed').textContent = maxSpeed + ' Km/Hr';
+                      } else {
+                          console.log('No data available for the selected date.');
+                      }
+                  } else {
+                      console.log('Error:', xhr.statusText);
                   }
-              },
-              error: function(xhr, textStatus, errorThrown) {
-                  console.log('Error:', errorThrown);
               }
-          });
+          };
+          xhr.send();
       }
 
       function calculateTopSpeed(data) {
-          let maxSpeed = 0;
-          for (let i = 0; i < data.length; i++) {
-              let speed = data[i].speed;
+          var maxSpeed = 0;
+          for (var i = 0; i < data.length; i++) {
+              var speed = data[i].speed;
               if (speed > maxSpeed) {
                   maxSpeed = speed;
               }
@@ -1077,8 +1271,105 @@ function updateGauge() {
           return maxSpeed;
       }
 
-      updateTopSpeed();
-      setInterval(updateTopSpeed, 5000);
+      document.getElementById('showButton').addEventListener('click', function () {
+          var selectedDate = document.getElementById('datepicker').value;
+          if (selectedDate) {
+              updateTopSpeed(selectedDate);
+          } else {
+              console.log('Please select a date.');
+          }
+      });
+  });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var deviceID = document.getElementById("currentdeviceID").innerText;
+
+    function updateGPSTable(deviceID, selectedDate) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onload = function () {
+            var data = JSON.parse(this.responseText);
+            var gpsTemplateString = "";
+            if (data.length <= 0) {
+                gpsTemplateString = "<tr> \
+                                        <td colspan='7'>No Data</td>\
+                                    </tr>";
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                var fieldData = data[i]["fields"];
+                gpsTemplateString += "<tr> \
+                                        <td>" + (i + 1) + "</td> \
+                                        <td>" + fieldData['date'] + "</td> \
+                                        <td>" + fieldData['time'] + "</td> \
+                                        <td>" + fieldData['distance'] + "</td> \
+                                        <td>" + fieldData['speed'] + "</td> \
+                                        <td>" + fieldData['latitude'] + "</td> \
+                                        <td>" + fieldData['longitude'] + "</td> \
+                                     </tr>";
+            }
+            document.getElementById("gps_data_table").innerHTML = gpsTemplateString;
+            console.log(fieldData);
+        };
+        xhttp.open("GET", "updategpsdatetable?deviceID={{deviceID}}" + "&date=" + selectedDate, true);
+        xhttp.send();
+    }
+
+    document.getElementById('showButton').addEventListener('click', function () {
+        var selectedDate = document.getElementById('datepicker').value;
+        if (selectedDate) {
+            updateGPSTable(deviceID, selectedDate);
+        } else {
+            console.log('Please select a date.');
+        }
+    });
+});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      var deviceID = document.getElementById("currentdeviceID").innerText;
+
+      function updateEXTTable(deviceID, selectedDate) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onload = function () {
+              var data = JSON.parse(this.responseText);
+              var extTemplateString = "";
+              if (data.length <= 0) {
+                  extTemplateString = "<tr> \
+                                          <td colspan='10'>No Data</td>\
+                                      </tr>";
+              }
+
+              for (var i = 0; i < data.length; i++) {
+                  var fieldData = data[i]["fields"];
+                  extTemplateString += "<tr> \
+                                          <td>" + (i + 1) + "</td> \
+                                          <td>" + fieldData['date'] + "</td> \
+                                          <td>" + fieldData['time'] + "</td> \
+                                          <td>" + fieldData['distance'] + "</td> \
+                                          <td>" + fieldData['speed'] + "</td> \
+                                          <td>" + fieldData['watt_hr'] + "</td> \
+                                          <td>" + fieldData['batt_voltage'] + "</td> \
+                                          <td>" + fieldData['batt_amp'] + "</td> \
+                                          <td>" + fieldData['batt_power'] + "</td> \
+                                          <td>" + fieldData['batt_capacity'] + "</td> \
+                                       </tr>";
+              }
+              document.getElementById("external_data_table").innerHTML = extTemplateString;
+              console.log(fieldData);
+          };
+          xhttp.open("GET", "updateextdatetable?deviceID={{deviceID}}" + "&date=" + selectedDate, true);
+          xhttp.send();
+      }
+
+      document.getElementById('showButton').addEventListener('click', function () {
+          var selectedDate = document.getElementById('datepicker').value;
+          if (selectedDate) {
+              updateEXTTable(deviceID, selectedDate);
+          } else {
+              console.log('Please select a date.');
+          }
+      });
   });
 </script>
 </body>

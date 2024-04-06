@@ -329,3 +329,131 @@ def generate_csv(request):
         writer.writerow([date, gps_distance, ext_distance, watt_hr, active_hours, inactive_hours, idle_hours])
 
     return response
+
+def get_gps_date_data(request):
+    if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+        selectedDate = request.GET.get('date')
+        if not selectedDate:
+            return JsonResponse([], safe=False)
+        selected_date = datetime.strptime(selectedDate, '%Y-%m-%d').date()
+
+        try:
+            deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+            gps_data = GPSData.objects.filter(device_id=deviceObject, date=selected_date).values('latitude', 'longitude')
+            return JsonResponse(list(gps_data), safe=False)
+        except tracker_device.DoesNotExist:
+            return JsonResponse([], safe=False)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        
+def get_utilization_date_hours(request):
+    currentDeviceID = request.GET.get('deviceID')
+    selected_date = request.GET.get('date') 
+
+    try:
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+    except tracker_device.DoesNotExist:
+        return JsonResponse({"error": "Device not found"}, status=404)
+
+    utilization_hours = {}
+
+    try:
+        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({"error": "Invalid date format"}, status=400)
+
+    gps_data = GPSData.objects.filter(device_id=deviceObject, date=selected_date).order_by('time')
+
+    state_hours = [0, 0, 0]
+
+    last_time = datetime.combine(selected_date, datetime.min.time())
+    for state in range(1, 4):
+        state_data = gps_data.filter(state=state)
+        for data_point in state_data:
+            current_time = datetime.combine(selected_date, data_point.time)
+            difference_seconds = (current_time - last_time).total_seconds()
+            if difference_seconds > 0:  
+                state_hours[state - 1] += difference_seconds
+            last_time = current_time
+
+    total_state_hours = sum(state_hours)
+    if total_state_hours > 86400:  
+        state_hours = [hour * 86400 / total_state_hours for hour in state_hours]
+    total_utilization = sum(state_hours) / 3600
+    utilization_hours[selected_date.strftime('%A')] = {
+        "Inactive": state_hours[0] / 3600,  
+        "Idle": state_hours[1] / 3600,
+        "Active": state_hours[2] / 3600,
+        'Total': total_utilization 
+    }
+
+    return JsonResponse(utilization_hours)
+
+def ext_data_date_list(request):
+    if request.method == 'GET':
+        selected_date = request.GET.get('date')
+        current_device_id = request.GET.get('deviceID')
+
+        device_object = tracker_device.objects.get(device_id=current_device_id)
+        ext_data = EXTData.objects.filter(device_id=device_object, date=selected_date).order_by('-id')
+
+        serializer = EXTDataSerializer(ext_data, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        serializer = EXTDataSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+def gps_data_date_list(request):
+    if request.method == 'GET':
+        current_device_id = request.GET.get('deviceID')
+        selected_date = request.GET.get('date')
+
+        device_object = tracker_device.objects.get(device_id=current_device_id)
+        
+        if selected_date:
+            gps_data = GPSData.objects.filter(device_id=device_object, date=selected_date).order_by('-id')
+        else:
+            gps_data = GPSData.objects.filter(device_id=device_object).order_by('-id')[:1]
+
+        serializer = GPSDataSerializer(gps_data, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = GPSDataSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+def get_last_date_data(request):
+    if request.method == 'GET':
+        current_device_id = request.GET.get('deviceID')
+        selected_date = request.GET.get('date')
+        
+        device_object = tracker_device.objects.get(device_id=current_device_id)
+        
+        gps_data_queryset = GPSData.objects.filter(device_id=device_object)
+        ext_data_queryset = EXTData.objects.filter(device_id=device_object)
+
+        if selected_date:
+            try:
+                selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+                gps_data_queryset = gps_data_queryset.filter(date=selected_date)
+                ext_data_queryset = ext_data_queryset.filter(date=selected_date)
+            except ValueError:
+                return JsonResponse({'error': 'Invalid date format. Please use YYYY-MM-DD.'}, status=400)
+
+        last_gps_data = gps_data_queryset.order_by('-date', '-time')[:5]
+        last_ext_data = ext_data_queryset.order_by('-date', '-time')[:5]
+
+        gps_serializer = GPSDataSerializer(last_gps_data, many=True)
+        ext_serializer = EXTDataSerializer(last_ext_data, many=True)
+
+        return JsonResponse({'gps_data': gps_serializer.data, 'ext_data': ext_serializer.data})
