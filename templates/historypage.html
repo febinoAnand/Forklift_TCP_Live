@@ -155,12 +155,18 @@
     <div class="notika-status-area">
       <div class="container">
           <div class="row">
-              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+              <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
                   <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
-                      <label for="datepicker">Select a date:</label>
-                      <input type="date" id="datepicker" name="datepicker">
-                      <button id="showButton">Show</button>
-                  </div>
+                    <label for="datepicker">Select a date:</label>
+                    <input type="date" id="datepicker" name="datepicker">&nbsp&nbsp
+                    <label for="fromTime">From :</label>
+                    <input type="time" id="fromTime">&nbsp&nbsp
+
+                    <label for="toTime">To :</label>
+                    <input type="time" id="toTime">&nbsp&nbsp
+                    
+                    <button id="showButton">Show</button>
+                </div>
               </div>
           </div>
       </div>
@@ -172,7 +178,7 @@
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="google-map-single" style="height: 150px">
-              <h3>Today Status</h3><br>
+              <h3>Status</h3><br>
               <div class="progress">
                 {% for gpsState in stateTiming %}
                
@@ -237,7 +243,7 @@
     <div class="form-element-area">
       <div class="container">
         <div class="row">
-          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="form-element-list" style="width: 100%; height: 485px">
               <div class="basic-tb-hd">
                 <h2>Vehicles Details</h2>
@@ -245,7 +251,7 @@
               <table id="data-table-basic" class="table table-striped">
                 <tr>
                   <th>Device ID</th>
-                  <td id="currentdeviceID">{{device.device_id}}</td>
+                  <td id="currentdeviceID">{{deviceID}}</td>
                 </tr>
                 <tr>
                   <th>Vehicle Name</th>
@@ -278,7 +284,26 @@
               </table>
             </div>
           </div>
-          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="form-element-list">
+              <div class="basic-tb-hd">
+                <h2>State of Vehicles</h2>
+              </div>
+              <div style="width: 100%; height: 400px; padding-top: 20px">
+                <canvas
+                  id="myPieChart"
+                  width="320"
+                  style="
+                    display: block;
+                    box-sizing: border-box;
+                    height: 320px;
+                    width: 320px;
+                  "
+                ></canvas>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
             <div class="form-element-list">
               <div class="basic-tb-hd">
                 <h2>GPS Speed</h2>
@@ -343,7 +368,7 @@
                 <tr>
                   <th>GSM Signal</th>
                   <td id="gsm_signal">
-                    <!-- <i style="font-size:24px" class="fa">&#xf012;</i> -->
+                     <i style="font-size:24px" class="fa">&#xf012;</i> 
                     {{gsmData.gsmSignal}}
                   </td>
                 </tr>
@@ -355,7 +380,7 @@
               <div id="ignition_state" style="display: none;">OFF</div>
               <div id="movementState_view" style="display: none;">Stationary</div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -377,7 +402,7 @@
     </div>
     <!-- Google Map area End-->
     <!-- Form Element area End-->
-    <div class="form-element-area">
+    <!-- <div class="form-element-area">
       <div class="container">
         <div class="row">
           <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
@@ -467,12 +492,12 @@
         </div>
       </div>
     </div>
-    <br /><br />
+    <br /><br /> -->
     <!-- Form Element area End-->
     <div class="form-element-area">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+          <div class="col-lg-12 col-md-8 col-sm-8 col-xs-8">
             <div class="form-element-list">
               <div class="basic-tb-hd" style="margin-bottom: 60px;">
                 <h2>Utilization Hour</h2>
@@ -553,25 +578,6 @@
                   </tr>
                 </tbody>
             </table>            
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-            <div class="form-element-list">
-              <div class="basic-tb-hd">
-                <h2>State of Vehicles</h2>
-              </div>
-              <div style="width: 100%; height: 400px; padding-top: 20px">
-                <canvas
-                  id="myPieChart"
-                  width="320"
-                  style="
-                    display: block;
-                    box-sizing: border-box;
-                    height: 320px;
-                    width: 320px;
-                  "
-                ></canvas>
-              </div>
             </div>
           </div>
         </div>
@@ -981,13 +987,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const lines = [];
 
       function addMarker(location) {
-          const icon = {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 7,
-              fillColor: 'blue',
-              fillOpacity: 1,
-              strokeWeight: 0,
-          };
+          if (location.lat === 0 && location.lng === 0) {
+              return;
+          }
 
           const marker = new google.maps.Marker({
               position: location,
@@ -1017,23 +1019,22 @@ document.addEventListener('DOMContentLoaded', function() {
       lines.forEach((line) => line.setMap(null));
       lines.length = 0;
 
-      data.forEach((item, index) => {
-          const location = { lat: item.latitude, lng: item.longitude };
-          addMarker(location);
-          if (index < data.length - 1) {
-              const nextLocation = { lat: data[index + 1].latitude, lng: data[index + 1].longitude };
-              addLine(location, nextLocation);
+      if (data.length > 0) {
+          const lastLocation = { lat: data[data.length - 1].latitude, lng: data[data.length - 1].longitude };
+          addMarker(lastLocation);
+          data.forEach((item, index) => {
+              if (index < data.length - 1) {
+                  const location = { lat: item.latitude, lng: item.longitude };
+                  const nextLocation = { lat: data[index + 1].latitude, lng: data[index + 1].longitude };
+                  addLine(location, nextLocation);
+              }
+          });
+
+          const bounds = new google.maps.LatLngBounds();
+          bounds.extend(lastLocation);
+          if (bounds.getCenter().lat() !== 0 || bounds.getCenter().lng() !== 0) {
+              map.fitBounds(bounds);
           }
-      });
-
-      const bounds = new google.maps.LatLngBounds();
-      data.forEach((item) => {
-          const location = new google.maps.LatLng(item.latitude, item.longitude);
-          bounds.extend(location);
-      });
-
-      if (bounds.getCenter().lat() !== 0 || bounds.getCenter().lng() !== 0) {
-          map.fitBounds(bounds);
       }
   }
 </script>
