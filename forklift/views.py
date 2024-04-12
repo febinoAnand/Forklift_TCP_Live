@@ -15,6 +15,7 @@ from django.core import serializers
 import random
 from datetime import datetime, date ,time ,timedelta
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 
@@ -153,8 +154,16 @@ def tracker_device_list(request):
     return JsonResponse(data, safe=False)
 
 def historypage(request):
-    currentDeviceID = request.GET['deviceID']
-    return render(request, 'historypage.html',{'deviceID': currentDeviceID})
+    currentDeviceID = request.GET.get('deviceID', None)
+    if currentDeviceID is None:
+        return HttpResponse("DeviceID is missing in the request parameters", status=400)
+    
+    try:
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+    except tracker_device.DoesNotExist:
+        return HttpResponse("DeviceID does not exist", status=404)
+    
+    return render(request, 'historypage.html', {'device': deviceObject})
 
 def get_gps_data_for_date(request):
     if request.method == 'GET':
@@ -195,24 +204,61 @@ def get_gps_data_for_date(request):
 def updateEXTTabledateView(request):
     currentDeviceID = request.GET.get('deviceID')
     selected_date = request.GET.get('date')
+    start_time = request.GET.get('startTime')
+    end_time = request.GET.get('endTime')
 
     if currentDeviceID is not None and selected_date is not None:
-        current_tracker_device = tracker_device.objects.get(device_id = currentDeviceID)
-        ext_table_list = EXTData.objects.filter(device_id=current_tracker_device, date=selected_date).order_by('-pk')[:10]
-        ext_table_json = serializers.serialize('json', ext_table_list)
+        current_tracker_device = tracker_device.objects.get(device_id=currentDeviceID)
+        ext_table_list = EXTData.objects.filter(device_id=current_tracker_device, date=selected_date)
+
+        if start_time and end_time:
+            start_datetime = datetime.strptime(start_time, '%H:%M')
+            end_datetime = datetime.strptime(end_time, '%H:%M')
+            ext_table_list = ext_table_list.filter(time__range=(start_datetime.time(), end_datetime.time()))
+        ext_table_list = ext_table_list.order_by('-pk')
+
+        paginator = Paginator(ext_table_list, 25)
+        page_number = request.GET.get('page')
+        try:
+            EXTpage = paginator.page(page_number)
+        except PageNotAnInteger:
+            EXTpage = paginator.page(1)
+        except EmptyPage:
+            EXTpage = paginator.page(paginator.num_pages)
+
+        ext_table_json = serializers.serialize('json', EXTpage)
+        
     else:
         ext_table_json = '{"error": "Please provide both deviceID and date parameters."}'
 
     return HttpResponse(ext_table_json, content_type='application/json')
 
 def updateGPSTabledateView(request):
-    currentDeviceID = request.GET['deviceID']
+    currentDeviceID = request.GET.get('deviceID')
     selected_date = request.GET.get('date')
+    start_time = request.GET.get('startTime')
+    end_time = request.GET.get('endTime')
 
     if currentDeviceID is not None and selected_date is not None:
-        current_tracker_device = tracker_device.objects.get(device_id = currentDeviceID)
-        gps_table_list = GPSData.objects.filter(device_id=current_tracker_device, date=selected_date).order_by('-pk')[:10]
-        gps_table_json = serializers.serialize('json', gps_table_list)
+        current_tracker_device = tracker_device.objects.get(device_id=currentDeviceID)
+        gps_table_list = GPSData.objects.filter(device_id=current_tracker_device, date=selected_date)
+
+        if start_time and end_time:
+            start_datetime = datetime.strptime(start_time, '%H:%M')
+            end_datetime = datetime.strptime(end_time, '%H:%M')
+            gps_table_list = gps_table_list.filter(time__range=(start_datetime.time(), end_datetime.time()))
+        gps_table_list = gps_table_list.order_by('-pk')
+
+        paginator = Paginator(gps_table_list, 25)
+        page_number = request.GET.get('page')
+        try:
+            GPSpage = paginator.page(page_number)
+        except PageNotAnInteger:
+            GPSpage = paginator.page(1)
+        except EmptyPage:
+            GPSpage = paginator.page(paginator.num_pages)
+
+        gps_table_json = serializers.serialize('json', GPSpage)
     else:
         gps_table_json = '{"error": "Please provide both deviceID and date parameters."}'
 

@@ -74,6 +74,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
@@ -251,7 +253,7 @@
               <table id="data-table-basic" class="table table-striped">
                 <tr>
                   <th>Device ID</th>
-                  <td id="currentdeviceID">{{deviceID}}</td>
+                  <td id="currentdeviceID">{{device.device_id}}</td>
                 </tr>
                 <tr>
                   <th>Vehicle Name</th>
@@ -610,11 +612,28 @@
                   </thead>
                   <tbody id="gps_data_table"></tbody>
                 </table>
+                <div class="pagination" id="gps-pagination-links">
+                  <span class="step-links">
+                      {% if GPSpage.has_previous %}
+                          <a href="?page=1">&laquo; first</a>
+                          <a href="?page={{ GPSpage.previous_page_number }}">&#9664;</a>
+                      {% endif %}
+              
+                      <span class="current">
+                          Page {{ GPSpage.number }} of {{ GPSpage.paginator.num_pages }}
+                      </span>
+              
+                      {% if GPSpage.has_next %}
+                          <a href="?page={{ GPSpage.next_page_number }}">&#9654;</a>
+                          <a href="?page={{ GPSpage.paginator.num_pages }}">last &#9658;</a>
+                      {% endif %}
+                  </span>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
     <br /><br />
     <!-- Table area End-->
@@ -646,6 +665,23 @@
                   </thead>
                   <tbody id="external_data_table"></tbody>
                 </table>
+                <div class="pagination" id="ext-pagination-links">
+                  <span class="step-links">
+                      {% if EXTpage.has_previous %}
+                          <a href="?page=1">&laquo; first</a>
+                          <a href="?page={{ EXTpage.previous_page_number }}">previous</a>
+                      {% endif %}
+              
+                      <span class="current">
+                          Page {{ EXTpage.number }} of {{ EXTpage.paginator.num_pages }}
+                      </span>
+              
+                      {% if EXTpage.has_next %}
+                          <a href="?page={{ EXTpage.next_page_number }}">next</a>
+                          <a href="?page={{ EXTpage.paginator.num_pages }}">last &raquo;</a>
+                      {% endif %}
+                  </span>
+              </div>
               </div>
             </div>
           </div>
@@ -740,45 +776,45 @@
           let myPieChart;
           var deviceID = document.getElementById("currentdeviceID").innerText;
   
-          const updatePieChart = async (selectedDate) => {
-    try {
-        const response = await fetch(`/get_gps_data_for_date/?deviceID={{deviceID}}&date=${selectedDate}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        let activeHours = 0, inactiveHours = 0, idleHours = 0;
-
-        if (data.length === 0) {
-            inactiveHours = 24;
-        } else {
-            data.forEach(entry => {
-                switch (entry.state) {
-                    case "Active":
-                        activeHours += entry.duration;
-                        break;
-                    case "Inactive":
-                        inactiveHours += entry.duration ;
-                        break;
-                    case "Idle":
-                        idleHours += entry.duration;
-                        break;
-                    case "Alert":
-                        inactiveHours += entry.duration;
-                        break;
-                }
-            });
-        }
-
-        myPieChart.data.datasets[0].data = [activeHours, inactiveHours, idleHours];
-        myPieChart.update();
-    } catch (error) {
-        console.error('Error fetching or parsing data:', error);
-        myPieChart.data.datasets[0].data = [0, 24, 0];
-        myPieChart.update();
-    }
-};
+          const updatePieChart = async (selectedDate, startTime, endTime) => {
+              try {
+                  const response = await fetch(`/get_today_gps_date_data/?deviceID={{device}}&date=${selectedDate}&startTime=${startTime}&endTime=${endTime}`);
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                  }
+  
+                  const data = await response.json();
+                  let activeHours = 0, inactiveHours = 0, idleHours = 0;
+  
+                  if (data.length === 0) {
+                      inactiveHours = 24;
+                  } else {
+                      data.forEach(entry => {
+                          switch (entry.state) {
+                              case "Active":
+                                  activeHours += entry.duration;
+                                  break;
+                              case "Inactive":
+                                  inactiveHours += entry.duration;
+                                  break;
+                              case "Idle":
+                                  idleHours += entry.duration;
+                                  break;
+                              case "Alert":
+                                  inactiveHours += entry.duration;
+                                  break;
+                          }
+                      });
+                  }
+  
+                  myPieChart.data.datasets[0].data = [activeHours, inactiveHours, idleHours];
+                  myPieChart.update();
+              } catch (error) {
+                  console.error('Error fetching or parsing data:', error);
+                  myPieChart.data.datasets[0].data = [0, 24, 0];
+                  myPieChart.update();
+              }
+          };
   
           myPieChart = new Chart(ctx, {
               type: 'pie',
@@ -807,7 +843,9 @@
   
           document.getElementById('showButton').addEventListener('click', async () => {
               const selectedDate = document.getElementById('datepicker').value;
-              updatePieChart(selectedDate);
+              const startTime = document.getElementById('fromTime').value;
+              const endTime = document.getElementById('toTime').value;
+              updatePieChart(selectedDate, startTime, endTime);
           });
       });
   </script>  
@@ -816,8 +854,10 @@
 
   document.getElementById('showButton').addEventListener('click', async () => {
       const selectedDate = document.getElementById('datepicker').value;
+      const startTime = document.getElementById('fromTime').value;
+      const endTime = document.getElementById('toTime').value;
       resetPreviousResults();
-      fetchDataAndUpdate(selectedDate);
+      fetchDataAndUpdate(selectedDate, startTime, endTime);
   });
 
   function resetPreviousResults() {
@@ -889,8 +929,9 @@
       }
   }
 
-  function fetchDataAndUpdate(selectedDate) {
-      fetch(`/get_utilization_date_hours/?deviceID={{deviceID}}&date=${selectedDate}`)
+  function fetchDataAndUpdate(selectedDate, startTime, endTime) {
+      const url = `/get_utilization_date_hours/?deviceID={{device}}&date=${selectedDate}&startTime=${startTime}&endTime=${endTime}`;
+      fetch(url)
           .then(response => {
               if (!response.ok) {
                   throw new Error('Network response was not ok');
@@ -901,7 +942,7 @@
           .catch(error => console.error('Error fetching data:', error));
   }
 </script>
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function() {
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart;
@@ -956,17 +997,19 @@ document.addEventListener('DOMContentLoaded', function() {
         updateChart(selectedDate);
     });
 });
-</script>
+</script> -->
 <script>
   document.getElementById('showButton').addEventListener('click', async () => {
       const selectedDate = document.getElementById('datepicker').value;
-      fetchDataAndUpdateMap(selectedDate);
+      const startTime = document.getElementById('fromTime').value;
+      const endTime = document.getElementById('toTime').value;
+      fetchDataAndUpdateMap(selectedDate, startTime, endTime);
   });
 
-  function fetchDataAndUpdateMap(selectedDate) {
+  function fetchDataAndUpdateMap(selectedDate, startTime, endTime) {
       const deviceID = document.getElementById("currentdeviceID").innerText;
       
-      fetch(`/get-gps-date-data/?deviceID={{deviceID}}&date=${selectedDate}`)
+      fetch(`/get-gps-date-data/?deviceID={{device}}&date=${selectedDate}&startTime=${startTime}&endTime=${endTime}`)
       .then(response => {
               if (!response.ok) {
                   throw new Error('Network response was not ok');
@@ -1043,7 +1086,7 @@ document.addEventListener('DOMContentLoaded', function() {
       defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcErlQMQKVQmqlnSmo9lIgEHp5e9MIjTE"
     ></script>
-<script>
+<!-- <script>
 var deviceID = document.getElementById("currentdeviceID").innerText;
 let isVehicleMovingOrNot = false;
 
@@ -1126,8 +1169,8 @@ function updateGpsData(selectedDate) {
         }
     });
 }
-</script>
-<script>
+</script> -->
+<!-- <script>
   $(document).ready(function () {
       $('#showButton').click(function () {
           const selectedDate = $('#datepicker').val();
@@ -1233,8 +1276,8 @@ function updateGpsData(selectedDate) {
       }
     });
   });
-</script>
-<script>
+</script> -->
+<!-- <script>
   document.addEventListener("DOMContentLoaded", function () {
       var deviceID = document.getElementById("currentdeviceID").innerText;
 
@@ -1281,12 +1324,14 @@ function updateGpsData(selectedDate) {
           }
       });
   });
-</script>
+</script> -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     var deviceID = document.getElementById("currentdeviceID").innerText;
+    var currentPage = 1;
+    var totalPages = 0;
 
-    function updateGPSTable(deviceID, selectedDate) {
+    function updateGPSTable(selectedDate, startTime, endTime, pageNumber) {
         var xhttp = new XMLHttpRequest();
         xhttp.onload = function () {
             var data = JSON.parse(this.responseText);
@@ -1312,66 +1357,164 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("gps_data_table").innerHTML = gpsTemplateString;
             console.log(fieldData);
         };
-        xhttp.open("GET", "updategpsdatetable?deviceID={{deviceID}}" + "&date=" + selectedDate, true);
+        var url = "updategpsdatetable?deviceID=" + deviceID + "&date=" + selectedDate + "&page=" + pageNumber;
+        if (startTime && endTime) {
+            url += "&startTime=" + startTime + "&endTime=" + endTime;
+        }
+        xhttp.open("GET", url, true);
         xhttp.send();
+    }
+    
+    function updateGPSPaginationLinks() {
+        var paginationLinks = document.getElementById("gps-pagination-links");
+        paginationLinks.innerHTML = "";
+        if (currentPage > 1) {
+            paginationLinks.innerHTML += '<a href="#" data-page="1">&#129032; first</a>';
+            paginationLinks.innerHTML += '<a href="#" data-page="' + (currentPage - 1) + '">&#9664;</a>';
+        }
+        paginationLinks.innerHTML += '<span class="current">Page ' + currentPage + ' of ' + totalPages + '</span>';
+        if (currentPage < totalPages) {
+            paginationLinks.innerHTML += '<a href="#" data-page="' + (currentPage + 1) + '">&#9654;</a>';
+            paginationLinks.innerHTML += '<a href="#" data-page="' + totalPages + '">last &#129034;</a>';
+        }
+
+        var paginationLinksArray = paginationLinks.getElementsByTagName('a');
+        for (var i = 0; i < paginationLinksArray.length; i++) {
+            paginationLinksArray[i].addEventListener('click', function (event) {
+                event.preventDefault();
+                var nextPage = parseInt(this.getAttribute('data-page'));
+                currentPage = nextPage;
+                updateGPSTable(document.getElementById('datepicker').value, document.getElementById('fromTime').value, document.getElementById('toTime').value, nextPage);
+                updateGPSPaginationLinks();
+            });
+        }
     }
 
     document.getElementById('showButton').addEventListener('click', function () {
         var selectedDate = document.getElementById('datepicker').value;
-        if (selectedDate) {
-            updateGPSTable(deviceID, selectedDate);
-        } else {
-            console.log('Please select a date.');
+        var startTime = document.getElementById('fromTime').value;
+        var endTime = document.getElementById('toTime').value;
+
+        if (!selectedDate) {
+            alert('Please select a date.');
+            return;
         }
+        if (!startTime) {
+            alert('Please enter a start time.');
+            return;
+        }
+        if (!endTime) {
+            alert('Please enter an end time.');
+            return;
+        }
+        if (startTime >= endTime) {
+            alert('End time must be after start time.');
+            return;
+        }
+
+        currentPage = 1;
+        updateGPSTable(selectedDate, startTime, endTime, currentPage);
+        totalPages = 999;
+        updateGPSPaginationLinks();
     });
 });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-      var deviceID = document.getElementById("currentdeviceID").innerText;
+  </script>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  var deviceID = document.getElementById("currentdeviceID").innerText;
+  var currentPage = 1;
+  var totalPages = 0;
 
-      function updateEXTTable(deviceID, selectedDate) {
-          var xhttp = new XMLHttpRequest();
-          xhttp.onload = function () {
-              var data = JSON.parse(this.responseText);
-              var extTemplateString = "";
-              if (data.length <= 0) {
-                  extTemplateString = "<tr> \
-                                          <td colspan='10'>No Data</td>\
-                                      </tr>";
-              }
+  function updateEXTTable(selectedDate, startTime, endTime, pageNumber) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onload = function () {
+          var data = JSON.parse(this.responseText);
+          var extTemplateString = "";
+          if (data.length <= 0) {
+              extTemplateString = "<tr> \
+                                      <td colspan='10'>No Data</td>\
+                                  </tr>";
+          }
 
-              for (var i = 0; i < data.length; i++) {
-                  var fieldData = data[i]["fields"];
-                  extTemplateString += "<tr> \
-                                          <td>" + (i + 1) + "</td> \
-                                          <td>" + fieldData['date'] + "</td> \
-                                          <td>" + fieldData['time'] + "</td> \
-                                          <td>" + fieldData['distance'] + "</td> \
-                                          <td>" + fieldData['speed'] + "</td> \
-                                          <td>" + fieldData['watt_hr'] + "</td> \
-                                          <td>" + fieldData['batt_voltage'] + "</td> \
-                                          <td>" + fieldData['batt_amp'] + "</td> \
-                                          <td>" + fieldData['batt_power'] + "</td> \
-                                          <td>" + fieldData['batt_capacity'] + "</td> \
-                                       </tr>";
-              }
-              document.getElementById("external_data_table").innerHTML = extTemplateString;
-              console.log(fieldData);
-          };
-          xhttp.open("GET", "updateextdatetable?deviceID={{deviceID}}" + "&date=" + selectedDate, true);
-          xhttp.send();
+          for (var i = 0; i < data.length; i++) {
+              var fieldData = data[i]["fields"];
+              extTemplateString += "<tr> \
+                                      <td>" + (i + 1) + "</td> \
+                                      <td>" + fieldData['date'] + "</td> \
+                                      <td>" + fieldData['time'] + "</td> \
+                                      <td>" + fieldData['distance'] + "</td> \
+                                      <td>" + fieldData['speed'] + "</td> \
+                                      <td>" + fieldData['watt_hr'] + "</td> \
+                                      <td>" + fieldData['batt_voltage'] + "</td> \
+                                      <td>" + fieldData['batt_amp'] + "</td> \
+                                      <td>" + fieldData['batt_power'] + "</td> \
+                                      <td>" + fieldData['batt_capacity'] + "</td> \
+                                  </tr>";
+          }
+          document.getElementById("external_data_table").innerHTML = extTemplateString;
+          console.log(fieldData);
+      };
+      var url = "updateextdatetable?deviceID=" + deviceID + "&date=" + selectedDate + "&page=" + pageNumber;
+      if (startTime && endTime) {
+          url += "&startTime=" + startTime + "&endTime=" + endTime;
+      }
+      xhttp.open("GET", url, true);
+      xhttp.send();
+  }
+
+  function updateEXTPaginationLinks() {
+      var paginationLinks = document.getElementById("ext-pagination-links");
+      paginationLinks.innerHTML = "";
+      if (currentPage > 1) {
+          paginationLinks.innerHTML += '<a href="#" data-page="1">&#129032; first</a>';
+          paginationLinks.innerHTML += '<a href="#" data-page="' + (currentPage - 1) + '">&#9664;</a>';
+      }
+      paginationLinks.innerHTML += '<span class="current">Page ' + currentPage + ' of ' + totalPages + '</span>';
+      if (currentPage < totalPages) {
+          paginationLinks.innerHTML += '<a href="#" data-page="' + (currentPage + 1) + '">&#9654;</a>';
+          paginationLinks.innerHTML += '<a href="#" data-page="' + totalPages + '">last &#129034;</a>';
       }
 
-      document.getElementById('showButton').addEventListener('click', function () {
-          var selectedDate = document.getElementById('datepicker').value;
-          if (selectedDate) {
-              updateEXTTable(deviceID, selectedDate);
-          } else {
-              console.log('Please select a date.');
-          }
-      });
+      var paginationLinksArray = paginationLinks.getElementsByTagName('a');
+      for (var i = 0; i < paginationLinksArray.length; i++) {
+          paginationLinksArray[i].addEventListener('click', function (event) {
+              event.preventDefault();
+              var nextPage = parseInt(this.getAttribute('data-page'));
+              currentPage = nextPage;
+              updateEXTTable(document.getElementById('datepicker').value, document.getElementById('fromTime').value, document.getElementById('toTime').value, nextPage);
+              updateEXTPaginationLinks();
+          });
+      }
+  }
+
+  document.getElementById('showButton').addEventListener('click', function () {
+      var selectedDate = document.getElementById('datepicker').value;
+      var startTime = document.getElementById('fromTime').value;
+      var endTime = document.getElementById('toTime').value;
+
+      if (!selectedDate) {
+          alert('Please select a date.');
+          return;
+      }
+      if (!startTime) {
+          alert('Please enter a start time.');
+          return;
+      }
+      if (!endTime) {
+          alert('Please enter an end time.');
+          return;
+      }
+      if (startTime >= endTime) {
+          alert('End time must be after start time.');
+          return;
+      }
+
+      currentPage = 1;
+      updateEXTTable(selectedDate, startTime, endTime, currentPage);
+      totalPages = 999;
+      updateEXTPaginationLinks();
   });
+});
 </script>
 </body>
 </html>

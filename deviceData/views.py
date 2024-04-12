@@ -334,13 +334,25 @@ def get_gps_date_data(request):
     if request.method == 'GET':
         currentDeviceID = request.GET.get('deviceID')
         selectedDate = request.GET.get('date')
+        startTime = request.GET.get('startTime')
+        endTime = request.GET.get('endTime')
+
         if not selectedDate:
             return JsonResponse([], safe=False)
+        
         selected_date = datetime.strptime(selectedDate, '%Y-%m-%d').date()
 
         try:
             deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
-            gps_data = GPSData.objects.filter(device_id=deviceObject, date=selected_date).values('latitude', 'longitude')
+            gps_data = GPSData.objects.filter(device_id=deviceObject, date=selected_date)
+            
+            if startTime and endTime:
+                start_time = datetime.strptime(startTime, '%H:%M').time()
+                end_time = datetime.strptime(endTime, '%H:%M').time()
+                gps_data = gps_data.filter(time__range=(start_time, end_time))
+                
+            gps_data = gps_data.values('latitude', 'longitude')
+            
             return JsonResponse(list(gps_data), safe=False)
         except tracker_device.DoesNotExist:
             return JsonResponse([], safe=False)
@@ -349,7 +361,9 @@ def get_gps_date_data(request):
         
 def get_utilization_date_hours(request):
     currentDeviceID = request.GET.get('deviceID')
-    selected_date = request.GET.get('date') 
+    selected_date = request.GET.get('date')
+    start_time = request.GET.get('startTime')
+    end_time = request.GET.get('endTime')
 
     try:
         deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
@@ -364,6 +378,14 @@ def get_utilization_date_hours(request):
         return JsonResponse({"error": "Invalid date format"}, status=400)
 
     gps_data = GPSData.objects.filter(device_id=deviceObject, date=selected_date).order_by('time')
+
+    if start_time:
+        start_time = datetime.strptime(start_time, '%H:%M').time()
+        gps_data = gps_data.filter(time__gte=start_time)
+
+    if end_time:
+        end_time = datetime.strptime(end_time, '%H:%M').time()
+        gps_data = gps_data.filter(time__lte=end_time)
 
     state_hours = [0, 0, 0]
 
@@ -457,3 +479,52 @@ def get_last_date_data(request):
         ext_serializer = EXTDataSerializer(last_ext_data, many=True)
 
         return JsonResponse({'gps_data': gps_serializer.data, 'ext_data': ext_serializer.data})
+    
+def get_today_gps_date_data(request):
+    if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+        selectedDate = request.GET.get('date')
+        startTime = request.GET.get('startTime')
+        endTime = request.GET.get('endTime')
+
+        deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+        if selectedDate:
+            selected_date = datetime.strptime(selectedDate, '%Y-%m-%d').date()
+        else:
+            selected_date = date.today()
+
+        if startTime:
+            start_time = datetime.combine(selected_date, datetime.strptime(startTime, '%H:%M').time())
+        else:
+            start_time = datetime.combine(selected_date, time.min)
+
+        if endTime:
+            end_time = datetime.combine(selected_date, datetime.strptime(endTime, '%H:%M').time())
+        else:
+            end_time = datetime.now()
+
+        data2 = GPSData.objects.filter(device_id=deviceObject, date=selected_date, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+
+        last_gps_data = GPSData.objects.filter(device_id=deviceObject).order_by('-date', '-time')[:5]
+
+        lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
+        states = ["Inactive", "Idle", "Active", "Alert"]
+        currentState = 1
+        stateHr = [0,0,0,0]
+        for gpsData in data2:
+            currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
+            differencesInSeconds = (currentTime - lastTime).total_seconds()
+            stateHr[currentState-1] = stateHr[currentState-1] + differencesInSeconds
+            currentState = gpsData["state"]
+            lastTime = currentTime
+
+        res = [round(x/3600, 2) for x in stateHr]
+
+        response_data = []
+        for n, item in enumerate(states):
+            response_data.append({
+                'state': item,
+                'duration': res[n]
+            })
+
+        return JsonResponse(response_data, safe=False)
