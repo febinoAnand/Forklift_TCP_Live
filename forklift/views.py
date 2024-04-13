@@ -263,3 +263,42 @@ def updateGPSTabledateView(request):
         gps_table_json = '{"error": "Please provide both deviceID and date parameters."}'
 
     return HttpResponse(gps_table_json, content_type='application/json')
+
+def get_state_data(request):
+    try:
+        if request.method == 'GET' and 'device_id' in request.GET and 'date' in request.GET and 'from_time' in request.GET and 'to_time' in request.GET:
+            device_id = request.GET.get('device_id')
+            current_device = tracker_device.objects.get(device_id=device_id)
+            selected_date = request.GET.get('date')
+            from_time = request.GET.get('from_time')
+            to_time = request.GET.get('to_time')
+
+            start_time = datetime.strptime(from_time, "%H:%M").time()
+            end_time = datetime.strptime(to_time, "%H:%M").time()
+
+            data = GPSData.objects.filter(device_id=current_device, date=selected_date, time__range=(start_time, end_time)).order_by("time").values()
+
+            state_timing = []
+            last_time = datetime.combine(datetime.min.date(), time.min)
+            states = ["Inactive", "Idle", "Active", "Alert"]
+            current_state = 1
+
+            for gps_data in data:
+                on_off_state_dict = {}
+                current_time = datetime.combine(datetime.min.date(), gps_data["time"])
+                differences_in_seconds = (current_time - last_time).total_seconds()
+
+                on_off_state_dict['state'] = states[current_state - 1]
+                on_off_state_dict['timediff'] = differences_in_seconds
+                on_off_state_dict['percent'] = round(((differences_in_seconds / (60 * 60 * 24)) * 100), 3)
+                state_timing.append(on_off_state_dict)
+
+                current_state = gps_data["state"]
+                last_time = current_time
+
+            return JsonResponse(state_timing, safe=False)
+        else:
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error': 'Device not found or data not available'}, status=404)

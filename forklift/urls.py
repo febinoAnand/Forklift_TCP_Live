@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import loginView, deviceDashborad, historypage,get_gps_data_for_date,updateGPSTabledateView,updateEXTTabledateView , updateGPSTableView,updateEXTTableView, report_page_view, register_device ,list_page_view, tracker_device_list,logoutView
+from .views import loginView, deviceDashborad, historypage,get_gps_data_for_date, get_state_data, updateGPSTabledateView,updateEXTTabledateView , updateGPSTableView,updateEXTTableView, report_page_view, register_device ,list_page_view, tracker_device_list,logoutView
 
 
 urlpatterns = [
@@ -17,4 +17,5 @@ urlpatterns = [
     path('get_gps_data_for_date/', get_gps_data_for_date, name='get_gps_data_for_date'),
     path('updateextdatetable',updateEXTTabledateView, name='update_exttabledate'),
     path('updategpsdatetable',updateGPSTabledateView, name='update_gpsdatetable'),
+    path('get_state_data/', get_state_data, name='get_state_data'),
 ]
