@@ -5,6 +5,8 @@ import datetime
 import struct
 import decimal
 import django
+from django.utils import timezone
+
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ForkliftWeb.settings')
@@ -173,7 +175,8 @@ def codec_8e_parser(codec_8E_packet, device_imei, props): #think a lot before mo
 
 	try:
 		rawDataObject.device_id = device_imei
-		rawDataObject.received_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		rawDataObject.received_time = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+		# rawDataObject.received_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		rawDataObject.data_length = len(codec_8E_packet)
 		rawDataObject.data = codec_8E_packet
 		rawDataObject.save()
@@ -485,7 +488,8 @@ def codec_12_parser(codec_12_packet, device_imei, props): #think a lot before mo
 
 	try:
 		rawDataObject.device_id = device_imei
-		rawDataObject.received_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		rawDataObject.received_time = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+		# rawDataObject.received_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		rawDataObject.data_length = len(codec_12_packet)
 		rawDataObject.data = codec_12_packet
 		rawDataObject.save()
@@ -566,8 +570,10 @@ def codec_12_parser(codec_12_packet, device_imei, props): #think a lot before mo
 
 	try:
 		EXTDataObject = EXTData()
-		EXTDataObject.date = datetime.datetime.now().strftime("%Y-%m-%d")
-		EXTDataObject.time = datetime.datetime.now().strftime("%H:%M:%S")
+		EXTDataObject.date = timezone.now().strftime("%Y-%m-%d")
+		# EXTDataObject.date = datetime.datetime.now().strftime("%Y-%m-%d")
+		EXTDataObject.time = timezone.now().strftime("%H:%M:%S")
+		# EXTDataObject.time = datetime.datetime.now().strftime("%H:%M:%S")
 		EXTDataObject.device_id = tracker_device.objects.get(device_id = device_imei)
 		EXTDataObject.distance = extDistance
 		EXTDataObject.batt_amp = extBatAmp
@@ -625,12 +631,14 @@ def json_printer_rawDATA(io_dict_raw, device_imei): #function to write JSON file
 ####################################################
 
 def time_stamper():
-	current_server_time = datetime.datetime.now()	
+	current_server_time = timezone.now()	
+	# current_server_time = datetime.datetime.now()	
 	server_time_stamp = current_server_time.strftime('%H:%M:%S %d-%m-%Y')
 	return server_time_stamp
 
 def time_stamper_for_json():
-	current_server_time = datetime.datetime.now()
+	current_server_time = timezone.now()
+	# current_server_time = datetime.datetime.now()
 	timestamp_utc = datetime.datetime.utcnow()
 	server_time_stamp = f"{current_server_time.strftime('%H:%M:%S %d-%m-%Y')} (local) / {timestamp_utc.strftime('%H:%M:%S %d-%m-%Y')} (utc)"
 	return server_time_stamp
@@ -666,7 +674,8 @@ def extract_device_time(timestamp):
 
 def record_delay_counter(timestamp):
 	timestamp_ms = int(timestamp, 16) / 1000
-	current_server_time = datetime.datetime.now().timestamp()
+	current_server_time = timezone.now().timestamp()
+	# current_server_time = datetime.datetime.now().timestamp()
 	return f"{int(current_server_time - timestamp_ms)} seconds"
 
 ####################################################
