@@ -20,13 +20,16 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def loginView(request):
-    print("login....")
+  
+  
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(username)
+   
+   
         user = authenticate(request, username=username, password=password)
-        print(user)
+      
+      
         if user is not None:
             if user.is_staff:
                 login(request, user)
@@ -37,7 +40,8 @@ def loginView(request):
         else:
             return render(request, 'login.html', {'error': True})
     else:
-        print("get")
+        
+        
         return render(request, 'login.html')
 
 def logoutView(request):
@@ -46,32 +50,37 @@ def logoutView(request):
 
 def deviceDashborad(request):
     try:
-        
         current_device_id = request.GET.get('device_id')
-        print (current_device_id)
-        currentDevice = tracker_device.objects.get(device_id = current_device_id)
-        gps_data = GPSData.objects.filter(device_id=currentDevice)
+        
+        
+        currentDevice = tracker_device.objects.get(device_id=current_device_id)
+        
+
+        gps_data = GPSData.objects.filter(device_id=currentDevice).order_by('-pk')[:10]
+        
+        
+        ext_data = EXTData.objects.filter(device_id=currentDevice).order_by('-pk')[:10]
+        
         stateTiming = []
         today = date.today() 
         start_time = datetime.combine(today, time.min)
         end_time = datetime.now()
-        if len(gps_data) > 0:
-            gps_data = gps_data.order_by('-pk')[0]
-
-            data2 = GPSData.objects.filter(device_id = currentDevice, date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
-    
+        last_gps_data=0
+        if not gps_data:
+            gps_data = GPSData()
+        else:
+           
+            last_gps_data = gps_data[0]
+            data2 = GPSData.objects.filter(device_id=currentDevice, date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
             lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
             states = ["Inactive", "Idle", "Active", "Alert"]
             currentState = 1
             stateHr = [0,0,0,0]
             
-            
             for gpsData in data2:
                 onOffStateDic = {}
                 currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
                 differencesInSeconds = (currentTime - lastTime).total_seconds()
-                # print(currentTime , " - ", lastTime , " = ", differencesInSeconds , " - ", states[currentState-1], " - ", currentState)
-                # stateHr[currentState-1] = stateHr[currentState-1] + differencesInSeconds
                 
                 onOffStateDic['state'] = states[currentState-1]
                 onOffStateDic['timediff'] = differencesInSeconds
@@ -80,20 +89,20 @@ def deviceDashborad(request):
                 
                 currentState = gpsData["state"]
                 lastTime = currentTime
-        else:
-            gps_data = GPSData()
-        ext_data = EXTData.objects.filter(device_id=currentDevice)
+            
+        
         if len(ext_data) > 0:
-            ext_data = ext_data.order_by('-pk')[0]
+            ext_data = ext_data[0]
         else:
             ext_data = EXTData()
         
-        # print (stateTiming)
         rand = random.randint(1,10)
-        return render(request,"devicedashboard.html", {"device":currentDevice,"gpsData":gps_data,"random":rand,"extData":ext_data,"stateTiming":stateTiming})
+        
+        return render(request, "devicedashboard.html", {"device": currentDevice, "gpsData": last_gps_data, "random": rand, "extData": ext_data, "stateTiming": stateTiming})
     except Exception as e:
-        print (e)
+        
         return HttpResponse('Device Not found')
+
     
 
 def updateGPSTableView(request):
