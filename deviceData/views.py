@@ -362,53 +362,56 @@ def get_gps_date_data(request):
 def get_utilization_date_hours(request):
     currentDeviceID = request.GET.get('deviceID')
     selected_date = request.GET.get('date')
-    start_time = request.GET.get('startTime')
-    end_time = request.GET.get('endTime')
+    start_time_str = request.GET.get('startTime')
+    end_time_str = request.GET.get('endTime')
 
     try:
         deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
     except tracker_device.DoesNotExist:
         return JsonResponse({"error": "Device not found"}, status=404)
 
-    utilization_hours = {}
-
     try:
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
     except ValueError:
         return JsonResponse({"error": "Invalid date format"}, status=400)
 
-    gps_data = GPSData.objects.filter(device_id=deviceObject, date=selected_date).order_by('time')
+    utilization_hours = {}
 
-    if start_time:
-        start_time = datetime.strptime(start_time, '%H:%M').time()
-        gps_data = gps_data.filter(time__gte=start_time)
+    date_range = [selected_date + timedelta(days=i) for i in range(7)]
 
-    if end_time:
-        end_time = datetime.strptime(end_time, '%H:%M').time()
-        gps_data = gps_data.filter(time__lte=end_time)
+    for date in date_range:
+        gps_data = GPSData.objects.filter(device_id=deviceObject, date=date).order_by('time')
 
-    state_hours = [0, 0, 0]
+        if start_time_str:
+            start_time = datetime.strptime(start_time_str, '%H:%M').time()
+            gps_data = gps_data.filter(time__gte=start_time)
 
-    last_time = datetime.combine(selected_date, datetime.min.time())
-    for state in range(1, 4):
-        state_data = gps_data.filter(state=state)
-        for data_point in state_data:
-            current_time = datetime.combine(selected_date, data_point.time)
-            difference_seconds = (current_time - last_time).total_seconds()
-            if difference_seconds > 0:  
-                state_hours[state - 1] += difference_seconds
-            last_time = current_time
+        if end_time_str:
+            end_time = datetime.strptime(end_time_str, '%H:%M').time()
+            gps_data = gps_data.filter(time__lte=end_time)
 
-    total_state_hours = sum(state_hours)
-    if total_state_hours > 86400:  
-        state_hours = [hour * 86400 / total_state_hours for hour in state_hours]
-    total_utilization = sum(state_hours) / 3600
-    utilization_hours[selected_date.strftime('%A')] = {
-        "Inactive": state_hours[0] / 3600,  
-        "Idle": state_hours[1] / 3600,
-        "Active": state_hours[2] / 3600,
-        'Total': total_utilization 
-    }
+        state_hours = [0, 0, 0]
+
+        last_time = datetime.combine(date, datetime.min.time())
+        for state in range(1, 4):
+            state_data = gps_data.filter(state=state)
+            for data_point in state_data:
+                current_time = datetime.combine(date, data_point.time)
+                difference_seconds = (current_time - last_time).total_seconds()
+                if difference_seconds > 0:  
+                    state_hours[state - 1] += difference_seconds
+                last_time = current_time
+
+        total_state_hours = sum(state_hours)
+        if total_state_hours > 86400:  
+            state_hours = [hour * 86400 / total_state_hours for hour in state_hours]
+        total_utilization = sum(state_hours) / 3600
+        utilization_hours[date.strftime('%A')] = {
+            "Inactive": state_hours[0] / 3600,  
+            "Idle": state_hours[1] / 3600,
+            "Active": state_hours[2] / 3600,
+            'Total': total_utilization 
+        }
 
     return JsonResponse(utilization_hours)
 
