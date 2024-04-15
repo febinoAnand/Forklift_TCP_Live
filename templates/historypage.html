@@ -856,33 +856,12 @@
       const selectedDate = document.getElementById('datepicker').value;
       const startTime = document.getElementById('fromTime').value;
       const endTime = document.getElementById('toTime').value;
-      resetPreviousResults();
       fetchDataAndUpdate(selectedDate, startTime, endTime);
   });
 
-  function resetPreviousResults() {
-      var barElements = document.querySelectorAll('.bar');
-      barElements.forEach(bar => {
-          var activeElement = bar.querySelector('.active');
-          activeElement.style.height = '0';
-          activeElement.textContent = '';
-          activeElement.style.display = 'none';
-
-          var idleElement = bar.querySelector('.idle');
-          idleElement.style.height = '0';
-          idleElement.textContent = '';
-          idleElement.style.display = 'none';
-
-          var inactiveElement = bar.querySelector('.inactive');
-          inactiveElement.style.height = '0';
-          inactiveElement.textContent = '';
-          inactiveElement.style.display = 'none';
-      });
-  }
-
   function updateBarChart(data) {
     for (const day in data) {
-        if (data.hasOwnProperty(day)) {
+        if (data.hasOwnProperty(day) && day.toLowerCase() !== 'sunday') {
             const utilizationData = data[day];
             const row = document.querySelector(`.bar-${day.toLowerCase()}`);
             if (row) {
@@ -924,18 +903,19 @@
     }
 }
 
-  function fetchDataAndUpdate(selectedDate, startTime, endTime) {
-      const url = `/get_utilization_date_hours/?deviceID={{device}}&date=${selectedDate}&startTime=${startTime}&endTime=${endTime}`;
-      fetch(url)
-          .then(response => {
-              if (!response.ok) {
-                  throw new Error('Network response was not ok');
-              }
-              return response.json();
-          })
-          .then(data => updateBarChart(data))
-          .catch(error => console.error('Error fetching data:', error));
-  }
+function fetchDataAndUpdate(selectedDate, startTime, endTime) {
+    const url = `/get_utilization_date_hours/?deviceID={{device}}&date=${selectedDate}&startTime=${startTime}&endTime=${endTime}`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => updateBarChart(data))
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 </script>
 <!-- <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1514,49 +1494,52 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 <script>
-  $(document).ready(function() {
-    var deviceID = $('#currentdeviceID').text();
-    $('#showButton').click(function() {
-      var selectedDate = $('#datepicker').val();
-      var fromTime = $('#fromTime').val();
-      var toTime = $('#toTime').val();
+$(document).ready(function() {
+  var deviceID = $('#currentdeviceID').text();
+  $('#showButton').click(function() {
+    var selectedDate = $('#datepicker').val();
+    var fromTime = $('#fromTime').val();
+    var toTime = $('#toTime').val();
 
-      $.ajax({
-        url: '/get_state_data/',
-        method: 'GET',
-        data: {
-          'device_id': deviceID,
-          'date': selectedDate,
-          'from_time': fromTime,
-          'to_time': toTime
-        },
-        success: function(response) {
-          $('.progress').empty();
-          for (var i = 0; i < response.length; i++) {
-            var gpsState = response[i];
-            var segmentColor = '';
-            if (gpsState.state === 'Idle') {
-              segmentColor = 'rgba(255, 206, 86, 1)';
-            } else if (gpsState.state === 'Active') {
-              segmentColor = 'rgba(54, 162, 235, 1)';
-            } else if (gpsState.state === 'Inactive') {
-              segmentColor = '';
-            }
-            var segmentHtml = '<div class="segment" style="background-color: ' + segmentColor + '; width: ' + gpsState.percent + '%;">' +
-              '<div class="tooltip">' + gpsState.state + ' : ' + gpsState.timediff + ' Seconds</div>' +
-              '</div>';
-            $('.progress').append(segmentHtml);
+    $.ajax({
+      url: '/get_state_data/',
+      method: 'GET',
+      data: {
+        'device_id': deviceID,
+        'date': selectedDate,
+        'from_time': fromTime,
+        'to_time': toTime
+      },
+      success: function(response) {
+        $('.progress').empty();
+        for (var i = 0; i < response.length; i++) {
+          var gpsState = response[i];
+          var segmentColor = '';
+          if (gpsState.state === 'Idle') {
+            segmentColor = 'rgba(255, 206, 86, 1)';
+          } else if (gpsState.state === 'Active') {
+            segmentColor = 'rgba(54, 162, 235, 1)';
+          } else if (gpsState.state === 'Inactive') {
+            segmentColor = 'rgba(255, 99, 132, 1)';
           }
-        },
-        error: function(xhr, status, error) {
-          console.error('AJAX Request Failed:');
-          console.error('Status: ' + status);
-          console.error('Error: ' + error);
-          console.error('Response Text: ' + xhr.responseText);
+
+          var segmentHtml = '<div class="segment" style="background-color: ' + segmentColor + '; width: ' + gpsState.percent + '%;">';
+          if (gpsState.state !== 'Empty') {
+            segmentHtml += '<div class="tooltip">' + gpsState.state + ' : ' + gpsState.timediff + ' Seconds</div>';
+          }
+          segmentHtml += '</div>';
+          $('.progress').append(segmentHtml);
         }
-      });
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX Request Failed:');
+        console.error('Status: ' + status);
+        console.error('Error: ' + error);
+        console.error('Response Text: ' + xhr.responseText);
+      }
     });
   });
+});
 </script>
 </body>
 </html>

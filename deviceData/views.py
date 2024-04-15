@@ -361,7 +361,7 @@ def get_gps_date_data(request):
         
 def get_utilization_date_hours(request):
     currentDeviceID = request.GET.get('deviceID')
-    selected_date = request.GET.get('date')
+    selected_date_str = request.GET.get('date')
     start_time_str = request.GET.get('startTime')
     end_time_str = request.GET.get('endTime')
 
@@ -371,7 +371,7 @@ def get_utilization_date_hours(request):
         return JsonResponse({"error": "Device not found"}, status=404)
 
     try:
-        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
     except ValueError:
         return JsonResponse({"error": "Invalid date format"}, status=400)
 
@@ -382,15 +382,13 @@ def get_utilization_date_hours(request):
     for date in date_range:
         gps_data = GPSData.objects.filter(device_id=deviceObject, date=date).order_by('time')
 
-        if start_time_str:
-            start_time = datetime.strptime(start_time_str, '%H:%M').time()
-            gps_data = gps_data.filter(time__gte=start_time)
-
-        if end_time_str:
-            end_time = datetime.strptime(end_time_str, '%H:%M').time()
-            gps_data = gps_data.filter(time__lte=end_time)
-
         state_hours = [0, 0, 0]
+
+        if date == selected_date: 
+            start_time = datetime.strptime(start_time_str, '%H:%M').time() if start_time_str else datetime.min.time()
+            end_time = datetime.strptime(end_time_str, '%H:%M').time() if end_time_str else datetime.max.time()
+
+            gps_data = gps_data.filter(time__gte=start_time, time__lte=end_time)
 
         last_time = datetime.combine(date, datetime.min.time())
         for state in range(1, 4):
