@@ -290,22 +290,25 @@ def get_state_data(request):
             state_timing = []
             last_time = datetime.combine(datetime.min.date(), time.min)
             states = ["Inactive", "Idle", "Active", "Alert"]
-            current_state = 1
+            current_state = "Empty"
 
             for gps_data in data:
                 on_off_state_dict = {}
                 current_time = datetime.combine(datetime.min.date(), gps_data["time"])
                 differences_in_seconds = (current_time - last_time).total_seconds()
 
-                on_off_state_dict['state'] = states[current_state - 1]
+                on_off_state_dict['state'] = current_state
                 on_off_state_dict['timediff'] = differences_in_seconds
                 on_off_state_dict['percent'] = round(((differences_in_seconds / (60 * 60 * 24)) * 100), 3)
                 state_timing.append(on_off_state_dict)
 
-                current_state = gps_data["state"]
+                current_state = states[gps_data["state"] - 1]
                 last_time = current_time
 
-            return JsonResponse(state_timing, safe=False)
+            if not state_timing:
+                return JsonResponse([], safe=False)
+            else:
+                return JsonResponse(state_timing, safe=False)
         else:
             return JsonResponse({'error': 'Invalid request'}, status=400)
     except Exception as e:

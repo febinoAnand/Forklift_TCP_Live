@@ -20,6 +20,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle,  Paragraph, Spacer
 from forklift.models import tracker_device
+from django.views import View
 
 def ext_data_list(request):
    
@@ -241,9 +242,8 @@ def generate_pdf(request):
     from_date = datetime.strptime(request.GET.get('fromDate'), '%Y-%m-%d').date()
     to_date = datetime.strptime(request.GET.get('toDate'), '%Y-%m-%d').date()
     utilization_hours = get_utilization_hours_for_report(currentDeviceID, from_date, to_date)
-    all_dates = set(GPSData.objects.filter(device_id=deviceObject).values_list('date', flat=True)) | \
-                set(EXTData.objects.filter(device_id=deviceObject).values_list('date', flat=True))
-    ext_data = EXTData.objects.filter(device_id=deviceObject)
+    gps_data = GPSData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
+    ext_data = EXTData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Forklift.pdf"'
     pdf = SimpleDocTemplate(response, pagesize=letter)
@@ -258,13 +258,10 @@ def generate_pdf(request):
     content.append(Spacer(1, 0.5 * inch))
     table_data = [['Date', 'GPS Distance', 'ODOMETER Distance', 'Watt HR', 'Utilization Hours']]
 
-    for date in all_dates:
-        gps_entry = GPSData.objects.filter(device_id=deviceObject, date=date).first()
-        ext_entry = ext_data.filter(date=date).first()
-
-        gps_distance = gps_entry.distance if gps_entry else "N/A"
-        ext_distance = ext_entry.distance if ext_entry else "N/A"
-        watt_hr = ext_entry.watt_hr if ext_entry else "N/A"
+    for date in set(gps_data.values_list('date', flat=True)) | set(ext_data.values_list('date', flat=True)):
+        gps_distance = gps_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+        ext_distance = ext_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+        watt_hr = ext_data.filter(date=date).aggregate(Sum('watt_hr'))['watt_hr__sum'] or 0
 
         active_hours = utilization_hours.get(date.strftime('%A'), {}).get('Active', 0)
         inactive_hours = utilization_hours.get(date.strftime('%A'), {}).get('Inactive', 0)
@@ -528,3 +525,166 @@ def get_today_gps_date_data(request):
             })
 
         return JsonResponse(response_data, safe=False)
+    
+class CombinedDataView(View):
+    def get(self, request):
+        if 'ext-data' in request.path:
+            current_device_id = request.GET.get('deviceID')
+            try:
+                device_object = tracker_device.objects.get(device_id=current_device_id)
+                ext_data = EXTData.objects.filter(device_id=device_object).order_by('-id')[:1]
+                serializer = EXTDataSerializer(ext_data, many=True)
+                return JsonResponse(serializer.data, safe=False)
+            except tracker_device.DoesNotExist:
+                return HttpResponse(status=404)
+
+        elif 'gps-data' in request.path:
+            current_device_id = request.GET.get('deviceID')
+            try:
+                device_object = tracker_device.objects.get(device_id=current_device_id)
+                gps_data = GPSData.objects.filter(device_id=device_object).order_by('-id')[:1]
+                serializer = GPSDataSerializer(gps_data, many=True)
+                return JsonResponse(serializer.data, safe=False)
+            except tracker_device.DoesNotExist:
+                return HttpResponse(status=404)
+
+        elif 'get_last_data' in request.path:
+            current_device_id = request.GET.get('deviceID')
+            try:
+                device_object = tracker_device.objects.get(device_id=current_device_id)
+                last_gps_data = GPSData.objects.filter(device_id=device_object).order_by('-date', '-time')[:5]
+                last_ext_data = EXTData.objects.filter(device_id=device_object).order_by('-date', '-time')[:5]
+                gps_serializer = GPSDataSerializer(last_gps_data, many=True)
+                ext_serializer = EXTDataSerializer(last_ext_data, many=True)
+                return JsonResponse({'gps_data': gps_serializer.data, 'ext_data': ext_serializer.data})
+            except tracker_device.DoesNotExist:
+                return HttpResponse(status=404)
+
+        elif 'get_today_gps_data' in request.path:
+            current_device_id = request.GET.get('deviceID')
+            try:
+                device_object = tracker_device.objects.get(device_id=current_device_id)
+                today = date.today()
+                start_time = datetime.combine(today, time.min)
+                end_time = datetime.now()
+
+                data2 = GPSData.objects.filter(device_id=device_object, date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+
+                lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
+                states = ["Inactive", "Idle", "Active", "Alert"]
+                currentState = 1
+                stateHr = [0,0,0,0]
+                for gpsData in data2:
+                    currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
+                    differencesInSeconds = (currentTime - lastTime).total_seconds()
+                    stateHr[currentState-1] = stateHr[currentState-1] + differencesInSeconds
+                    currentState = gpsData["state"]
+                    lastTime = currentTime
+                res = [round(x/3600,2) for x in stateHr]
+                response_data = []
+
+                for n,item in enumerate(states):
+                    response_data.append({
+                        'state': item,
+                        'duration': res[n]
+                    })
+
+                return JsonResponse(response_data, safe=False)
+
+            except tracker_device.DoesNotExist:
+                return HttpResponse(status=404)
+
+        elif 'get_utilization_hours' in request.path:
+            current_device_id = request.GET.get('deviceID')
+            try:
+                device_object = tracker_device.objects.get(device_id=current_device_id)
+                end_date = datetime.now().date()
+                start_date = end_date - timedelta(days=7)
+                utilization_hours = {}
+
+                for day in range(7):
+                    current_date = start_date + timedelta(days=day)
+                    
+                    gps_data = GPSData.objects.filter(device_id=device_object, date=current_date).order_by('time')
+
+                    state_hours = [0, 0, 0]
+
+                    last_time = datetime.combine(current_date, datetime.min.time())
+                    for state in range(1, 4):
+                        state_data = gps_data.filter(state=state)
+                        for data_point in state_data:
+                            current_time = datetime.combine(current_date, data_point.time)
+                            difference_seconds = (current_time - last_time).total_seconds()
+                            if difference_seconds > 0:  
+                                state_hours[state - 1] += difference_seconds
+                            last_time = current_time
+
+                    total_state_hours = sum(state_hours)
+                    if total_state_hours > 86400:  
+                        state_hours = [hour * 86400 / total_state_hours for hour in state_hours]
+                    total_utilization = sum(state_hours) / 3600
+                    utilization_hours[current_date.strftime('%A')] = {
+                        "Inactive": state_hours[0] / 3600,  
+                        "Idle": state_hours[1] / 3600,
+                        "Active": state_hours[2] / 3600,
+                        'Total':total_utilization 
+                    }
+         
+                return JsonResponse(utilization_hours)
+
+            except tracker_device.DoesNotExist:
+                return JsonResponse({"error": "Device not found"}, status=404)
+            
+        elif 'search_data' in request.path:
+            if request.method == 'GET':
+                currentDeviceID = request.GET.get('deviceID')
+                from_date = datetime.strptime(request.GET.get('fromDate'), '%Y-%m-%d').date()
+                to_date = datetime.strptime(request.GET.get('toDate'), '%Y-%m-%d').date()
+
+                utilization_hours = get_utilization_hours_for_report(currentDeviceID, from_date, to_date)
+
+                deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+                gps_data = GPSData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
+                ext_data = EXTData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
+
+                data = []
+
+                for date in set(gps_data.values_list('date', flat=True)) | set(ext_data.values_list('date', flat=True)):
+                    gps_distance = gps_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+                    ext_distance = ext_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+                    watt_hr = ext_data.filter(date=date).aggregate(Sum('watt_hr'))['watt_hr__sum'] or 0
+
+                    data.append({
+                        'date': date.strftime('%Y-%m-%d'),
+                        'gps_distance': gps_distance,
+                        'ext_distance': ext_distance,
+                        'watt_hr': watt_hr,
+                        'utilization_hours': utilization_hours.get(date.strftime('%A'), {})
+                    })
+
+                return JsonResponse(data, safe=False)
+
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        current_device_id = data.get('deviceID')
+        if not current_device_id:
+            return JsonResponse({'error': 'Device ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            device_object = tracker_device.objects.get(device_id=current_device_id)
+        except tracker_device.DoesNotExist:
+            return JsonResponse({'error': 'Device not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if 'ext-data' in request.path:
+            serializer = EXTDataSerializer(data=data)
+        elif 'gps-data' in request.path:
+            data['device_id'] = device_object.id
+            serializer = GPSDataSerializer(data=data)
+        else:
+            return HttpResponse(status=404)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
