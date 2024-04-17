@@ -16,7 +16,7 @@ import random
 from datetime import datetime, date ,time ,timedelta
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.views import View
 
 
 def loginView(request):
@@ -314,3 +314,156 @@ def get_state_data(request):
     except Exception as e:
         print(e)
         return JsonResponse({'error': 'Device not found or data not available'}, status=404)
+
+class AllDeviceClass(View):
+    def get(self, request, *args, **kwargs):
+        return self.DeviceDashboardView(request)
+
+    def post(self, request, *args, **kwargs):
+        return self.DeviceDashboardView(request)
+
+    def DeviceDashboardView(self, request):
+        if request.method == 'GET' or request.method == 'POST':
+            try:
+                current_device_id = request.GET.get('device_id')
+                currentDevice = tracker_device.objects.get(device_id=current_device_id)
+                gps_data = GPSData.objects.filter(device_id=currentDevice).order_by('-pk')[:10]
+                ext_data = EXTData.objects.filter(device_id=currentDevice).order_by('-pk')[:10]
+                stateTiming = []
+                today = date.today() 
+                start_time = datetime.combine(today, time.min)
+                end_time = datetime.now()
+                last_gps_data=0
+                if not gps_data:
+                    gps_data = GPSData()
+                else:
+                    last_gps_data = gps_data[0]
+                    data2 = GPSData.objects.filter(device_id=currentDevice, date=today, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+                    lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
+                    states = ["Inactive", "Idle", "Active", "Alert"]
+                    currentState = 1
+                    stateHr = [0,0,0,0]
+                    for gpsData in data2:
+                        onOffStateDic = {}
+                        currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
+                        differencesInSeconds = (currentTime - lastTime).total_seconds()
+                        onOffStateDic['state'] = states[currentState-1]
+                        onOffStateDic['timediff'] = differencesInSeconds
+                        onOffStateDic['percent'] = round(((differencesInSeconds / (60 * 60 * 24)) * 100),3)
+                        stateTiming.append(onOffStateDic)
+                        currentState = gpsData["state"]
+                        lastTime = currentTime
+                if len(ext_data) > 0:
+                    ext_data = ext_data[0]
+                else:
+                    ext_data = EXTData()
+                rand = random.randint(1,10)
+                return render(request, "devicedashboard.html", {"device": currentDevice, "gpsData": last_gps_data, "random": rand, "extData": ext_data, "stateTiming": stateTiming})
+            except tracker_device.DoesNotExist:
+                return JsonResponse({'error': 'Device Not found'}, status=404)
+            except Exception as e:
+                return HttpResponse('An error occurred', status=500)
+
+    def updateGPSTable(self, request):
+        if request.method == 'GET':
+            currentDeviceID = request.GET.get('deviceID')
+            if currentDeviceID:
+                try:
+                    current_tracker_device = tracker_device.objects.get(device_id=currentDeviceID)
+                    gps_table_list = GPSData.objects.filter(device_id=current_tracker_device).filter(latitude__gt=0.0).order_by('-pk')[:10]
+                    gps_table_json = serializers.serialize('json', gps_table_list)
+                    return HttpResponse(gps_table_json, content_type='application/json')
+                except tracker_device.DoesNotExist:
+                    return JsonResponse({'error': 'Device Not found'}, status=404)
+                except Exception as e:
+                    return HttpResponse('An error occurred', status=500)
+            else:
+                return HttpResponse(status=400)
+
+    def updateEXTTable(self, request):
+        if request.method == 'GET':
+            currentDeviceID = request.GET.get('deviceID')
+            if currentDeviceID:
+                try:
+                    current_tracker_device = tracker_device.objects.get(device_id=currentDeviceID)
+                    ext_table_list = EXTData.objects.filter(device_id=current_tracker_device).order_by('-pk')[:10]
+                    ext_table_json = serializers.serialize('json', ext_table_list)
+                    return HttpResponse(ext_table_json, content_type='application/json')
+                except tracker_device.DoesNotExist:
+                    return JsonResponse({'error': 'Device Not found'}, status=404)
+                except Exception as e:
+                    return HttpResponse('An error occurred', status=500)
+            else:
+                return HttpResponse(status=400)
+            
+    def report_page_view(self, request):
+        currentDeviceID = request.GET.get('deviceID')
+        return render(request, 'reportpage.html', {'deviceID': currentDeviceID})
+
+    def registration_view(self, request):
+        if request.method == 'POST':
+            return redirect('login')
+        else:
+            return render(request, 'registration.html')
+
+    def list_page_view(self, request):
+        if request.user.is_authenticated:
+            return render(request, 'listpage.html')
+        else:
+            return redirect('/')
+        
+    def tracker_device_list(self, request):
+        devices = tracker_device.objects.all()
+        data = [{'device_id': device.device_id, 'vehicle_name': device.vehicle_name, 'device_model': device.device_model,
+                'vehicle_id': device.vehicle_id, 'driver': device.driver, 'add_date': device.add_date.strftime('%Y-%m-%d'),
+                'manufacturer': device.manufacturer, 'hardware_version': device.hardware_version,
+                'software_version': device.software_version} for device in devices]
+        return JsonResponse(data, safe=False)
+
+    def updateEXTTabledateView(self, request):
+        currentDeviceID = request.GET.get('deviceID')
+        selected_date = request.GET.get('date')
+        start_time = request.GET.get('startTime')
+        end_time = request.GET.get('endTime')
+
+        if currentDeviceID is not None and selected_date is not None:
+            current_tracker_device = tracker_device.objects.get(device_id=currentDeviceID)
+            ext_table_list = EXTData.objects.filter(device_id=current_tracker_device, date=selected_date)
+
+            if start_time and end_time:
+                start_datetime = datetime.strptime(start_time, '%H:%M')
+                end_datetime = datetime.strptime(end_time, '%H:%M')
+                ext_table_list = ext_table_list.filter(time__range=(start_datetime.time(), end_datetime.time()))
+            ext_table_list = ext_table_list.order_by('-pk')
+
+            paginator = Paginator(ext_table_list, 25)
+            page_number = request.GET.get('page')
+            try:
+                EXTpage = paginator.page(page_number)
+            except PageNotAnInteger:
+                EXTpage = paginator.page(1)
+            except EmptyPage:
+                EXTpage = paginator.page(paginator.num_pages)
+
+            ext_table_json = serializers.serialize('json', EXTpage)
+            
+        else:
+            ext_table_json = '{"error": "Please provide both deviceID and date parameters."}'
+
+        return HttpResponse(ext_table_json, content_type='application/json')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.path == '/updategpstable':
+            return self.updateGPSTable(request, *args, **kwargs)
+        elif request.path == '/updateexttable':
+            return self.updateEXTTable(request, *args, **kwargs)
+        elif request.path == '/reportpage/':
+            return self.report_page_view(request, *args, **kwargs)
+        elif request.path == '/listpage/':
+            return self.list_page_view(request, *args, **kwargs)
+        elif request.path == '/listpage/api/tracker-devices/':
+            return self.tracker_device_list(request, *args, **kwargs)
+        elif request.path == '/updateextdatetable':
+            return self.updateEXTTabledateView(request, *args, **kwargs)
+        else:
+            return super().dispatch(request, *args, **kwargs)
