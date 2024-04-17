@@ -412,6 +412,16 @@ class AllDeviceClass(View):
         else:
             return redirect('/')
         
+    def register_device(self ,request):
+        if request.method == 'POST':
+            form = TrackerDeviceForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('list_page') 
+        else:
+            form = TrackerDeviceForm()
+        return render(request, 'registration.html', {'form': form})
+        
     def tracker_device_list(self, request):
         devices = tracker_device.objects.all()
         data = [{'device_id': device.device_id, 'vehicle_name': device.vehicle_name, 'device_model': device.device_model,
@@ -419,6 +429,54 @@ class AllDeviceClass(View):
                 'manufacturer': device.manufacturer, 'hardware_version': device.hardware_version,
                 'software_version': device.software_version} for device in devices]
         return JsonResponse(data, safe=False)
+    
+    def historypage(self, request):
+        currentDeviceID = request.GET.get('deviceID', None)
+        if currentDeviceID is None:
+            return HttpResponse("DeviceID is missing in the request parameters", status=400)
+        
+        try:
+            deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+        except tracker_device.DoesNotExist:
+            return HttpResponse("DeviceID does not exist", status=404)
+        
+        return render(request, 'historypage.html', {'device': deviceObject})
+    
+    def get_gps_data_for_date(self, request):
+        if request.method == 'GET':
+            currentDeviceID = request.GET.get('deviceID')
+            selected_date_str = request.GET.get('date')
+            selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+            deviceObject = tracker_device.objects.get(device_id=currentDeviceID)
+            
+            start_time = datetime.combine(selected_date, time.min)
+            end_time = datetime.combine(selected_date, time.max)
+            
+            data2 = GPSData.objects.filter(device_id=deviceObject, date=selected_date, time__range=(start_time.time(), end_time.time())).order_by("time").values()
+            
+            last_gps_data = GPSData.objects.filter(device_id=deviceObject).order_by('-date', '-time')[:5]
+            
+            lastTime = datetime.strptime("00:00:00", "%H:%M:%S")
+            states = ["Inactive", "Idle", "Active", "Alert"]
+            currentState = 1
+            stateHr = [0, 0, 0, 0]
+            for gpsData in data2:
+                currentTime = datetime.strptime(str(gpsData["time"]), "%H:%M:%S")
+                differencesInSeconds = (currentTime - lastTime).total_seconds()
+                stateHr[currentState-1] += differencesInSeconds
+                currentState = gpsData["state"]
+                lastTime = currentTime
+            
+            res = [round(x / 3600, 2) for x in stateHr]
+            response_data = []
+
+            for n, item in enumerate(states):
+                response_data.append({
+                    'state': item,
+                    'duration': res[n]
+                })
+
+            return JsonResponse(response_data, safe=False)
 
     def updateEXTTabledateView(self, request):
         currentDeviceID = request.GET.get('deviceID')
@@ -451,6 +509,37 @@ class AllDeviceClass(View):
             ext_table_json = '{"error": "Please provide both deviceID and date parameters."}'
 
         return HttpResponse(ext_table_json, content_type='application/json')
+    
+    def updateGPSTabledateView(self, request):
+        currentDeviceID = request.GET.get('deviceID')
+        selected_date = request.GET.get('date')
+        start_time = request.GET.get('startTime')
+        end_time = request.GET.get('endTime')
+
+        if currentDeviceID is not None and selected_date is not None:
+            current_tracker_device = tracker_device.objects.get(device_id=currentDeviceID)
+            gps_table_list = GPSData.objects.filter(device_id=current_tracker_device, date=selected_date)
+
+            if start_time and end_time:
+                start_datetime = datetime.strptime(start_time, '%H:%M')
+                end_datetime = datetime.strptime(end_time, '%H:%M')
+                gps_table_list = gps_table_list.filter(time__range=(start_datetime.time(), end_datetime.time()))
+            gps_table_list = gps_table_list.order_by('-pk')
+
+            paginator = Paginator(gps_table_list, 25)
+            page_number = request.GET.get('page')
+            try:
+                GPSpage = paginator.page(page_number)
+            except PageNotAnInteger:
+                GPSpage = paginator.page(1)
+            except EmptyPage:
+                GPSpage = paginator.page(paginator.num_pages)
+
+            gps_table_json = serializers.serialize('json', GPSpage)
+        else:
+            gps_table_json = '{"error": "Please provide both deviceID and date parameters."}'
+
+        return HttpResponse(gps_table_json, content_type='application/json')
 
     def dispatch(self, request, *args, **kwargs):
         if request.path == '/updategpstable':
@@ -461,9 +550,17 @@ class AllDeviceClass(View):
             return self.report_page_view(request, *args, **kwargs)
         elif request.path == '/listpage/':
             return self.list_page_view(request, *args, **kwargs)
+        elif request.path == '/register/':
+            return self.register_device(request, *args, **kwargs)
         elif request.path == '/listpage/api/tracker-devices/':
             return self.tracker_device_list(request, *args, **kwargs)
+        elif request.path == '/historypage':
+            return self.historypage(request, *args, **kwargs)
+        elif request.path == '/get_gps_data_for_date/':
+            return self.get_gps_data_for_date(request, *args, **kwargs)
         elif request.path == '/updateextdatetable':
             return self.updateEXTTabledateView(request, *args, **kwargs)
+        elif request.path == '/updategpsdatetable':
+            return self.updateGPSTabledateView(request, *args, **kwargs)
         else:
             return super().dispatch(request, *args, **kwargs)
