@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import views, ext_data_list, gps_data_list, get_today_gps_data, get_gps_date_data,get_today_gps_date_data, gps_data_date_list,ext_data_date_list, get_utilization_date_hours, get_utilization_hours , get_gps_data, search_data, generate_pdf,generate_csv
+from .views import views,combined_data, ext_data_list, gps_data_list, get_today_gps_data, get_gps_date_data,get_today_gps_date_data, gps_data_date_list,ext_data_date_list, get_utilization_date_hours, get_utilization_hours , get_gps_data, search_data, generate_pdf,generate_csv
 
 urlpatterns = [
+    path('combined-data/', combined_data, name='combined_data'),
     path('ext-data/', ext_data_list, name='ext-data-list'),
     path('gps-data/', gps_data_list, name='gps-data-list'),
     path('api/get_last_data/', views.get_last_data, name='get_last_data'),

@@ -16,8 +16,29 @@ import random
 from datetime import datetime, date ,time ,timedelta
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.cache import cache_page
 
+@cache_page(5)
+def combined_data_view(request):
+    current_device_id = request.GET.get('deviceID')
 
+    if current_device_id:
+        current_tracker_device = tracker_device.objects.get(device_id=current_device_id)
+
+        gps_table_list = GPSData.objects.filter(device_id=current_tracker_device).filter(latitude__gt=0.0).order_by('-pk')[:10]
+        gps_table_json = serializers.serialize('json', gps_table_list)
+
+        ext_table_list = EXTData.objects.filter(device_id=current_tracker_device).order_by('-pk')[:10]
+        ext_table_json = serializers.serialize('json', ext_table_list)
+
+        combined_data = {
+            'gps_data': gps_table_json,
+            'ext_data': ext_table_json
+        }
+
+        return JsonResponse(combined_data)
+    else:
+        return JsonResponse({'error': 'Device ID not provided'}, status=400)
 
 def loginView(request):
   

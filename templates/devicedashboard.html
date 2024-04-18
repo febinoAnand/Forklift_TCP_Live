@@ -823,253 +823,221 @@ function fetchDataAndUpdateMap() {
     <script>
       var deviceID = document.getElementById("currentdeviceID").innerText;
       $(document).ready(function () {
-        let lastEXTData = { 
-          movementState: true 
-        };
-        let isVehicleMovingOrNot = false;
-        function updateExtData() {
-          $.ajax({
-            url: "ext-data/?deviceID="+deviceID,
-            type: "GET",
-            success: function (data) {
-              // $('#ext-data-table').html(JSON.stringify(data));
-             // console.log("Received DAta -> ", data);
-             let datacount = data.length;
-        console.log(data[datacount - 1]);
-        
-        let lastEXTData = data[datacount - 1];
-
-        if (lastEXTData["batt_voltage"]) {
-            $('#battery_voltage').text(lastEXTData.batt_voltage);
-        }
-        if (lastEXTData["batt_amp"]) {
-            $('#battery_amps').text(lastEXTData.batt_amp);
-        }
-        if (lastEXTData["watt_hr"]) {
-            $('#watt_hour').text(lastEXTData.watt_hr);
-        }
-        if (lastEXTData["speed"]) {
-            $('#ext_speed').text(lastEXTData.speed +"Km/Hr" );
-        }
-        if (lastEXTData["batt_power"]) {
-            $('#battery_power').text(lastEXTData.batt_power + "Watt");
-        }
-        if (lastEXTData["batt_capacity"]) {
-            $('#battery_capacity').text(lastEXTData.batt_capacity);
-        }
-        let extSpeed = lastEXTData["speed"];
-        let movementState = (extSpeed > 0) ? "Moving" : "Not Moving";
-        isVehicleMovingOrNot = (extSpeed > 0) ? true : false;
-        $('#movementState_view').text(movementState);
+          let isVehicleMovingOrNot = false;
   
-    },
-    error: function (xhr, textStatus, errorThrown) {
-        console.log("Error:", errorThrown);
-            },
-          });
-        }
-function updateGpsData() {
-    $.ajax({
-        url: "gps-data/?deviceID="+deviceID,
-        type: "GET",
-        success: function(data) {
-            let datacount = data.length;
-            let lastGPSData = data[datacount - 1];
-
-            if (lastGPSData["ignition"]) {
-                $('#ignition_state').text("ON");
-            } else {
-                $('#ignition_state').text("OFF");
-            }
-
-            if (lastGPSData["ignition"] && isVehicleMovingOrNot) {
-                if ($('#status_view').text() != "Active") {
-                    $('#status_view').text("Active");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status active-1");
-                }
-            } else if (lastGPSData["ignition"] && !isVehicleMovingOrNot) {
-                if ($('#status_view').text() != "Idle") {
-                    $('#status_view').text("Idle");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status idle");
-                }
-            } else if (!lastGPSData["ignition"] && !isVehicleMovingOrNot) {
-                if ($('#status_view').text() != "Inactive") {
-                    $('#status_view').text("Inactive");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status inactive");
-                }
-            } else {
-                if ($('#status_view').text() != "Alert") {
-                    $('#status_view').text("Alert");
-                    $('#status_view').removeClass();
-                    $('#status_view').addClass("status alert");
-                }
-            }
-
-        // if (lastGPSData["ignition"]) {
-        //   if (lastGPSData["movementState"]) {
-        //       $('#status_view').text("Active").removeClass("inactive").addClass("active");
-        //   } else {
-        //      $('#status_view').text("Idle").removeClass("inactive").addClass("idle");
-        //   }
-        // } else {
-        //     $('#status_view').text("Inactive").removeClass("active idle").addClass("inactive");
-        // }
-
-        if (lastGPSData["gsmOperatorCode"]) {
-            $('#gsm_operator').text(lastGPSData.gsmOperatorCode);
-        }
-
-        if (lastGPSData["gsmSignal"]) {
-            $('#gsm_signal').text(lastGPSData.gsmSignal);
-        }
-
-        if (lastGPSData["gsmAreaCode"]) {
-            $('#gsm_area').text(lastGPSData.gsmAreaCode);
-        }
-
-        if (lastGPSData["speed"]) {
-            $('#gps_speed').text( lastGPSData.speed + ' Km/Hr');
-        }
-
-        if (lastGPSData["time"]) {
-            $('#gps_time').text('Current Time: ' + lastGPSData.time);
-        }
-
-        if (lastGPSData["satellite"]) {
-            $('#satellite_connect').text(lastGPSData.satellite);
-        }
-
-        if (lastGPSData["latitude"]) {
-            $('#latitude_view').text(lastGPSData.latitude);
-        }
-
-        if (lastGPSData["longitude"]) {
-            $('#longitude_view').text(lastGPSData.longitude);
-        }
-
-    },
-    error: function (xhr, textStatus, errorThrown) {
-        console.log("Error:", errorThrown);
-    }
-});
-        }
-        updateGpsData();
-        updateExtData();
-
-        setInterval(function () {
-          updateGpsData();
-          updateExtData();
-        }, 5000);
-      });
-    </script>
-     
-    <script>
-      
-      $(document).ready(function () {
-          function updateExtData() {
+          function updateExtData(data) {
+            console.log(data);
+              let lastEXTData = data.ext_data[data.ext_data.length - 1];
+              if (lastEXTData) {
+                  if (lastEXTData["batt_voltage"]) {
+                      $('#battery_voltage').text(lastEXTData.batt_voltage);
+                  }
+                  if (lastEXTData["batt_amp"]) {
+                      $('#battery_amps').text(lastEXTData.batt_amp);
+                  }
+                  if (lastEXTData["watt_hr"]) {
+                      $('#watt_hour').text(lastEXTData.watt_hr);
+                  }
+                  if (lastEXTData["speed"]) {
+                      $('#ext_speed').text(lastEXTData.speed + " Km/Hr");
+                  }
+                  if (lastEXTData["batt_power"]) {
+                      $('#battery_power').text(lastEXTData.batt_power + " Watt");
+                  }
+                  if (lastEXTData["batt_capacity"]) {
+                      $('#battery_capacity').text(lastEXTData.batt_capacity);
+                  }
+                  let extSpeed = lastEXTData["speed"];
+                  let movementState = (extSpeed > 0) ? "Moving" : "Not Moving";
+                  isVehicleMovingOrNot = (extSpeed > 0);
+                  $('#movementState_view').text(movementState);
+              }
+          }
+  
+          function updateGpsData(data) {
+              let lastGPSData = data.gps_data[data.gps_data.length - 1];
+              if (lastGPSData) {
+                  if (lastGPSData["ignition"]) {
+                      $('#ignition_state').text("ON");
+                  } else {
+                      $('#ignition_state').text("OFF");
+                  }
+                  if (lastGPSData["gsmOperatorCode"]) {
+                      $('#gsm_operator').text(lastGPSData.gsmOperatorCode);
+                  }
+                  if (lastGPSData["gsmSignal"]) {
+                      $('#gsm_signal').text(lastGPSData.gsmSignal);
+                  }
+                  if (lastGPSData["gsmAreaCode"]) {
+                      $('#gsm_area').text(lastGPSData.gsmAreaCode);
+                  }
+                  if (lastGPSData["speed"]) {
+                      $('#gps_speed').text(lastGPSData.speed + " Km/Hr");
+                  }
+                  if (lastGPSData["time"]) {
+                      $('#gps_time').text('Current Time: ' + lastGPSData.time);
+                  }
+                  if (lastGPSData["satellite"]) {
+                      $('#satellite_connect').text(lastGPSData.satellite);
+                  }
+                  if (lastGPSData["latitude"]) {
+                      $('#latitude_view').text(lastGPSData.latitude);
+                  }
+                  if (lastGPSData["longitude"]) {
+                      $('#longitude_view').text(lastGPSData.longitude);
+                  }
+                  if (lastGPSData["ignition"]) {
+                      if (isVehicleMovingOrNot) {
+                          $('#status_view').text("Active").removeClass().addClass("status active-1");
+                      } else {
+                          $('#status_view').text("Idle").removeClass().addClass("status idle");
+                      }
+                  } else {
+                      $('#status_view').text("Inactive").removeClass().addClass("status inactive");
+                  }
+              }
+          }
+  
+          function fetchDataAndUpdate() {
               $.ajax({
-                  url: "ext-data/?deviceID="+deviceID,
+                  url: "combined-data/?deviceID=" + deviceID,
                   type: "GET",
                   success: function (data) {
-                      let datacount = data.length;
-                      let lastEXTData = data[datacount - 1];
-                      if (lastEXTData["batt_capacity"]) {
-                          let batt_capacity = lastEXTData.batt_capacity;
-                          updateBatteryBar(batt_capacity);
-                      }
+                      updateExtData(data);
+                      updateGpsData(data);
                   },
                   error: function (xhr, textStatus, errorThrown) {
                       console.log("Error:", errorThrown);
-                  },
+                  }
               });
           }
-
-          function updateBatteryBar(batt_capacity) {
-              let widthPercentage = (batt_capacity / 5) * 100;
-              $('#battery_capacity').css('width', widthPercentage + '%');
-          }
-          updateExtData();
-          setInterval(updateExtData, 5000);
+  
+          fetchDataAndUpdate();
+          setInterval(fetchDataAndUpdate, 5000);
       });
+  </script>  
+<script>
+  $(document).ready(function () {
+      function updateExtData() {
+          $.ajax({
+              url: "combined-data/?deviceID="+deviceID,
+              type: "GET",
+              success: function (data) {
+                  if (data && data.ext_data && data.ext_data.length > 0) {
+                      let lastEXTData = data.ext_data[data.ext_data.length - 1];
+                      if (lastEXTData && lastEXTData["batt_capacity"]) {
+                          let batt_capacity = lastEXTData.batt_capacity;
+                          updateBatteryBar(batt_capacity);
+                      }
+                  } else {
+                      console.log("No ext data available.");
+                  }
+              },
+              error: function (xhr, textStatus, errorThrown) {
+                  console.log("Error:", errorThrown);
+              },
+          });
+      }
+
+      function updateBatteryBar(batt_capacity) {
+          let widthPercentage = (batt_capacity / 5) * 100;
+          $('#battery_capacity').css('width', widthPercentage + '%');
+      }
+      
+      updateExtData();
+      setInterval(updateExtData, 5000);
+  });
 </script>
 <script>
-   document.addEventListener("DOMContentLoaded", function() {
-    function updateGauge() {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', "gps-data/?deviceID=" + deviceID, true);
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            var datacount = data.length;
-            var lastGPSData = data[datacount - 1];
-            //console.log(lastGPSData.speed);
-            document.getElementById('gps-data-conta').style.setProperty('--rotation', (lastGPSData.speed / 25 * 180) + 'deg');
-          } else {
-            console.log('Error:', xhr.statusText);
-          }
-        }
-      };
-      xhr.send();
-    }
-
-    updateGauge();
-    setInterval(updateGauge, 5000);
+  document.addEventListener("DOMContentLoaded", function() {
+      var deviceID = document.getElementById("currentdeviceID").innerText;
+  
+      function updateGauge() {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', "combined-data/?deviceID=" + deviceID, true);
+          xhr.onreadystatechange = function() {
+              if (xhr.readyState === 4) {
+                  if (xhr.status === 200) {
+                      var data = JSON.parse(xhr.responseText);
+                      if (data && data.gps_data && data.gps_data.length > 0) {
+                          var lastGPSData = data.gps_data[data.gps_data.length - 1];
+                          if (lastGPSData && lastGPSData.speed !== undefined) {
+                              document.getElementById('gps-data-conta').style.setProperty('--rotation', (lastGPSData.speed / 25 * 180) + 'deg');
+                          } else {
+                              console.log('Speed data not found.');
+                          }
+                      } else {
+                          console.log('GPS data not found.');
+                      }
+                  } else {
+                      console.log('Error:', xhr.statusText);
+                  }
+              }
+          };
+          xhr.send();
+      }
+  
+      updateGauge();
+      setInterval(updateGauge, 5000);
   });
-  </script>
+</script>
 <script>
 function updateGauge() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', "ext-data/?deviceID=" + deviceID, true);
+    xhr.open('GET', "combined-data/?deviceID=" + deviceID, true);
     xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          var data = JSON.parse(xhr.responseText);
-          var datacount = data.length;
-          var lastEXTData = data[datacount - 1];
-          //console.log(lastEXTData.speed);
-          //console.log(lastEXTData.batt_power);
-          document.getElementById('ext-data-conta').style.setProperty('--rotation', (lastEXTData.speed / 25 * 180) + 'deg');
-          document.getElementById('ext_batt').style.setProperty('--rotation', (lastEXTData.batt_power / 10000 * 180) + 'deg');
-        } else {
-          console.log('Error:', xhr.statusText);
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                var extData = data.ext_data;
+                if (extData && extData.length > 0) {
+                    var lastEXTData = extData[extData.length - 1];
+                    if (lastEXTData.speed !== undefined && lastEXTData.batt_power !== undefined) {
+                        document.getElementById('ext-data-conta').style.setProperty('--rotation', (lastEXTData.speed / 25 * 180) + 'deg');
+                        document.getElementById('ext_batt').style.setProperty('--rotation', (lastEXTData.batt_power / 10000 * 180) + 'deg');
+                    } else {
+                        console.log("Speed or battery power data is undefined.");
+                    }
+                } else {
+                    console.log("No EXT data available.");
+                }
+            } else {
+                console.log('Error:', xhr.statusText);
+            }
         }
-      }
     };
     xhr.send();
-  }
+}
 
-  updateGauge();
-  setInterval(updateGauge, 5000);
+updateGauge();
+setInterval(updateGauge, 5000);
 </script>
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
       let topSpeed = 0;
 
       function updateTopSpeed() {
           $.ajax({
-              url: "gps-data/?deviceID=" + deviceID,
+              url: "combined-data/?deviceID=" + deviceID,
               type: 'GET',
-              success: function(data) {
-                  let newTopSpeed = calculateTopSpeed(data);
+              success: function (data) {
+                  let gpsData = data.gps_data;
+                  let newTopSpeed = calculateTopSpeed(gpsData);
                   if (newTopSpeed > topSpeed) {
                       topSpeed = newTopSpeed;
                       $('#top-speed').text(topSpeed + " Km/Hr");
                   }
               },
-              error: function(xhr, textStatus, errorThrown) {
+              error: function (xhr, textStatus, errorThrown) {
                   console.log('Error:', errorThrown);
               }
           });
       }
 
-      function calculateTopSpeed(data) {
+      function calculateTopSpeed(gpsData) {
           let maxSpeed = 0;
-          for (let i = 0; i < data.length; i++) {
-              let speed = data[i].speed;
+          for (let i = 0; i < gpsData.length; i++) {
+              let speed = gpsData[i].speed;
               if (speed > maxSpeed) {
                   maxSpeed = speed;
               }

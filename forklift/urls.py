@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import loginView, deviceDashborad, historypage,get_gps_data_for_date, get_state_data, updateGPSTabledateView,updateEXTTabledateView , updateGPSTableView,updateEXTTableView, report_page_view, register_device ,list_page_view, tracker_device_list,logoutView
+from .views import loginView,combined_data_view, deviceDashborad, historypage,get_gps_data_for_date, get_state_data, updateGPSTabledateView,updateEXTTabledateView , updateGPSTableView,updateEXTTableView, report_page_view, register_device ,list_page_view, tracker_device_list,logoutView
 
 
 urlpatterns = [
+    path('combined-data-view/', combined_data_view, name='combined_data_view'),
     path('',loginView, name='login'),
     path('login',loginView, name='login'),
     path('devicedashboard',deviceDashborad, name='device_dashboard'),

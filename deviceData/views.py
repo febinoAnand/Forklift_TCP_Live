@@ -20,6 +20,38 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle,  Paragraph, Spacer
 from forklift.models import tracker_device
+from django.views import View
+from django.core.serializers import serialize
+from django.views.decorators.cache import cache_page
+
+@cache_page(5)
+def combined_data(request):
+    if request.method == 'GET':
+        currentDeviceID = request.GET.get('deviceID')
+
+        ext_data_response = ext_data_list(request) if currentDeviceID else None
+        gps_data_response = gps_data_list(request) if currentDeviceID else None
+        last_data_response = get_last_data(request) if currentDeviceID else None
+        today_gps_data_response = get_today_gps_data(request) if currentDeviceID else None
+        utilization_hours_response = get_utilization_hours(request) if currentDeviceID else None
+
+        ext_data = json.loads(ext_data_response.content) if ext_data_response else None
+        gps_data = json.loads(gps_data_response.content) if gps_data_response else None
+        last_data = json.loads(last_data_response.content) if last_data_response else None
+        today_gps_data = json.loads(today_gps_data_response.content) if today_gps_data_response else None
+        utilization_hours = json.loads(utilization_hours_response.content) if utilization_hours_response else None
+
+        combined_data = {
+            'ext_data': ext_data,
+            'gps_data': gps_data,
+            'last_data': last_data,
+            'today_gps_data': today_gps_data,
+            'utilization_hours': utilization_hours,
+        }
+
+        return JsonResponse(combined_data, safe=False)
+
+    
 
 def ext_data_list(request):
    
@@ -241,9 +273,8 @@ def generate_pdf(request):
     from_date = datetime.strptime(request.GET.get('fromDate'), '%Y-%m-%d').date()
     to_date = datetime.strptime(request.GET.get('toDate'), '%Y-%m-%d').date()
     utilization_hours = get_utilization_hours_for_report(currentDeviceID, from_date, to_date)
-    all_dates = set(GPSData.objects.filter(device_id=deviceObject).values_list('date', flat=True)) | \
-                set(EXTData.objects.filter(device_id=deviceObject).values_list('date', flat=True))
-    ext_data = EXTData.objects.filter(device_id=deviceObject)
+    gps_data = GPSData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
+    ext_data = EXTData.objects.filter(device_id=deviceObject, date__range=[from_date, to_date])
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Forklift.pdf"'
     pdf = SimpleDocTemplate(response, pagesize=letter)
@@ -258,13 +289,10 @@ def generate_pdf(request):
     content.append(Spacer(1, 0.5 * inch))
     table_data = [['Date', 'GPS Distance', 'ODOMETER Distance', 'Watt HR', 'Utilization Hours']]
 
-    for date in all_dates:
-        gps_entry = GPSData.objects.filter(device_id=deviceObject, date=date).first()
-        ext_entry = ext_data.filter(date=date).first()
-
-        gps_distance = gps_entry.distance if gps_entry else "N/A"
-        ext_distance = ext_entry.distance if ext_entry else "N/A"
-        watt_hr = ext_entry.watt_hr if ext_entry else "N/A"
+    for date in set(gps_data.values_list('date', flat=True)) | set(ext_data.values_list('date', flat=True)):
+        gps_distance = gps_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+        ext_distance = ext_data.filter(date=date).aggregate(Sum('distance'))['distance__sum'] or 0
+        watt_hr = ext_data.filter(date=date).aggregate(Sum('watt_hr'))['watt_hr__sum'] or 0
 
         active_hours = utilization_hours.get(date.strftime('%A'), {}).get('Active', 0)
         inactive_hours = utilization_hours.get(date.strftime('%A'), {}).get('Inactive', 0)
