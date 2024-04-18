@@ -887,14 +887,34 @@ function fetchDataAndUpdateMap() {
                       $('#longitude_view').text(lastGPSData.longitude);
                   }
                   if (lastGPSData["ignition"]) {
-                      if (isVehicleMovingOrNot) {
-                          $('#status_view').text("Active").removeClass().addClass("status active-1");
-                      } else {
-                          $('#status_view').text("Idle").removeClass().addClass("status idle");
-                      }
-                  } else {
-                      $('#status_view').text("Inactive").removeClass().addClass("status inactive");
-                  }
+                    if (isVehicleMovingOrNot) {
+                        if ($('#status_view').text() != "Active") {
+                            $('#status_view').text("Active");
+                            $('#status_view').removeClass();
+                            $('#status_view').addClass("status active-1");
+                        }
+                    } else {
+                        if ($('#status_view').text() != "Idle") {
+                            $('#status_view').text("Idle");
+                            $('#status_view').removeClass();
+                            $('#status_view').addClass("status idle");
+                        }
+                    }
+                } else {
+                    if (!isVehicleMovingOrNot) {
+                        if ($('#status_view').text() != "Inactive") {
+                            $('#status_view').text("Inactive");
+                            $('#status_view').removeClass();
+                            $('#status_view').addClass("status inactive");
+                        }
+                    } else {
+                        if ($('#status_view').text() != "Alert") {
+                            $('#status_view').text("Alert");
+                            $('#status_view').removeClass();
+                            $('#status_view').addClass("status alert");
+                        }
+                    }
+                }
               }
           }
   
